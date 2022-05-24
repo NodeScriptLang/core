@@ -1,4 +1,4 @@
-import { GraphEvalContext } from "./context.ts";
+import { GraphEvalContext } from './context.ts';
 import { DataSchema } from './data.ts';
 
 /**
@@ -71,7 +71,7 @@ export type ParamMetadata = {
     kind?: 'lambda';
     schema: DataSchema;
     scope?: Record<string, DataSchema>;
-    default?: unknown;
+    default?: string;
     label?: string;
     addItemLabel?: string;
     removeItemLabel?: string;

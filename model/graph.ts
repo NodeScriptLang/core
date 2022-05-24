@@ -1,6 +1,6 @@
 import { DeepPartial } from '@airtight';
-import { serialize } from "~/util/serialize.ts";
-import { MultiMap } from "~/util/multimap.ts";
+import { serialize } from '~/util/serialize.ts';
+import { MultiMap } from '~/util/multimap.ts';
 import { GraphSchema } from '~/schema/graph.ts';
 import * as t from '~/types/mod.ts';
 

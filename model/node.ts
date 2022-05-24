@@ -1,8 +1,8 @@
 import { DeepPartial } from '@airtight';
 import * as t from '~/types/mod.ts';
-import { serialize } from "~/util/serialize.ts";
+import { serialize } from '~/util/serialize.ts';
 import { NodeSchema } from '~/schema/node.ts';
-import { Point } from "~/util/point.ts";
+import { Point } from '~/util/point.ts';
 import { clamp } from '~/util/clamp.ts';
 
 import { Graph } from './graph.ts';

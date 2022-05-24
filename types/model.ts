@@ -1,5 +1,5 @@
-import { DataSchema } from "./data.ts";
-import { NodeMetadata, ParamMetadata } from "./defs.ts";
+import { DataSchema } from './data.ts';
+import { NodeMetadata, ParamMetadata } from './defs.ts';
 
 export interface Graph extends NodeMetadata {
     label: string;

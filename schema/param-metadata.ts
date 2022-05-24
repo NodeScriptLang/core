@@ -24,7 +24,8 @@ export const ParamMetadataSchema = new Schema<t.ParamMetadata>({
             optional: true,
         },
         default: {
-            type: 'any',
+            type: 'string',
+            optional: true,
         },
         addItemLabel: {
             type: 'string',
