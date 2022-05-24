@@ -1,0 +1,7 @@
+{
+    "imports": {
+        "@airtight": "https://esm.sh/airtight",
+        "@nanoid": "https://deno.land/x/nanoid/mod.ts",
+        "~/": "./"
+    }
+}
