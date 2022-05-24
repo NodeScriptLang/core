@@ -1,10 +1,10 @@
-import { Schema } from '@airtight';
-import * as t from '~/types/mod.ts';
-import { IdSchema } from '~/util/id.ts';
+import { Schema } from 'airtight';
+import * as t from '../types/index.js';
+import { IdSchema } from '../util/id.js';
 
-import { DataSchemaSchema } from './data-schema.ts';
-import { NodeSchema } from './node.ts';
-import { ParamMetadataSchema } from './param-metadata.ts';
+import { DataSchemaSchema } from './data-schema.js';
+import { NodeSchema } from './node.js';
+import { ParamMetadataSchema } from './param-metadata.js';
 
 export const GraphSchema = new Schema<t.Graph>({
     id: 'Graph',

@@ -1,4 +1,4 @@
-import { getType } from './type.ts';
+import { getType } from './type.js';
 
 export function capitalizeWords(str: string) {
     return str.replace(/\b([a-zA-Z])/g, (_, letter) => letter.toUpperCase());

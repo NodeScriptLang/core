@@ -1,4 +1,4 @@
-import { Schema } from '@airtight';
+import { Schema } from 'airtight';
 
 export type Point = { x: number; y: number };
 

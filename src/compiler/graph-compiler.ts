@@ -1,10 +1,8 @@
-import { Graph, Node, Prop } from '~/model/mod.ts';
-import * as t from '~/types/mod.ts';
-import { NotFoundError } from '~/util/errors.ts'
-import { MultiMap } from '~/util/multimap.ts';
-import { isSchemaCompatible } from '~/util/type.ts';
+import { Graph, Node, Prop } from '../model/index.js';
+import * as t from '../types/index.js';
+import { NotFoundError, MultiMap, isSchemaCompatible } from '../util/index.js'
 
-import { CodeBuilder } from './code.ts';
+import { CodeBuilder } from './code.js';
 
 const AsyncFunction = Object.getPrototypeOf(async () => {}).constructor;
 

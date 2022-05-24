@@ -1,5 +1,5 @@
-import { Schema } from '@airtight';
-import * as t from '~/types/mod.ts';
+import { Schema } from 'airtight';
+import * as t from '../types/index.js';
 
 export const DataSchemaSchema = new Schema<t.DataSchemaSpec>({
     id: 'DataSchema',

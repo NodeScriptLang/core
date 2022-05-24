@@ -1,5 +1,5 @@
-import { Schema } from '@airtight';
-import * as t from '~/types/mod.ts';
+import { Schema } from 'airtight';
+import * as t from '../types/index.js';
 
 export const NodeResultSchema = new Schema<t.NodeResult>({
     type: 'object',

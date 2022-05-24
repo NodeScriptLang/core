@@ -1,5 +1,5 @@
-import { Event } from './event.ts';
-import { NodeResult } from './node-result.ts';
+import { Event } from './event.js';
+import { NodeResult } from './node-result.js';
 
 export interface GraphEvalContext {
     nodeEvaluated: Event<NodeResult>;

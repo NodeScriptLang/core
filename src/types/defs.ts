@@ -1,5 +1,5 @@
-import { GraphEvalContext } from './context.ts';
-import { DataSchema } from './data.ts';
+import { GraphEvalContext } from './context.js';
+import { DataSchema } from './data.js';
 
 /**
  * These fields are optional when you define them in TypeScript.

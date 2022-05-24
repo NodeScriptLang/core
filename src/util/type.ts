@@ -1,4 +1,4 @@
-import { DataType, DataSchema } from '~/types/data.ts';
+import { DataType, DataSchema } from '../types/data.js';
 
 export function parseAny(str: string) {
     const s = String(str ?? '').trim();

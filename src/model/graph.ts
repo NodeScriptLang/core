@@ -1,10 +1,9 @@
-import { DeepPartial } from '@airtight';
-import { serialize } from '~/util/serialize.ts';
-import { MultiMap } from '~/util/multimap.ts';
-import { GraphSchema } from '~/schema/graph.ts';
-import * as t from '~/types/mod.ts';
+import { DeepPartial } from 'airtight';
+import { serialize, MultiMap } from '../util/index.js';
+import { GraphSchema } from '../schema/index.js';
+import * as t from '../types/index.js';
 
-import { Node, NodeLink } from './node.ts';
+import { Node, NodeLink } from './node.js';
 
 export class Graph implements t.Graph {
 

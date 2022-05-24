@@ -1,7 +1,7 @@
-import { Schema } from '@airtight';
-import * as t from '~/types/mod.ts';
+import { Schema } from 'airtight';
+import * as t from '../types/index.js';
 
-import { DataSchemaSchema } from './data-schema.ts';
+import { DataSchemaSchema } from './data-schema.js';
 
 export const ParamMetadataSchema = new Schema<t.ParamMetadata>({
     id: 'ParamDef',

@@ -1,12 +1,12 @@
-import { DeepPartial } from '@airtight';
-import * as t from '~/types/mod.ts';
-import { serialize } from '~/util/serialize.ts';
-import { NodeSchema } from '~/schema/node.ts';
-import { Point } from '~/util/point.ts';
-import { clamp } from '~/util/clamp.ts';
+import { DeepPartial } from 'airtight';
+import * as t from '../types/index.js';
+import { serialize } from '../util/serialize.js';
+import { NodeSchema } from '../schema/node.js';
+import { Point } from '../util/point.js';
+import { clamp } from '../util/clamp.js';
 
-import { Graph } from './graph.ts';
-import { Prop } from './prop.ts';
+import { Graph } from './graph.js';
+import { Prop } from './prop.js';
 
 export type NodeLink = {
     node: Node;

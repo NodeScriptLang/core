@@ -1,8 +1,18 @@
 {
-    "deno.enable": true,
-    "deno.lint": true,
-    "deno.unstable": true,
-    "deno.importMap": "./import_map.json",
-    "deno.config": "./deno.json",
-    "javascript.suggest.includeCompletionsForImportStatements": true
+    // "deno.enable": true,
+    // "deno.lint": true,
+    // "deno.unstable": true,
+    // "deno.importMap": "./import_map.json",
+    // "deno.config": "./deno.json",
+    // "javascript.suggest.includeCompletionsForImportStatements": true
+    "files.exclude": {
+        "**/node_modules": true,
+        "**/out": false,
+        "**/dist": true,
+        "**/*.tsbuildinfo": true,
+    },
+    "files.associations": {
+        "*.css": "scss"
+    },
+    "deno.enable": false,
 }

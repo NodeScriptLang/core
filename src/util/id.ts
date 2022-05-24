@@ -1,5 +1,5 @@
-import { Schema } from '@airtight';
-import { customAlphabet, nanoid } from '@nanoid';
+import { Schema } from 'airtight';
+import { customAlphabet, nanoid } from 'nanoid';
 
 const safeAlphabet = 'abcdefghijklmnopqrstuvwxyz0123456789';
 

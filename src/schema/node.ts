@@ -1,9 +1,9 @@
-import { Schema } from '@airtight';
-import * as t from '~/types/mod.ts';
-import { IdSchema, shortId } from '~/util/id.ts';
-import { PointSchema } from '~/util/point.ts';
+import { Schema } from 'airtight';
+import * as t from '../types/index.js';
+import { IdSchema, shortId } from '../util/id.js';
+import { PointSchema } from '../util/point.js';
 
-import { PropSchema } from './prop.ts';
+import { PropSchema } from './prop.js';
 
 export const NodeSchema = new Schema<t.Node>({
     id: 'Node',
