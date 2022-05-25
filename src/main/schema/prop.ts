@@ -1,6 +1,7 @@
 import { Schema } from 'airtight';
-import { IdSchema, shortId } from '../util/id.js';
+
 import * as t from '../types/index.js';
+import { IdSchema, shortId } from '../util/id.js';
 
 export const PropSchema = new Schema<t.Prop>({
     id: 'Prop',

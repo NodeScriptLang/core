@@ -1,8 +1,8 @@
 import { DeepPartial } from 'airtight';
-import { serialize, MultiMap } from '../util/index.js';
+
 import { GraphSchema } from '../schema/index.js';
 import * as t from '../types/index.js';
-
+import { MultiMap, serialize } from '../util/index.js';
 import { Node, NodeLink } from './node.js';
 
 export class Graph implements t.Graph {

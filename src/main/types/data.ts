@@ -21,7 +21,7 @@ export type DataSchemaSpec = {
     };
     additionalProperties?: DataSchemaSpec;
     items?: DataSchemaSpec;
-}
+};
 
 export type UnknownDataSchema =
     StringDataSchema |

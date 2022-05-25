@@ -1,6 +1,4 @@
 {
-    // See also:
-    // - https: //2ality.com/2021/06/typescript-esm-nodejs.html
     "compilerOptions": {
         "module": "ES2020",
         "moduleResolution": "node",

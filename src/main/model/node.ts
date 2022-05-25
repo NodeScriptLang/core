@@ -1,10 +1,10 @@
 import { DeepPartial } from 'airtight';
-import * as t from '../types/index.js';
-import { serialize } from '../util/serialize.js';
-import { NodeSchema } from '../schema/node.js';
-import { Point } from '../util/point.js';
-import { clamp } from '../util/clamp.js';
 
+import { NodeSchema } from '../schema/node.js';
+import * as t from '../types/index.js';
+import { clamp } from '../util/clamp.js';
+import { Point } from '../util/point.js';
+import { serialize } from '../util/serialize.js';
 import { Graph } from './graph.js';
 import { Prop } from './prop.js';
 

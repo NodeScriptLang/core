@@ -1,4 +1,4 @@
-import { GraphEvalContext } from './context.js';
+import { GraphEvalContext } from './ctx.js';
 import { DataSchema } from './data.js';
 
 /**
@@ -20,14 +20,14 @@ export type NodeMetadata = {
     ref: string;
     params: Record<string, ParamDef>;
     returns: DataSchema<unknown>;
-    compute?: (...args: unknown[]) => unknown;
+    compute?: (...args: any[]) => unknown;
 } & NodeDescription;
 
 /**
  * The type used when defining nodes in TypeScript.
  * Type parameters correspond to params (P) and return value (R).
  */
-export type NodeDef<P = unknown, R = unknown> = {
+export type NodeDef<P = any, R = any> = {
     ref: string;
     params: ParamDefs<P>;
     returns: DataSchema<R>;

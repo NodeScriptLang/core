@@ -1,0 +1,7 @@
+{
+    "extends": [
+        "@ubio/eslint-config"
+    ],
+    "rules": {
+    }
+}

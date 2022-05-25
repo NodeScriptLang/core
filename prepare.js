@@ -1,12 +1,12 @@
+import glob from 'glob';
 import fs from 'node:fs';
 import path from 'node:path';
-import glob from 'glob';
 
-generateIndexes('./types');
-generateIndexes('./util');
-generateIndexes('./schema');
-generateIndexes('./model');
-generateIndexes('./compiler');
+generateIndexes('./src/main/types');
+generateIndexes('./src/main/util');
+generateIndexes('./src/main/schema');
+generateIndexes('./src/main/model');
+generateIndexes('./src/main/runtime');
 
 function generateIndexes(dir) {
     dir = path.join(process.cwd(), dir);

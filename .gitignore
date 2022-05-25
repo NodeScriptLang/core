@@ -9,7 +9,6 @@ yarn.lock
 !.env.test
 
 out/
-dist/
 .tmp*
 _dev
 _archive/

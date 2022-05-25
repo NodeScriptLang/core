@@ -1,7 +1,7 @@
 import { Schema } from 'airtight';
+
 import * as t from '../types/index.js';
 import { IdSchema } from '../util/id.js';
-
 import { DataSchemaSchema } from './data-schema.js';
 import { NodeSchema } from './node.js';
 import { ParamMetadataSchema } from './param-metadata.js';

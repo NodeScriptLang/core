@@ -1,7 +1,6 @@
 import { Graph, Node, Prop } from '../model/index.js';
 import * as t from '../types/index.js';
-import { NotFoundError, MultiMap, isSchemaCompatible } from '../util/index.js'
-
+import { isSchemaCompatible, MultiMap, NotFoundError } from '../util/index.js';
 import { CodeBuilder } from './code.js';
 
 const AsyncFunction = Object.getPrototypeOf(async () => {}).constructor;

@@ -1,10 +1,9 @@
 import { DeepPartial } from 'airtight';
 
-import * as t from '../types/index.js';
-import { humanize } from '../util/string.js';
-import { serialize } from '../util/serialize.js';
 import { PropSchema } from '../schema/prop.js';
-
+import * as t from '../types/index.js';
+import { serialize } from '../util/serialize.js';
+import { humanize } from '../util/string.js';
 import { Node } from './node.js';
 
 export type PropParent = Node | Prop;
