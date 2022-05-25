@@ -1,6 +1,6 @@
 {
     "name": "nodescript",
-    "version": "0.0.0",
+    "version": "0.0.1",
     "type": "module",
     "description": "Visual programming language for Browser and Node",
     "exports": {
