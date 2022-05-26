@@ -6,6 +6,7 @@ generateIndexes('./src/main/types');
 generateIndexes('./src/main/util');
 generateIndexes('./src/main/schema');
 generateIndexes('./src/main/model');
+generateIndexes('./src/main/nodes');
 generateIndexes('./src/main/runtime');
 
 function generateIndexes(dir) {

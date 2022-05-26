@@ -8,11 +8,6 @@ export function humanize(str: string) {
     return capitalizeWords(str.replace(/([A-Z])/g, ` $1`).trim());
 }
 
-export function createDefaultLabel(str: string) {
-    const lastComponent = str.split(/[.:]/).pop() + '';
-    return humanize(lastComponent);
-}
-
 export function abbreviate(val: any) {
     switch (getType(val)) {
         case 'object':

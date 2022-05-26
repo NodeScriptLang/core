@@ -9,7 +9,6 @@ export class Graph implements t.Graph {
 
     static schema = GraphSchema;
 
-    ref!: string;
     label!: string;
     category!: string[];
     description!: string;
@@ -18,12 +17,12 @@ export class Graph implements t.Graph {
     rootNodeId!: string;
     params: Record<string, t.ParamMetadata> = {};
     returns: t.DataSchema<any> = { type: 'any' };
-
     nodes: Node[];
+    refs: Record<string, string> = {};
 
     protected $nodeMap = new Map<string, Node>();
 
-    constructor(readonly $resolver: t.NodeResolver, spec: DeepPartial<t.Graph> = {}) {
+    constructor(readonly $loader: t.GraphLoader, spec: DeepPartial<t.Graph> = {}) {
         const graph = Graph.schema.decode(spec);
         Object.assign(this, graph);
         this.nodes = [];
@@ -41,7 +40,13 @@ export class Graph implements t.Graph {
             category: [],
             params: {},
             rootNodeId: '',
+            refs: {},
         });
+    }
+
+    resolveNode(ref: string): t.NodeDef {
+        const uri = this.refs[ref];
+        return this.$loader.resolveNodeDef(uri);
     }
 
     getNodeById(id: string): Node | null {

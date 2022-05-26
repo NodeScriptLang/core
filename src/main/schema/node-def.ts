@@ -4,15 +4,14 @@ import * as t from '../types/index.js';
 import { DataSchemaSchema } from './data-schema.js';
 import { ParamMetadataSchema } from './param-metadata.js';
 
-export const NodeMetadataSchema = new Schema<t.NodeMetadata>({
+export const NodeDefSchema = new Schema<t.NodeDef>({
     type: 'object',
     properties: {
-        ref: { type: 'string' },
+        label: { type: 'string' },
         category: {
             type: 'array',
             items: { type: 'string' },
         },
-        label: { type: 'string' },
         description: { type: 'string' },
         deprecated: { type: 'string' },
         hidden: { type: 'boolean' },

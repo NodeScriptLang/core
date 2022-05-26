@@ -1,14 +1,9 @@
-import { DataSchema } from './data.js';
-import { NodeMetadata, ParamMetadata } from './defs.js';
+import { NodeDef } from './defs.js';
 
-export interface Graph extends NodeMetadata {
-    label: string;
-    category: string[];
-    description: string;
+export interface Graph extends NodeDef {
     nodes: Node[];
-    params: Record<string, ParamMetadata>;
-    returns: DataSchema<any>;
     rootNodeId: string;
+    refs: Record<string, string>;
 }
 
 export interface Node {

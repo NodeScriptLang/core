@@ -3,6 +3,6 @@ export class NotFoundError extends Error {
 
     constructor(resourceName: string = 'Object') {
         super(`${resourceName} not found`);
-        this.name = this.constructor.name;
+        this.name = 'NotFoundError';
     }
 }

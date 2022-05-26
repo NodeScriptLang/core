@@ -46,12 +46,8 @@ export class Node implements t.Node {
         });
     }
 
-    get $resolver() {
-        return this.$graph.$resolver;
-    }
-
     get $def() {
-        return this.$resolver.resolveNode(this.ref);
+        return this.$graph.resolveNode(this.ref);
     }
 
     /**

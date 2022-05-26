@@ -1,5 +1,5 @@
 {
-    "name": "nodescript",
+    "name": "@nodescript/core",
     "version": "0.0.1",
     "type": "module",
     "description": "Visual programming language for Browser and Node",
@@ -8,7 +8,8 @@
         "./util": "./out/main/util/index.js",
         "./schema": "./out/main/schema/index.js",
         "./model": "./out/main/model/index.js",
-        "./runtime": "./out/main/runtime/index.js"
+        "./runtime": "./out/main/runtime/index.js",
+        "./nodes": "./out/main/nodes/index.js"
     },
     "files": [
         "out/main/**/*"
@@ -16,13 +17,18 @@
     "scripts": {
         "clean": "rm -rf out *.tsbuildinfo",
         "prepare": "node ./prepare.js",
-        "dev": "tsc -b -w",
-        "compile": "tsc -b",
+        "dev": "run-s clean prepare dev:ts",
+        "dev:ts": "tsc -b -w",
+        "compile": "run-s compile:*",
+        "compile:ts": "tsc -b",
         "lint": "eslint --ext=.js,.ts --cache .",
         "test": "NODE_ENV=test mocha",
         "preversion": "npm run lint",
         "version": "npm run compile",
         "postversion": "npm publish --access=public && git push --tags origin main"
+    },
+    "engines": {
+        "node": ">18"
     },
     "pre-commit": [
         "lint"
@@ -44,6 +50,7 @@
         "mocha": "^10.0.0",
         "npm-run-all": "^4.1.5",
         "ts-node": "^10.8.0",
-        "typescript": "^4.6.4"
+        "typescript": "^4.6.4",
+        "yaml": "^2.1.0"
     }
 }

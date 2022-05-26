@@ -1,38 +1,23 @@
 import { GraphEvalContext } from './ctx.js';
 import { DataSchema } from './data.js';
 
-/**
- * These fields are optional when you define them in TypeScript.
- */
-export type NodeDescription = {
-    category: string[];
+export type NodeDef = {
     label: string;
+    category: string[];
     description: string;
     deprecated: string;
     hidden: boolean;
+    params: Record<string, ParamDef>;
+    returns: DataSchema<any>;
+    compute?: (...args: any[]) => any;
 };
 
-/**
- * The type you obtain from the resolver.
- * `compute` may or may not exist depending on the environment.
- */
-export type NodeMetadata = {
-    ref: string;
-    params: Record<string, ParamDef>;
-    returns: DataSchema<unknown>;
-    compute?: (...args: any[]) => unknown;
-} & NodeDescription;
-
-/**
- * The type used when defining nodes in TypeScript.
- * Type parameters correspond to params (P) and return value (R).
- */
-export type NodeDef<P = any, R = any> = {
-    ref: string;
-    params: ParamDefs<P>;
-    returns: DataSchema<R>;
-    compute: NodeCompute<P, R>;
-} & Partial<NodeDescription>;
+export type Operator<Params = any, Returns = any> = {
+    label: string;
+    params: ParamDefs<Params>;
+    returns: DataSchema<Returns>;
+    compute: NodeCompute<Params, Returns>;
+} & Partial<NodeDef>;
 
 export type NodeCompute<P, R> = (this: void, params: P, ctx: GraphEvalContext) => R | Promise<R>;
 

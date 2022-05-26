@@ -1,7 +1,6 @@
 import { Schema } from 'airtight';
 
 import * as t from '../types/index.js';
-import { IdSchema } from '../util/id.js';
 import { DataSchemaSchema } from './data-schema.js';
 import { NodeSchema } from './node.js';
 import { ParamMetadataSchema } from './param-metadata.js';
@@ -10,7 +9,6 @@ export const GraphSchema = new Schema<t.Graph>({
     id: 'Graph',
     type: 'object',
     properties: {
-        ref: IdSchema.schema,
         label: {
             type: 'string',
         },
@@ -40,6 +38,11 @@ export const GraphSchema = new Schema<t.Graph>({
             type: 'array',
             items: NodeSchema.schema,
         },
-        rootNodeId: { type: 'string' }
+        rootNodeId: { type: 'string' },
+        refs: {
+            type: 'object',
+            properties: {},
+            additionalProperties: { type: 'string' },
+        }
     },
 });

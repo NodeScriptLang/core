@@ -18,12 +18,11 @@ export interface GraphCompilerOptions {
  */
 export class GraphCompiler {
 
-    constructor(readonly $resolver: t.NodeResolver) {}
+    constructor(readonly $loader: t.GraphLoader) {}
 
     compileGraphDef(graph: Graph, options: Partial<GraphCompilerOptions> = {}): t.NodeDef {
         const compute = this.compileGraphFn(graph, graph.rootNodeId, options);
         return {
-            ref: graph.ref,
             category: graph.category,
             deprecated: graph.deprecated,
             description: graph.description,
@@ -429,5 +428,5 @@ class GraphCompilerContext {
 
 export class CompilerError extends Error {
     status = 500;
-    name = this.constructor.name;
+    name = 'CompilerError';
 }
