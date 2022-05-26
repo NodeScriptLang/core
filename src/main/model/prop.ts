@@ -1,5 +1,3 @@
-import { DeepPartial } from 'airtight';
-
 import { PropSchema } from '../schema/prop.js';
 import * as t from '../types/index.js';
 import { serialize } from '../util/serialize.js';
@@ -26,7 +24,7 @@ export class Prop implements t.Prop {
     expand!: boolean;
     entries: Prop[];
 
-    constructor(readonly $parent: PropParent, spec: DeepPartial<t.Prop> = {}) {
+    constructor(readonly $parent: PropParent, spec: t.DeepPartial<t.Prop> = {}) {
         const prop = Prop.schema.decode(spec);
         Object.assign(this, prop);
         this.entries = (prop.entries ?? []).map(spec => new Prop(this, spec));

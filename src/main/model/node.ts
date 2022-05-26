@@ -1,5 +1,3 @@
-import { DeepPartial } from 'airtight';
-
 import { NodeSchema } from '../schema/node.js';
 import * as t from '../types/index.js';
 import { clamp } from '../util/clamp.js';
@@ -32,7 +30,7 @@ export class Node implements t.Node {
 
     props: Prop[] = [];
 
-    constructor(readonly $graph: Graph, spec: DeepPartial<t.Node> = {}) {
+    constructor(readonly $graph: Graph, spec: t.DeepPartial<t.Node> = {}) {
         const node = Node.schema.decode(spec);
         Object.assign(this, node);
         this.props = this.initProps(node.props);

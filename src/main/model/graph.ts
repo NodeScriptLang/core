@@ -1,5 +1,3 @@
-import { DeepPartial } from 'airtight';
-
 import { GraphSchema } from '../schema/index.js';
 import * as t from '../types/index.js';
 import { MultiMap, serialize } from '../util/index.js';
@@ -22,7 +20,7 @@ export class Graph implements t.Graph {
 
     protected $nodeMap = new Map<string, Node>();
 
-    constructor(readonly $loader: t.GraphLoader, spec: DeepPartial<t.Graph> = {}) {
+    constructor(readonly $loader: t.GraphLoader, spec: t.DeepPartial<t.Graph> = {}) {
         const graph = Graph.schema.decode(spec);
         Object.assign(this, graph);
         this.nodes = [];
@@ -57,7 +55,7 @@ export class Graph implements t.Graph {
         return this.rootNodeId ? this.getNodeById(this.rootNodeId) : null;
     }
 
-    addNode(spec: DeepPartial<t.Node> = {}) {
+    addNode(spec: t.DeepPartial<t.Node> = {}) {
         const node = new Node(this, spec);
         this.nodes.push(node);
         this.$nodeMap.set(node.id, node);

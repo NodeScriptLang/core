@@ -1,4 +1,6 @@
+import { Graph } from '../model/graph.js';
 import * as systemNodes from '../nodes/index.js';
+import { NodeDefSchema } from '../schema/node-def.js';
 import * as t from '../types/index.js';
 
 export class GraphLoader implements t.GraphLoader {
@@ -11,12 +13,27 @@ export class GraphLoader implements t.GraphLoader {
         this.defineOperator('core:Local', systemNodes.Local);
     }
 
-    loadGraph(spec: t.DeepPartial<t.Graph>): Promise<t.Graph> {
-        throw new Error('Method not implemented.');
+    async loadGraph(spec: t.DeepPartial<t.Graph>): Promise<Graph> {
+        const { refs = {} } = spec;
+        const promises = [];
+        for (const uri of Object.values(refs)) {
+            if (!uri) {
+                continue;
+            }
+            const promise = this.loadNodeDef(uri)
+                .then(nodeDef => this.defineOperator(uri, nodeDef));
+            promises.push(promise);
+        }
+        await Promise.all(promises);
+        return new Graph(this, spec);
     }
 
-    loadNodeDef(uri: string): Promise<t.NodeDef> {
-        throw new Error('Method not implemented.');
+    async loadNodeDef(uri: string): Promise<t.NodeDef> {
+        const { node } = await import(uri);
+        if (!node) {
+            return this.unresolved(uri);
+        }
+        return NodeDefSchema.decode(node);
     }
 
     resolveNodeDef(uri: string): t.NodeDef {
@@ -28,7 +45,7 @@ export class GraphLoader implements t.GraphLoader {
         return this.nodeDefs.get(uri) ?? null;
     }
 
-    defineOperator(url: string, op: t.Operator): t.NodeDef {
+    defineOperator(uri: string, op: t.Operator): t.NodeDef {
         const def: t.NodeDef = {
             category: [],
             description: '',
@@ -36,11 +53,11 @@ export class GraphLoader implements t.GraphLoader {
             hidden: false,
             ...op,
         };
-        this.nodeDefs.set(url, def);
+        this.nodeDefs.set(uri, def);
         return def;
     }
 
-    unresolved(ref: string): t.NodeDef {
+    unresolved(uri: string): t.NodeDef {
         return {
             label: 'Unresolved',
             description: '',
@@ -50,7 +67,7 @@ export class GraphLoader implements t.GraphLoader {
             params: {},
             returns: { type: 'any' },
             compute() {
-                throw new UnresolvedNodeError(`Node definition ${ref} not found`);
+                throw new UnresolvedNodeError(`Node definition ${uri} not found`);
             },
         };
     }

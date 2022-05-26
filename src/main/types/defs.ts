@@ -16,7 +16,7 @@ export type Operator<Params = any, Returns = any> = {
     label: string;
     params: ParamDefs<Params>;
     returns: DataSchema<Returns>;
-    compute: NodeCompute<Params, Returns>;
+    compute?: NodeCompute<Params, Returns>;
 } & Partial<NodeDef>;
 
 export type NodeCompute<P, R> = (this: void, params: P, ctx: GraphEvalContext) => R | Promise<R>;
