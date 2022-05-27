@@ -1,4 +1,1 @@
-- [ ] node def resolution:
-    - node.ref -> graph.refs -> uri -> resolver.resolve(uri)
-    - resolver -> import refs
 - [ ] compile ESM module
