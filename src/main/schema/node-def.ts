@@ -20,7 +20,7 @@ export const NodeDefSchema = new Schema<t.NodeDef>({
             properties: {},
             additionalProperties: ParamMetadataSchema.schema,
         },
-        returns: DataSchemaSchema.schema as any,
+        result: DataSchemaSchema.schema as any,
         compute: { type: 'any', optional: true },
     }
 });

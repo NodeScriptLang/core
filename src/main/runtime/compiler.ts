@@ -3,53 +3,32 @@ import * as t from '../types/index.js';
 import { isSchemaCompatible, MultiMap, NotFoundError } from '../util/index.js';
 import { CodeBuilder } from './code.js';
 
-const AsyncFunction = Object.getPrototypeOf(async () => {}).constructor;
-
 export interface GraphCompilerOptions {
     comments: boolean;
     introspect: boolean;
 }
 
 /**
- * Compiles a graph into a JavaScript function.
+ * Compiles a graph into an EcmaScript Module (ESM).
  *
- * The result function signature is equivalent to NodeDef.compute
- * meaning that compiled graph is 100% compatible to Node definition.
+ * The result is a standard node definition module with `export node = { ... }`.
+ * A compiled graph can be computed as follows:
+ *
+ * ```
+ * const { node } = await import(code);
+ * const ctx = new GraphEvalContext(...);
+ * await node.compute(params, ctx);
+ * ```
  */
 export class GraphCompiler {
 
-    constructor(readonly $loader: t.GraphLoader) {}
-
-    compileGraphDef(graph: Graph, options: Partial<GraphCompilerOptions> = {}): t.NodeDef {
-        const compute = this.compileGraphFn(graph, graph.rootNodeId, options);
-        return {
-            category: graph.category,
-            deprecated: graph.deprecated,
-            description: graph.description,
-            label: graph.label,
-            hidden: graph.hidden,
-            params: graph.params,
-            returns: graph.returns,
-            compute,
-        };
-    }
-
-    compileGraphCode(graph: Graph, rootNodeId: string, options: Partial<GraphCompilerOptions> = {}) {
+    compileEsm(graph: Graph, rootNodeId: string, options: Partial<GraphCompilerOptions> = {}) {
         const node = graph.getNodeById(rootNodeId);
         if (!node) {
             throw new NotFoundError('Node');
         }
-        const gcc = new GraphCompilerContext(this, graph, node, options);
-        return gcc.compile();
-    }
-
-    compileGraphFn(graph: Graph, rootNodeId: string, options: Partial<GraphCompilerOptions> = {}): t.NodeCompute<any, any> {
-        const code = this.compileGraphCode(graph, rootNodeId, options);
-        return this.createFunction(code);
-    }
-
-    protected createFunction(compiledCode: string) {
-        return new AsyncFunction('params', 'ctx', compiledCode);
+        const gcc = new GraphCompilerContext(graph, node, options);
+        return gcc.compileEsm();
     }
 
 }
@@ -64,10 +43,17 @@ class GraphCompilerContext {
     code = new CodeBuilder();
     // The order in which nodes need to be computed to fulfill the root node
     order: Node[] = [];
+    // The cached dependency map of a graph
     depsMap: MultiMap<string, Node>;
 
+    // Commonly used symbols
+    sym = {
+        nodeEvaluated: this.nextSym('o'),
+        toArray: this.nextSym('o'),
+        convertType: this.nextSym('o'),
+    };
+
     constructor(
-        readonly compiler: GraphCompiler,
         readonly graph: Graph,
         readonly rootNode: Node,
         options: Partial<GraphCompilerOptions> = {},
@@ -78,81 +64,91 @@ class GraphCompilerContext {
             ...options
         };
         this.order = graph.computeOrder(rootNode.id);
-        this.depsMap = graph.getDepMap();
+        this.depsMap = graph.computeDepMap();
     }
 
-    compile() {
-        if (this.rootNode.ref === 'Comment') {
-            return 'return undefined;';
-        }
-        this.emitHeader();
-        this.emitDefinitions();
-        this.emitComputations();
-        this.emitResult();
+    compileEsm() {
+        this.emitImports();
+        this.emitExportNode();
         return this.code.toString();
     }
 
-    protected emitHeader() {
-        // This section destructures a few commonly used variables from ctx and
-        // maps them to custom symbols to make the code shorter
-        const resolver = this.nextSym('o');
-        const nodeEvaluated = this.nextSym('o');
-        const toArray = this.nextSym('o');
-        const convertType = this.nextSym('o');
-        this.symtable.set('resolver', resolver);
-        this.symtable.set('nodeEvaluated', nodeEvaluated);
-        this.symtable.set('toArray', toArray);
-        this.symtable.set('convertType', convertType);
-        this.code.line(`const {` +
-          `resolver:${resolver},` +
-          `nodeEvaluated:${nodeEvaluated},` +
-          `lib: {` +
-             `toArray:${toArray},` +
-             `convertType:${convertType},` +
-           `}` +
-        `} = ctx;`);
-    }
-
-    protected emitDefinitions() {
-        this.emitComment('Definitions');
+    private emitImports() {
+        this.emitComment('Imports');
         const refs = new Set(this.order.map(_ => _.ref));
-        const resolverSym = this.getSym('resolver');
         for (const ref of refs) {
-            if (['Param', 'Result'].includes(ref)) {
+            const uri = this.graph.refs[ref];
+            if (!uri) {
+                throw new CompilerError(`Cannot resolve ref ${ref}`);
+            }
+            if (uri.startsWith('core:')) {
                 continue;
             }
-            const sym = this.nextSym('d');
-            this.code.line(`const ${sym} = ${resolverSym}.resolveNode(${JSON.stringify(ref)});`);
+            const sym = this.nextSym('n');
             this.symtable.set(`def:${ref}`, sym);
+            this.code.line(`import { node as ${sym} } from '${encodeURI(uri)}'`);
         }
     }
 
-    protected emitComputations() {
-        this.emitComment('Computations');
+    private emitExportNode() {
+        this.emitComment('Node Definition');
+        this.code.block('export const node = {', '};', () => {
+            this.emitGraphProp('label');
+            this.emitGraphProp('category');
+            this.emitGraphProp('description');
+            this.emitGraphProp('deprecated');
+            this.emitGraphProp('hidden');
+            this.emitGraphProp('params');
+            this.emitGraphProp('result');
+            this.code.block('async compute(params, ctx) {', '}', () => {
+                this.emitComputeBody();
+            });
+        });
+    }
+
+    private emitGraphProp<K extends keyof Graph>(key: K) {
+        this.code.line(`${key}: ${JSON.stringify(this.graph[key])},`);
+    }
+
+    private emitComputeBody() {
+        this.emitCtxLocals();
         for (const node of this.order) {
             this.emitNode(node);
         }
+        this.emitResult();
     }
 
-    protected emitResult() {
+    private emitCtxLocals() {
+        // These locals are accessed by the code within `compute` function
+        this.symtable.set('nodeEvaluated', this.sym.nodeEvaluated);
+        this.symtable.set('toArray', this.sym.toArray);
+        this.symtable.set('convertType', this.sym.convertType);
+        this.code.line(`const {` +
+          `$nodeEvaluated: ${this.sym.nodeEvaluated},` +
+          `$toArray: ${this.sym.toArray},` +
+          `$convertType: ${this.sym.convertType},` +
+        `} = ctx;`);
+    }
+
+    private emitResult() {
         this.emitComment('Result');
         const expr = this.nodeResultExpr(this.rootNode);
         this.code.line(`return ${expr};`);
     }
 
-    protected emitNode(node: Node) {
+    private emitNode(node: Node) {
         this.emitComment(`${node.ref} ${node.id}`);
         const sym = this.nextSym('r');
         this.symtable.set(`node:${node.id}`, sym);
-        if (node.ref === 'Param') {
-            // Param nodes are not emitted, accessed in-place
+        if (node.$uri === 'core:Param') {
+            // Param nodes are not emitted, "params" sym is accessed in-place
             return;
         }
-        if (node.ref === 'Comment') {
+        if (node.$uri === 'core:Comment') {
             // Comment nodes are discarded
             return;
         }
-        if (node.ref === 'Result') {
+        if (node.$uri === 'core:Result') {
             // Result node needs a special type conversion defined by graph metadata
             return this.emitResultNode(node);
         }
@@ -164,7 +160,7 @@ class GraphCompilerContext {
                     this.emitNodeBody(node);
                 });
                 this.code.block('catch (err) {', '}', () => {
-                    this.code.line(`ctx.cache.set("${node.id}", Promise.reject(err));`);
+                    this.code.line(`ctx.$cache.set("${node.id}", Promise.reject(err));`);
                     this.code.line(`throw err;`);
                 });
             } else {
@@ -173,7 +169,7 @@ class GraphCompilerContext {
         });
     }
 
-    protected emitNodeBody(node: Node) {
+    private emitNodeBody(node: Node) {
         const emitBody = () => {
             if (node.isExpanded()) {
                 this.emitExpandedNode(node);
@@ -182,12 +178,11 @@ class GraphCompilerContext {
             }
         };
         if (this.options.introspect) {
-            const nodeEvaluated = this.getSym('nodeEvaluated');
             this.code.block('try {', '}', () => {
                 emitBody();
             });
             this.code.block('catch (error) {', '}', () => {
-                this.code.line(`${nodeEvaluated}.emit({` +
+                this.code.line(`${this.sym.nodeEvaluated}.emit({` +
                     `nodeId: ${JSON.stringify(node.id)},` +
                     `error,` +
                 `});`);
@@ -198,16 +193,16 @@ class GraphCompilerContext {
         }
     }
 
-    protected emitResultNode(node: Node) {
+    private emitResultNode(node: Node) {
         const sym = this.getNodeSym(node.id);
         const prop = node.getBasePropByKey('value')!;
-        const expr = this.singlePropExpr(prop, this.graph.returns);
+        const expr = this.singlePropExpr(prop, this.graph.result);
         this.code.line(`async function ${sym}(ctx) {` +
             `return ${expr};` +
         `}`);
     }
 
-    protected emitRegularNode(node: Node) {
+    private emitRegularNode(node: Node) {
         const defSym = this.getDefSym(node.ref);
         const resSym = `$r`;
         this.code.block(`const ${resSym} = ${defSym}.compute({`, `}, ctx);`, () => {
@@ -217,8 +212,7 @@ class GraphCompilerContext {
             this.code.line(`ctx.$cache.set("${node.id}", ${resSym});`);
         }
         if (this.options.introspect) {
-            const nodeEvaluated = this.getSym('nodeEvaluated');
-            this.code.line(`${nodeEvaluated}.emit({` +
+            this.code.line(`${this.sym.nodeEvaluated}.emit({` +
                 `nodeId: ${JSON.stringify(node.id)},` +
                 `result: await ${resSym}` +
             `});`);
@@ -226,14 +220,13 @@ class GraphCompilerContext {
         this.code.line(`return await ${resSym};`);
     }
 
-    protected emitExpandedNode(node: Node) {
+    private emitExpandedNode(node: Node) {
         const defSym = this.getDefSym(node.ref);
         const resSym = '$r';
         // Expanded nodes always produce an array by
         // repeating the computation per each value of expanded property
         const props = [...node.computedProps()];
         const expandProps = props.filter(_ => _.isExpanded());
-        const toArray = this.getSym('toArray');
         this.code.line(`const ${resSym} = []`);
         const expSyms: string[] = [];
         for (const prop of expandProps) {
@@ -256,9 +249,9 @@ class GraphCompilerContext {
                     expr = `${linkExpr}`;
                 }
             } else if (linkKey) {
-                expr = `${toArray}((${linkExpr})[${JSON.stringify(prop.linkKey)}])`;
+                expr = `${this.sym.toArray}((${linkExpr})[${JSON.stringify(prop.linkKey)}])`;
             } else {
-                expr = `${toArray}(${linkExpr})`;
+                expr = `${this.sym.toArray}(${linkExpr})`;
             }
             this.code.line(`const ${propSym} = ${expr}`);
         }
@@ -274,8 +267,7 @@ class GraphCompilerContext {
             this.code.line(`ctx.$cache.set("${node.id}", ${resSym});`);
         }
         if (this.options.introspect) {
-            const nodeEvaluated = this.getSym('nodeEvaluated');
-            this.code.line(`${nodeEvaluated}.emit({` +
+            this.code.line(`${this.sym.nodeEvaluated}.emit({` +
                 `nodeId: ${JSON.stringify(node.id)},` +
                 `result: ${resSym}` +
             `});`);
@@ -283,7 +275,7 @@ class GraphCompilerContext {
         this.code.line(`return ${resSym};`);
     }
 
-    protected emitNodeProps(node: Node) {
+    private emitNodeProps(node: Node) {
         for (const prop of node.props) {
             if (prop.isUsesEntries()) {
                 this.emitEntries(prop);
@@ -293,7 +285,7 @@ class GraphCompilerContext {
         }
     }
 
-    protected emitEntries(prop: Prop) {
+    private emitEntries(prop: Prop) {
         const { schema } = prop.$param;
         switch (schema.type) {
             case 'array':
@@ -303,7 +295,7 @@ class GraphCompilerContext {
         }
     }
 
-    protected emitArrayEntries(prop: Prop) {
+    private emitArrayEntries(prop: Prop) {
         this.code.block(`${JSON.stringify(prop.key)}: [`, '],', () => {
             for (const p of prop.entries) {
                 const expr = this.singlePropExpr(p);
@@ -312,7 +304,7 @@ class GraphCompilerContext {
         });
     }
 
-    protected emitObjectEntries(prop: Prop) {
+    private emitObjectEntries(prop: Prop) {
         this.code.block(`${JSON.stringify(prop.key)}: {`, '},', () => {
             for (const p of prop.entries) {
                 const expr = this.singlePropExpr(p);
@@ -321,12 +313,12 @@ class GraphCompilerContext {
         });
     }
 
-    protected emitSingleProp(prop: Prop) {
+    private emitSingleProp(prop: Prop) {
         const expr = this.singlePropExpr(prop);
         this.code.line(`${JSON.stringify(prop.key)}: ${expr},`);
     }
 
-    protected singlePropExpr(prop: Prop, targetSchema: t.DataSchema = prop.getTargetSchema()) {
+    private singlePropExpr(prop: Prop, targetSchema: t.DataSchema = prop.getTargetSchema()) {
         if (prop.isLambda()) {
             return this.lambdaPropExpr(prop);
         }
@@ -334,7 +326,7 @@ class GraphCompilerContext {
         let sourceSchema: t.DataSchema = { type: 'string' };
         const linkNode = prop.getLinkNode();
         if (linkNode) {
-            sourceSchema = linkNode.$def.returns;
+            sourceSchema = linkNode.$def.result;
         }
         const needsTypeConversion = !isSchemaCompatible(targetSchema, sourceSchema);
         if (needsTypeConversion) {
@@ -343,12 +335,11 @@ class GraphCompilerContext {
         return expr;
     }
 
-    protected convertTypeExpr(expr: string, targetSchema: t.DataSchema) {
-        const convertTypeSym = this.getSym('convertType');
-        return `${convertTypeSym}(${expr}, ${JSON.stringify(targetSchema)})`;
+    private convertTypeExpr(expr: string, targetSchema: t.DataSchema) {
+        return `${this.sym.convertType}(${expr}, ${JSON.stringify(targetSchema)})`;
     }
 
-    protected rawPropExpr(prop: Prop) {
+    private rawPropExpr(prop: Prop) {
         // Property result expression prior to type conversion
         const expSym = this.symtable.get(`prop:${prop.id}`);
         if (expSym) {
@@ -367,7 +358,7 @@ class GraphCompilerContext {
         return expr;
     }
 
-    protected nodeResultExpr(node: Node) {
+    private nodeResultExpr(node: Node) {
         if (node.ref === 'Param') {
             const prop = node.getBasePropByKey('key');
             const key = prop ? prop.value : '';
@@ -377,13 +368,13 @@ class GraphCompilerContext {
         return `await ${sym}(ctx)`;
     }
 
-    protected lambdaPropExpr(prop: Prop) {
+    private lambdaPropExpr(prop: Prop) {
         const param = prop.$param;
         const linkNode = prop.getLinkNode();
         if (!linkNode) {
             return `() => ${this.convertTypeExpr(param.default ?? '', param.schema)}`;
         }
-        const targetSchema = linkNode.$def.returns;
+        const targetSchema = linkNode.$def.result;
         const linkSym = this.getNodeSym(linkNode.id);
         const schemaCompatible = isSchemaCompatible(param.schema, targetSchema);
         return schemaCompatible ?
@@ -392,15 +383,15 @@ class GraphCompilerContext {
                 `.then(res => ${this.convertTypeExpr('res', targetSchema)})`;
     }
 
-    protected getNodeSym(nodeId: string) {
+    private getNodeSym(nodeId: string) {
         return this.getSym(`node:${nodeId}`);
     }
 
-    protected getDefSym(ref: string) {
+    private getDefSym(ref: string) {
         return this.getSym(`def:${ref}`);
     }
 
-    protected getSym(id: string) {
+    private getSym(id: string) {
         const sym = this.symtable.get(id);
         if (!sym) {
             throw new CompilerError(`Symbol not found: ${id}`);
@@ -408,25 +399,25 @@ class GraphCompilerContext {
         return sym;
     }
 
-    protected nextSym(sym: string) {
+    private nextSym(sym: string) {
         const c = this.symCounters.get(sym) ?? 0;
         this.symCounters.set(sym, c + 1);
         return `${sym}${c + 1}`;
     }
 
-    protected emitComment(str: string) {
+    private emitComment(str: string) {
         if (this.options.comments) {
             this.code.line(`// ${str}`);
         }
     }
 
-    protected isNodeCached(nodeId: string) {
+    private isNodeCached(nodeId: string) {
         return this.depsMap.get(nodeId).size > 1;
     }
 
 }
 
 export class CompilerError extends Error {
+    name = this.constructor.name;
     status = 500;
-    name = 'CompilerError';
 }

@@ -14,7 +14,7 @@ export class Graph implements t.Graph {
     hidden!: boolean;
     rootNodeId!: string;
     params: Record<string, t.ParamMetadata> = {};
-    returns: t.DataSchema<any> = { type: 'any' };
+    result: t.DataSchema<any> = { type: 'any' };
     nodes: Node[];
     refs: Record<string, string> = {};
 
@@ -42,8 +42,13 @@ export class Graph implements t.Graph {
         });
     }
 
+    resolveUri(ref: string): string {
+        const uri = this.refs[ref] ?? '';
+        return uri;
+    }
+
     resolveNode(ref: string): t.NodeDef {
-        const uri = this.refs[ref];
+        const uri = this.resolveUri(ref);
         return this.$loader.resolveNodeDef(uri);
     }
 
@@ -55,6 +60,7 @@ export class Graph implements t.Graph {
         return this.rootNodeId ? this.getNodeById(this.rootNodeId) : null;
     }
 
+    // TODO create AddNodeSpec with URL and ref gerenation
     addNode(spec: t.DeepPartial<t.Node> = {}) {
         const node = new Node(this, spec);
         this.nodes.push(node);
@@ -89,9 +95,10 @@ export class Graph implements t.Graph {
     }
 
     /**
-     * Returns a map of fromNodeId -> set of toNodeId.
+     * Returns a map of fromNodeId -> set of toNode.
+     * Only direct links are mapped.
      */
-    getDepMap() {
+    computeDepMap() {
         const map = new MultiMap<string, Node>();
         for (const node of this.nodes) {
             for (const prop of node.computedProps()) {

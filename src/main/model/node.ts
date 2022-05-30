@@ -44,6 +44,10 @@ export class Node implements t.Node {
         });
     }
 
+    get $uri() {
+        return this.$graph.resolveUri(this.ref);
+    }
+
     get $def() {
         return this.$graph.resolveNode(this.ref);
     }
@@ -129,7 +133,7 @@ export class Node implements t.Node {
         }
     }
 
-    *rightNodes(depMap = this.$graph.getDepMap()): Iterable<Node> {
+    *rightNodes(depMap = this.$graph.computeDepMap()): Iterable<Node> {
         yield this;
         for (const node of depMap.get(this.id)) {
             yield* node.rightNodes(depMap);

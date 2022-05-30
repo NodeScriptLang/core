@@ -93,5 +93,6 @@ export function isSchemaCompatible(desiredSchema: DataSchema<unknown>, actualSch
 }
 
 export class InvalidTypeError extends Error {
-    name = 'InvalidTypeError';
+    name = this.constructor.name;
+    status = 400;
 }

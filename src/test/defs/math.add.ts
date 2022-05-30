@@ -17,7 +17,7 @@ export const node: Operator<{
             }
         }
     },
-    returns: {
+    result: {
         type: 'number',
     },
     compute(params) {
