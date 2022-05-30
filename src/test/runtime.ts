@@ -15,6 +15,8 @@ export class TestRuntime {
         'math.add': this.makeUrl('/out/test/defs/math.add.js'),
         'string': this.makeUrl('/out/test/defs/string.js'),
         'number': this.makeUrl('/out/test/defs/number.js'),
+        'object': this.makeUrl('/out/test/defs/object.js'),
+        'array': this.makeUrl('/out/test/defs/array.js'),
         'any': this.makeUrl('/out/test/defs/any.js'),
     };
 
