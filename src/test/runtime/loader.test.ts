@@ -10,7 +10,7 @@ describe('GraphLoader', () => {
         const def = await loader.loadNodeDef(runtime.defs['math.add']);
         assert.deepStrictEqual(def.label, 'Math.Add');
         assert.deepStrictEqual(def.category, []);
-        assert.deepStrictEqual(def.description, '');
+        assert.deepStrictEqual(def.description, 'Computes a sum of two numbers.');
         assert.deepStrictEqual(def.params, {
             a: { schema: { type: 'number' } },
             b: { schema: { type: 'number' } },

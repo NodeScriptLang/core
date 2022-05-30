@@ -13,7 +13,7 @@ export class GraphLoader implements t.GraphLoader {
         this.defineOperator('core:Local', systemNodes.Local);
     }
 
-    async loadGraph(spec: t.DeepPartial<t.Graph>): Promise<Graph> {
+    async loadGraph(spec: t.GraphSpec): Promise<Graph> {
         const { refs = {} } = spec;
         const promises = [];
         for (const uri of Object.values(refs)) {
@@ -27,7 +27,17 @@ export class GraphLoader implements t.GraphLoader {
     }
 
     async loadNodeDef(uri: string): Promise<t.NodeDef> {
+        const existing = this.getNodeDef(uri);
+        if (existing) {
+            // No not import twice
+            return existing;
+        }
+        if (uri.startsWith('core:')) {
+            // Do not import core:
+            return existing ?? this.unresolved(uri);
+        }
         const res = await import(uri);
+        // TODO throw if node does not exist or cannot be decoded?
         if (!res.node) {
             return this.unresolved(uri);
         }

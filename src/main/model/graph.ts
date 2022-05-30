@@ -152,4 +152,8 @@ export class Graph implements t.Graph {
         return ref;
     }
 
+    compute() {
+        // Just a dummy to satisfy the interface
+    }
+
 }

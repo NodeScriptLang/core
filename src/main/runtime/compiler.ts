@@ -4,6 +4,7 @@ import { isSchemaCompatible, MultiMap, NotFoundError } from '../util/index.js';
 import { CodeBuilder } from './code.js';
 
 export interface GraphCompilerOptions {
+    rootNodeId: string;
     comments: boolean;
     introspect: boolean;
 }
@@ -22,8 +23,8 @@ export interface GraphCompilerOptions {
  */
 export class GraphCompiler {
 
-    compileEsm(graph: Graph, rootNodeId?: string, options: Partial<GraphCompilerOptions> = {}) {
-        const node = graph.getNodeById(rootNodeId ?? graph.rootNodeId);
+    compileEsm(graph: Graph, options: Partial<GraphCompilerOptions> = {}) {
+        const node = graph.getNodeById(options.rootNodeId ?? graph.rootNodeId);
         if (!node) {
             throw new NotFoundError('Node');
         }
@@ -59,6 +60,7 @@ class GraphCompilerContext {
         options: Partial<GraphCompilerOptions> = {},
     ) {
         this.options = {
+            rootNodeId: rootNode.id,
             comments: false,
             introspect: false,
             ...options
@@ -86,7 +88,7 @@ class GraphCompilerContext {
             }
             const sym = this.nextSym('n');
             this.symtable.set(`def:${ref}`, sym);
-            this.code.line(`import { node as ${sym} } from '${encodeURI(uri)}'`);
+            this.code.line(`import { node as ${sym} } from '${uri}'`);
         }
     }
 
@@ -359,7 +361,7 @@ class GraphCompilerContext {
     }
 
     private nodeResultExpr(node: Node) {
-        if (node.ref === 'Param') {
+        if (node.$uri === 'core:Param') {
             const prop = node.getBasePropByKey('key');
             const key = prop ? prop.value : '';
             return `params[${JSON.stringify(key)}]`;

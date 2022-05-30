@@ -21,6 +21,6 @@ export const NodeDefSchema = new Schema<t.NodeDef>({
             additionalProperties: ParamMetadataSchema.schema,
         },
         result: DataSchemaSchema.schema as any,
-        compute: { type: 'any', optional: true },
+        compute: { type: 'any' },
     }
 });
