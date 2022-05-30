@@ -24,7 +24,7 @@ export class Prop implements t.Prop {
     expand!: boolean;
     entries: Prop[];
 
-    constructor(readonly $parent: PropParent, spec: t.DeepPartial<t.Prop> = {}) {
+    constructor(readonly $parent: PropParent, spec: t.PropSpec = {}) {
         const prop = Prop.schema.decode(spec);
         Object.assign(this, prop);
         this.entries = (prop.entries ?? []).map(spec => new Prop(this, spec));

@@ -30,7 +30,7 @@ export class Node implements t.Node {
 
     props: Prop[] = [];
 
-    constructor(readonly $graph: Graph, spec: t.DeepPartial<t.Node> = {}) {
+    constructor(readonly $graph: Graph, spec: t.NodeSpec = {}) {
         const node = Node.schema.decode(spec);
         Object.assign(this, node);
         this.props = this.initProps(node.props);

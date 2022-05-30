@@ -22,8 +22,8 @@ export interface GraphCompilerOptions {
  */
 export class GraphCompiler {
 
-    compileEsm(graph: Graph, rootNodeId: string, options: Partial<GraphCompilerOptions> = {}) {
-        const node = graph.getNodeById(rootNodeId);
+    compileEsm(graph: Graph, rootNodeId?: string, options: Partial<GraphCompilerOptions> = {}) {
+        const node = graph.getNodeById(rootNodeId ?? graph.rootNodeId);
         if (!node) {
             throw new NotFoundError('Node');
         }

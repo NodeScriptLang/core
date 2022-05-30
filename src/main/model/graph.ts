@@ -1,6 +1,6 @@
 import { GraphSchema } from '../schema/index.js';
 import * as t from '../types/index.js';
-import { MultiMap, serialize } from '../util/index.js';
+import { MultiMap, serialize, shortId } from '../util/index.js';
 import { Node, NodeLink } from './node.js';
 
 export class Graph implements t.Graph {
@@ -20,12 +20,13 @@ export class Graph implements t.Graph {
 
     protected $nodeMap = new Map<string, Node>();
 
-    constructor(readonly $loader: t.GraphLoader, spec: t.DeepPartial<t.Graph> = {}) {
+    constructor(readonly $loader: t.GraphLoader, spec: t.GraphSpec = {}) {
         const graph = Graph.schema.decode(spec);
         Object.assign(this, graph);
         this.nodes = [];
         for (const spec of graph.nodes) {
-            this.addNode(spec);
+            const node = new Node(this, spec);
+            this.addNodeRaw(node);
         }
     }
 
@@ -60,12 +61,17 @@ export class Graph implements t.Graph {
         return this.rootNodeId ? this.getNodeById(this.rootNodeId) : null;
     }
 
-    // TODO create AddNodeSpec with URL and ref gerenation
-    addNode(spec: t.DeepPartial<t.Node> = {}) {
-        const node = new Node(this, spec);
+    async createNode(spec: t.AddNodeSpec) {
+        await this.$loader.loadNodeDef(spec.uri);
+        const ref = this.getRefForUri(spec.uri);
+        const node = new Node(this, { ...spec.node, ref });
+        this.addNodeRaw(node);
+        return node;
+    }
+
+    protected addNodeRaw(node: Node) {
         this.nodes.push(node);
         this.$nodeMap.set(node.id, node);
-        return node;
     }
 
     deleteNode(nodeId: string) {
@@ -132,6 +138,18 @@ export class Graph implements t.Graph {
                 this._computeOrder(order, linkNode);
             }
         }
+    }
+
+    protected getRefForUri(uri: string): string {
+        for (const [k, v] of Object.entries(this.refs)) {
+            if (v === uri) {
+                return k;
+            }
+        }
+        // Generate a new one
+        const ref = shortId();
+        this.refs[ref] = uri;
+        return ref;
     }
 
 }

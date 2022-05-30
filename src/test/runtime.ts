@@ -1,4 +1,6 @@
+import { Graph } from '../main/model/graph.js';
 import { GraphLoader } from '../main/runtime/loader.js';
+import * as t from '../main/types/index.js';
 
 /**
  * Test runtime utilities.
@@ -23,6 +25,12 @@ export class TestRuntime {
             await loader.loadNodeDef(uri);
         }
         return loader;
+    }
+
+    async loadGraph(spec: t.GraphSpec): Promise<Graph> {
+        const loader = await this.createLoader();
+        const graph = await loader.loadGraph(spec);
+        return graph;
     }
 }
 
