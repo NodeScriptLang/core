@@ -1,4 +1,4 @@
-import { Graph, Node, Prop } from '../model/index.js';
+import { Graph, Node, NodeLink, Prop } from '../model/index.js';
 import * as t from '../types/index.js';
 import { isSchemaCompatible, MultiMap, NotFoundError } from '../util/index.js';
 import { CodeBuilder } from './code.js';
@@ -45,7 +45,7 @@ class GraphCompilerContext {
     // The order in which nodes need to be computed to fulfill the root node
     order: Node[] = [];
     // The cached dependency map of a graph
-    depsMap: MultiMap<string, Node>;
+    linkMap: MultiMap<string, NodeLink>;
 
     // Commonly used symbols
     sym = {
@@ -66,7 +66,7 @@ class GraphCompilerContext {
             ...options
         };
         this.order = graph.computeOrder(rootNode.id);
-        this.depsMap = graph.computeDepMap();
+        this.linkMap = graph.computeLinkMap();
     }
 
     compileEsm() {
@@ -414,7 +414,7 @@ class GraphCompilerContext {
     }
 
     private isNodeCached(nodeId: string) {
-        return this.depsMap.get(nodeId).size > 1;
+        return this.linkMap.get(nodeId).size > 1;
     }
 
 }

@@ -133,10 +133,10 @@ export class Node implements t.Node {
         }
     }
 
-    *rightNodes(depMap = this.$graph.computeDepMap()): Iterable<Node> {
+    *rightNodes(linkMap = this.$graph.computeLinkMap()): Iterable<Node> {
         yield this;
-        for (const node of depMap.get(this.id)) {
-            yield* node.rightNodes(depMap);
+        for (const link of linkMap.get(this.id)) {
+            yield* link.node.rightNodes(linkMap);
         }
     }
 

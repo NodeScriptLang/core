@@ -100,17 +100,18 @@ export class Graph implements t.Graph {
         }
     }
 
-    /**
-     * Returns a map of fromNodeId -> set of toNode.
-     * Only direct links are mapped.
-     */
-    computeDepMap() {
-        const map = new MultiMap<string, Node>();
+    computeLinkMap() {
+        const map = new MultiMap<string, NodeLink>();
         for (const node of this.nodes) {
             for (const prop of node.computedProps()) {
                 const linkNode = prop.getLinkNode();
                 if (linkNode) {
-                    map.add(linkNode.id, node);
+                    map.add(linkNode.id, {
+                        node,
+                        prop,
+                        linkNode,
+                        linkKey: prop.linkKey,
+                    });
                 }
             }
         }
