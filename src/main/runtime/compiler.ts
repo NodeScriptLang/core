@@ -142,17 +142,8 @@ class GraphCompilerContext {
         this.emitComment(`${node.ref} ${node.id}`);
         const sym = this.nextSym('r');
         this.symtable.set(`node:${node.id}`, sym);
-        if (node.$uri === 'core:Param') {
-            // Param nodes are not emitted, "params" sym is accessed in-place
-            return;
-        }
-        if (node.$uri === 'core:Comment') {
-            // Comment nodes are discarded
-            return;
-        }
-        if (node.$uri === 'core:Result') {
-            // Result node needs a special type conversion defined by graph metadata
-            return this.emitResultNode(node);
+        if (node.$uri.startsWith('core:')) {
+            return this.emitCoreNode(node);
         }
         this.code.block(`async function ${sym}(ctx) {`, `}`, () => {
             if (this.isNodeCached(node.id)) {
@@ -169,6 +160,21 @@ class GraphCompilerContext {
                 this.emitNodeBody(node);
             }
         });
+    }
+
+    private emitCoreNode(node: Node) {
+        switch (node.$uri) {
+            // Param nodes are not emitted, "params" sym is accessed in-place
+            case 'core:Param':
+                return;
+            // Comment nodes are discarded
+            case 'core:Comment':
+                return;
+            case 'core:Result':
+                return this.emitResultNode(node);
+            case 'core:Local':
+                return this.emitLocalNode(node);
+        }
     }
 
     private emitNodeBody(node: Node) {
@@ -201,6 +207,14 @@ class GraphCompilerContext {
         const expr = this.singlePropExpr(prop, this.graph.result);
         this.code.line(`async function ${sym}(ctx) {` +
             `return ${expr};` +
+        `}`);
+    }
+
+    private emitLocalNode(node: Node) {
+        const sym = this.getNodeSym(node.id);
+        const prop = node.getBasePropByKey('key')!;
+        this.code.line(`async function ${sym}(ctx) {` +
+            `return ctx.getLocal(${JSON.stringify(prop.value)});` +
         `}`);
     }
 

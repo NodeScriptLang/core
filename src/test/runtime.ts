@@ -12,12 +12,13 @@ export class TestRuntime {
     httpPort = Number(process.env.PORT) || 8080;
 
     defs = {
-        'math.add': this.makeUrl('/out/test/defs/math.add.js'),
         'string': this.makeUrl('/out/test/defs/string.js'),
         'number': this.makeUrl('/out/test/defs/number.js'),
         'object': this.makeUrl('/out/test/defs/object.js'),
         'array': this.makeUrl('/out/test/defs/array.js'),
         'any': this.makeUrl('/out/test/defs/any.js'),
+        'math.add': this.makeUrl('/out/test/defs/math.add.js'),
+        'lambda.map': this.makeUrl('/out/test/defs/lambda.map.js'),
     };
 
     makeUrl(path: string) {

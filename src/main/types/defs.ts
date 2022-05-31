@@ -25,7 +25,7 @@ export type Operator<Params = any, Result = any> = {
 
 export type NodeCompute<P, R> = (this: void, params: P, ctx: GraphEvalContext) => R | Promise<R>;
 
-export type Lambda<P, R> = (params: P) => Promise<R>;
+export type Lambda<Params, Result> = (params: Params) => Promise<Result>;
 
 export type ParamDefs<P> = {
     [K in keyof P]: ParamDef<P[K]>;

@@ -289,8 +289,8 @@ describe('GraphCompiler', () => {
                             {
                                 key: 'items',
                                 entries: [
-                                    { key: '', value: '42' },
-                                    { key: '', linkId: 'num' },
+                                    { value: '42' },
+                                    { linkId: 'num' },
                                 ]
                             },
                         ]
@@ -315,7 +315,45 @@ describe('GraphCompiler', () => {
             assert.deepStrictEqual(res, ['42', 42]);
         });
 
-        it('prefers base link over entries');
+        it('prefers base link over entries if both specified', async () => {
+            const graph = await runtime.loadGraph({
+                rootNodeId: 'res',
+                nodes: [
+                    {
+                        id: 'res',
+                        ref: 'array',
+                        props: [
+                            {
+                                key: 'items',
+                                linkId: 'p',
+                                entries: [
+                                    { value: 'one' },
+                                    { value: 'two' },
+                                ]
+                            },
+                        ]
+                    },
+                    {
+                        id: 'p',
+                        ref: 'param',
+                        props: [
+                            { key: 'key', value: 'value' }
+                        ]
+                    }
+                ],
+                refs: {
+                    param: 'core:Param',
+                    array: runtime.defs['array'],
+                }
+            });
+            const code = new GraphCompiler().compileEsm(graph);
+            const { node } = await evalEsmModule(code);
+            const ctx = new GraphEvalContext();
+            const res = await node.compute({
+                value: ['foo', 'bar']
+            }, ctx);
+            assert.deepStrictEqual(res, ['foo', 'bar']);
+        });
 
     });
 
@@ -585,15 +623,124 @@ describe('GraphCompiler', () => {
                 { nodeId: 'p', result: '42' },
                 { nodeId: 'res', result: 84 },
             ]);
+            assert.deepStrictEqual(ctx.$cache.size, 1);
+            assert.deepStrictEqual(ctx.$cache.get('p'), '42');
         });
 
-        it('does not cache node when its result is only used once');
-        it('TODO never caches the nodes with cache: never');
-        it('TODO always caches the nodes with cache: always');
+        it('does not cache node when its result is only used once', async () => {
+            const graph = await runtime.loadGraph({
+                rootNodeId: 'res',
+                nodes: [
+                    {
+                        id: 'res',
+                        ref: 'add',
+                        props: [
+                            { key: 'a', linkId: 'p' },
+                            { key: 'b', value: '12' },
+                        ]
+                    },
+                    {
+                        id: 'p',
+                        ref: 'string',
+                        props: [
+                            { key: 'value', value: '42' },
+                        ]
+                    }
+                ],
+                refs: {
+                    add: runtime.defs['math.add'],
+                    string: runtime.defs['string'],
+                }
+            });
+            const code = new GraphCompiler().compileEsm(graph, { introspect: true });
+            const { node } = await evalEsmModule(code);
+            const ctx = new GraphEvalContext();
+            const results: t.NodeResult[] = [];
+            ctx.$nodeEvaluated.on(_ => results.push(_));
+            const res = await node.compute({}, ctx);
+            assert.deepStrictEqual(res, 54);
+            assert.deepStrictEqual(results, [
+                { nodeId: 'p', result: '42' },
+                { nodeId: 'res', result: 54 },
+            ]);
+            assert.deepStrictEqual(ctx.$cache.size, 0);
+        });
+
     });
 
     describe('lambda', () => {
-        it('evaluates locals and scoped nodes');
+
+        it('evaluates locals and scoped nodes', async () => {
+            const graph = await runtime.loadGraph({
+                rootNodeId: 'res',
+                nodes: [
+                    {
+                        id: 'res',
+                        ref: 'map',
+                        props: [
+                            { key: 'array', linkId: 'arr' },
+                            { key: 'fn', linkId: 'fn' },
+                        ]
+                    },
+                    {
+                        id: 'arr',
+                        ref: 'array',
+                        props: [
+                            {
+                                key: 'items',
+                                entries: [
+                                    { value: 'one' },
+                                    { value: 'two' },
+                                    { value: 'three' },
+                                ]
+                            },
+                        ]
+                    },
+                    {
+                        id: 'fn',
+                        ref: 'array',
+                        props: [
+                            {
+                                key: 'items',
+                                entries: [
+                                    { linkId: 'index' },
+                                    { linkId: 'item' },
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        id: 'index',
+                        ref: 'local',
+                        props: [
+                            { key: 'key', value: 'index' },
+                        ]
+                    },
+                    {
+                        id: 'item',
+                        ref: 'local',
+                        props: [
+                            { key: 'key', value: 'item' },
+                        ]
+                    }
+                ],
+                refs: {
+                    map: runtime.defs['lambda.map'],
+                    array: runtime.defs['array'],
+                    local: 'core:Local',
+                }
+            });
+            const code = new GraphCompiler().compileEsm(graph);
+            const { node } = await evalEsmModule(code);
+            const ctx = new GraphEvalContext();
+            const res = await node.compute({}, ctx);
+            assert.deepStrictEqual(res, [
+                [0, 'one'],
+                [1, 'two'],
+                [2, 'three'],
+            ]);
+        });
+
     });
 
 });

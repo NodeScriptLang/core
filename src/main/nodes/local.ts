@@ -13,7 +13,5 @@ export const Local: t.Operator<{
         }
     },
     result: { type: 'any' },
-    compute(params, ctx) {
-        return ctx.getLocal(params.key);
-    }
+    compute() {}
 };
