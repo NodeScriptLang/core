@@ -1,0 +1,22 @@
+name: CI
+on:
+  push:
+    branches:
+    - main
+  pull_request:
+    branches:
+    - main
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v2
+    - name: use node 18
+      uses: actions/setup-node@v2
+      with:
+        node-version: '18'
+    - run: npm ci
+    - run: npm run lint
+    - run: npm run compile
+    - run: npm test
