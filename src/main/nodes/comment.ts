@@ -4,7 +4,7 @@ export const Comment: t.Operator<{
     comment: string;
 }, any> = {
     label: 'Comment',
-    category: ['Utils'],
+    category: ['Graph'],
     params: {
         comment: {
             schema: {
@@ -12,6 +12,6 @@ export const Comment: t.Operator<{
             },
         }
     },
-    returns: { type: 'any' },
+    result: { type: 'any' },
     compute() {},
 };

@@ -13,27 +13,37 @@ export class GraphLoader implements t.GraphLoader {
         this.defineOperator('core:Local', systemNodes.Local);
     }
 
-    async loadGraph(spec: t.DeepPartial<t.Graph>): Promise<Graph> {
+    async loadGraph(spec: t.GraphSpec): Promise<Graph> {
         const { refs = {} } = spec;
         const promises = [];
         for (const uri of Object.values(refs)) {
             if (!uri) {
                 continue;
             }
-            const promise = this.loadNodeDef(uri)
-                .then(nodeDef => this.defineOperator(uri, nodeDef));
-            promises.push(promise);
+            promises.push(this.loadNodeDef(uri));
         }
         await Promise.all(promises);
         return new Graph(this, spec);
     }
 
     async loadNodeDef(uri: string): Promise<t.NodeDef> {
-        const { node } = await import(uri);
-        if (!node) {
+        const existing = this.getNodeDef(uri);
+        if (existing) {
+            // No not import twice
+            return existing;
+        }
+        if (uri.startsWith('core:')) {
+            // Do not import core:
+            return existing ?? this.unresolved(uri);
+        }
+        const res = await import(uri);
+        // TODO throw if node does not exist or cannot be decoded?
+        if (!res.node) {
             return this.unresolved(uri);
         }
-        return NodeDefSchema.decode(node);
+        const nodeDef = NodeDefSchema.decode(res.node);
+        this.defineOperator(uri, nodeDef);
+        return nodeDef;
     }
 
     resolveNodeDef(uri: string): t.NodeDef {
@@ -65,7 +75,7 @@ export class GraphLoader implements t.GraphLoader {
             category: [],
             hidden: true,
             params: {},
-            returns: { type: 'any' },
+            result: { type: 'any' },
             compute() {
                 throw new UnresolvedNodeError(`Node definition ${uri} not found`);
             },
@@ -74,6 +84,6 @@ export class GraphLoader implements t.GraphLoader {
 }
 
 export class UnresolvedNodeError extends Error {
+    name = this.constructor.name;
     status = 500;
-    name = 'UnresolvedNodeError';
 }

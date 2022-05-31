@@ -1,6 +1,6 @@
 import { GraphSchema } from '../schema/index.js';
 import * as t from '../types/index.js';
-import { MultiMap, serialize } from '../util/index.js';
+import { MultiMap, serialize, shortId } from '../util/index.js';
 import { Node, NodeLink } from './node.js';
 
 export class Graph implements t.Graph {
@@ -14,18 +14,19 @@ export class Graph implements t.Graph {
     hidden!: boolean;
     rootNodeId!: string;
     params: Record<string, t.ParamMetadata> = {};
-    returns: t.DataSchema<any> = { type: 'any' };
+    result: t.DataSchema<any> = { type: 'any' };
     nodes: Node[];
     refs: Record<string, string> = {};
 
     protected $nodeMap = new Map<string, Node>();
 
-    constructor(readonly $loader: t.GraphLoader, spec: t.DeepPartial<t.Graph> = {}) {
+    constructor(readonly $loader: t.GraphLoader, spec: t.GraphSpec = {}) {
         const graph = Graph.schema.decode(spec);
         Object.assign(this, graph);
         this.nodes = [];
         for (const spec of graph.nodes) {
-            this.addNode(spec);
+            const node = new Node(this, spec);
+            this.addNodeRaw(node);
         }
     }
 
@@ -42,8 +43,13 @@ export class Graph implements t.Graph {
         });
     }
 
+    resolveUri(ref: string): string {
+        const uri = this.refs[ref] ?? '';
+        return uri;
+    }
+
     resolveNode(ref: string): t.NodeDef {
-        const uri = this.refs[ref];
+        const uri = this.resolveUri(ref);
         return this.$loader.resolveNodeDef(uri);
     }
 
@@ -55,11 +61,17 @@ export class Graph implements t.Graph {
         return this.rootNodeId ? this.getNodeById(this.rootNodeId) : null;
     }
 
-    addNode(spec: t.DeepPartial<t.Node> = {}) {
-        const node = new Node(this, spec);
+    async createNode(spec: t.AddNodeSpec) {
+        await this.$loader.loadNodeDef(spec.uri);
+        const ref = this.getRefForUri(spec.uri);
+        const node = new Node(this, { ...spec.node, ref });
+        this.addNodeRaw(node);
+        return node;
+    }
+
+    protected addNodeRaw(node: Node) {
         this.nodes.push(node);
         this.$nodeMap.set(node.id, node);
-        return node;
     }
 
     deleteNode(nodeId: string) {
@@ -88,16 +100,18 @@ export class Graph implements t.Graph {
         }
     }
 
-    /**
-     * Returns a map of fromNodeId -> set of toNodeId.
-     */
-    getDepMap() {
-        const map = new MultiMap<string, Node>();
+    computeLinkMap() {
+        const map = new MultiMap<string, NodeLink>();
         for (const node of this.nodes) {
             for (const prop of node.computedProps()) {
                 const linkNode = prop.getLinkNode();
                 if (linkNode) {
-                    map.add(linkNode.id, node);
+                    map.add(linkNode.id, {
+                        node,
+                        prop,
+                        linkNode,
+                        linkKey: prop.linkKey,
+                    });
                 }
             }
         }
@@ -125,6 +139,22 @@ export class Graph implements t.Graph {
                 this._computeOrder(order, linkNode);
             }
         }
+    }
+
+    protected getRefForUri(uri: string): string {
+        for (const [k, v] of Object.entries(this.refs)) {
+            if (v === uri) {
+                return k;
+            }
+        }
+        // Generate a new one
+        const ref = shortId();
+        this.refs[ref] = uri;
+        return ref;
+    }
+
+    compute() {
+        // Just a dummy to satisfy the interface
     }
 
 }

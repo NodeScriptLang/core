@@ -1,25 +1,21 @@
 import assert from 'assert';
 
-import { GraphLoader } from '../main/runtime/loader.js';
-import { runtime } from './runtime.js';
-
-const nodeUrls = {
-    'math.add': runtime.makeUrl('/out/test/nodes/math.add.js'),
-};
+import { GraphLoader } from '../../main/runtime/loader.js';
+import { runtime } from '../runtime.js';
 
 describe('GraphLoader', () => {
 
     it('loads modules from URL', async () => {
         const loader = new GraphLoader();
-        const def = await loader.loadNodeDef(nodeUrls['math.add']);
+        const def = await loader.loadNodeDef(runtime.defs['math.add']);
         assert.deepStrictEqual(def.label, 'Math.Add');
         assert.deepStrictEqual(def.category, []);
-        assert.deepStrictEqual(def.description, '');
+        assert.deepStrictEqual(def.description, 'Computes a sum of two numbers.');
         assert.deepStrictEqual(def.params, {
             a: { schema: { type: 'number' } },
             b: { schema: { type: 'number' } },
         });
-        assert.deepStrictEqual(def.returns, { type: 'number' });
+        assert.deepStrictEqual(def.result, { type: 'number' });
         assert.strictEqual(typeof def.compute, 'function');
     });
 
@@ -30,10 +26,10 @@ describe('GraphLoader', () => {
                 { ref: 'n1' }
             ],
             refs: {
-                'n1': nodeUrls['math.add'],
+                'n1': runtime.defs['math.add'],
             }
         });
-        const def = loader.resolveNodeDef(nodeUrls['math.add']);
+        const def = loader.resolveNodeDef(runtime.defs['math.add']);
         assert.deepStrictEqual(def.label, 'Math.Add');
         assert.strictEqual(typeof def.compute, 'function');
     });
@@ -52,7 +48,7 @@ describe('GraphLoader', () => {
                 }
             ],
             refs: {
-                'n1': nodeUrls['math.add'],
+                'n1': runtime.defs['math.add'],
             }
         });
         const node = graph.getNodeById('node1');

@@ -5,6 +5,7 @@ export const node: Operator<{
     b: number;
 }, number> = {
     label: 'Math.Add',
+    description: 'Computes a sum of two numbers.',
     params: {
         a: {
             schema: {
@@ -17,7 +18,7 @@ export const node: Operator<{
             }
         }
     },
-    returns: {
+    result: {
         type: 'number',
     },
     compute(params) {

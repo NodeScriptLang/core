@@ -1,0 +1,11 @@
+{
+    "exec": "npx mocha --node-option=experimental-network-imports",
+    "watch": [
+        "./out/**/*"
+    ],
+    "delay": 100,
+    "ext": "js,ts,json",
+    "env": {
+        "NODE_ENV": "test"
+    }
+}

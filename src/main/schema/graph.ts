@@ -32,8 +32,8 @@ export const GraphSchema = new Schema<t.Graph>({
             properties: {},
             additionalProperties: ParamMetadataSchema.schema,
         },
-        returns: DataSchemaSchema.schema as any,
-        compute: { type: 'any', optional: true },
+        result: DataSchemaSchema.schema as any,
+        compute: { type: 'any' },
         nodes: {
             type: 'array',
             items: NodeSchema.schema,

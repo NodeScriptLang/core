@@ -8,20 +8,24 @@ export type NodeDef = {
     deprecated: string;
     hidden: boolean;
     params: Record<string, ParamDef>;
-    returns: DataSchema<any>;
-    compute?: (...args: any[]) => any;
+    result: DataSchema<any>;
+    compute: (...args: any[]) => any;
 };
 
-export type Operator<Params = any, Returns = any> = {
+export type Operator<Params = any, Result = any> = {
     label: string;
+    category?: string[];
+    description?: string;
+    deprecated?: string;
+    hidden?: boolean;
     params: ParamDefs<Params>;
-    returns: DataSchema<Returns>;
-    compute?: NodeCompute<Params, Returns>;
-} & Partial<NodeDef>;
+    result: DataSchema<Result>;
+    compute: NodeCompute<Params, Result>;
+};
 
 export type NodeCompute<P, R> = (this: void, params: P, ctx: GraphEvalContext) => R | Promise<R>;
 
-export type Lambda<P, R> = (params: P) => Promise<R>;
+export type Lambda<Params, Result> = (params: Params) => Promise<Result>;
 
 export type ParamDefs<P> = {
     [K in keyof P]: ParamDef<P[K]>;

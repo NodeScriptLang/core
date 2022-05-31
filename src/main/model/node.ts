@@ -30,7 +30,7 @@ export class Node implements t.Node {
 
     props: Prop[] = [];
 
-    constructor(readonly $graph: Graph, spec: t.DeepPartial<t.Node> = {}) {
+    constructor(readonly $graph: Graph, spec: t.NodeSpec = {}) {
         const node = Node.schema.decode(spec);
         Object.assign(this, node);
         this.props = this.initProps(node.props);
@@ -42,6 +42,10 @@ export class Node implements t.Node {
             collapsed: false,
             scopeId: '',
         });
+    }
+
+    get $uri() {
+        return this.$graph.resolveUri(this.ref);
     }
 
     get $def() {
@@ -129,10 +133,10 @@ export class Node implements t.Node {
         }
     }
 
-    *rightNodes(depMap = this.$graph.getDepMap()): Iterable<Node> {
+    *rightNodes(linkMap = this.$graph.computeLinkMap()): Iterable<Node> {
         yield this;
-        for (const node of depMap.get(this.id)) {
-            yield* node.rightNodes(depMap);
+        for (const link of linkMap.get(this.id)) {
+            yield* link.node.rightNodes(linkMap);
         }
     }
 

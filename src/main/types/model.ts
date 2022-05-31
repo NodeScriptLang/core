@@ -1,3 +1,4 @@
+import { DeepPartial } from './deep-partial.js';
 import { NodeDef } from './defs.js';
 
 export interface Graph extends NodeDef {
@@ -5,6 +6,8 @@ export interface Graph extends NodeDef {
     rootNodeId: string;
     refs: Record<string, string>;
 }
+
+export type GraphSpec = DeepPartial<Graph>;
 
 export interface Node {
     id: string;
@@ -15,6 +18,8 @@ export interface Node {
     props: Prop[];
 }
 
+export type NodeSpec = DeepPartial<Node>;
+
 export interface Prop {
     id: string;
     key: string;
@@ -24,3 +29,10 @@ export interface Prop {
     expand: boolean;
     entries?: Prop[];
 }
+
+export type PropSpec = DeepPartial<Prop>;
+
+export type AddNodeSpec = {
+    uri: string;
+    node: NodeSpec;
+};

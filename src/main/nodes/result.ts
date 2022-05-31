@@ -12,6 +12,6 @@ export const Result: t.Operator<{
             },
         }
     },
-    returns: { type: 'any' },
+    result: { type: 'any' },
     compute() {},
 };
