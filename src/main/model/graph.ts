@@ -43,6 +43,8 @@ export class Graph implements t.Graph {
         });
     }
 
+    compute() {}
+
     resolveUri(ref: string): string {
         const uri = this.refs[ref] ?? '';
         return uri;
@@ -151,10 +153,6 @@ export class Graph implements t.Graph {
         const ref = shortId();
         this.refs[ref] = uri;
         return ref;
-    }
-
-    compute() {
-        // Just a dummy to satisfy the interface
     }
 
 }

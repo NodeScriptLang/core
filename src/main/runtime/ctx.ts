@@ -1,7 +1,7 @@
+import { Schema } from 'airtight';
 import { Event } from 'typesafe-event';
 
 import * as t from '../types/index.js';
-import { convertType } from '../util/index.js';
 
 /**
  * GraphEvalContext provides runtime tools for graph computation
@@ -26,7 +26,7 @@ export abstract class BaseContext implements t.GraphEvalContext {
     }
 
     $convertType<T>(value: unknown, schema: t.DataSchema<T>): T {
-        return convertType(value, schema);
+        return new Schema<T>(schema as any).decode(value);
     }
 }
 
