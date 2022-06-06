@@ -1,7 +1,7 @@
 import { GraphEvalContext } from './ctx.js';
 import { DataSchema } from './data.js';
 
-export type NodeDef = {
+export type NodeMetadata = {
     label: string;
     category: string[];
     description: string;
@@ -9,19 +9,24 @@ export type NodeDef = {
     hidden: boolean;
     params: Record<string, ParamDef>;
     result: DataSchema<any>;
+};
+
+export type NodeDef = {
+    metadata: NodeMetadata;
     compute: (...args: any[]) => any;
 };
 
 export type Operator<Params = any, Result = any> = {
-    label: string;
-    category?: string[];
-    description?: string;
-    deprecated?: string;
-    hidden?: boolean;
-    params: ParamDefs<Params>;
-    result: DataSchema<Result>;
+    metadata: OperatorMetadata<Params, Result>;
     compute: NodeCompute<Params, Result>;
 };
+
+export type OperatorMetadata<Params = any, Result = any> =
+    Partial<NodeMetadata> & {
+        label: string;
+        params: ParamDefs<Params>;
+        result: DataSchema<Result>;
+    };
 
 export type NodeCompute<P, R> = (this: void, params: P, ctx: GraphEvalContext) => R | Promise<R>;
 

@@ -109,15 +109,17 @@ describe('GraphCompiler', () => {
         it('can compile graph and use it as a node', async () => {
             const loader = await runtime.createLoader();
             const graph1 = await loader.loadGraph({
+                metadata: {
+                    params: {
+                        val: {
+                            schema: { type: 'number' },
+                        }
+                    },
+                    result: {
+                        type: 'number',
+                    },
+                },
                 rootNodeId: 'res',
-                params: {
-                    val: {
-                        schema: { type: 'number' },
-                    }
-                },
-                result: {
-                    type: 'number',
-                },
                 nodes: [
                     {
                         id: 'p1',

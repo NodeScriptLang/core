@@ -1,7 +1,8 @@
 import { DeepPartial } from './deep-partial.js';
-import { NodeDef } from './defs.js';
+import { NodeMetadata } from './defs.js';
 
-export interface Graph extends NodeDef {
+export interface Graph {
+    metadata: NodeMetadata;
     nodes: Node[];
     rootNodeId: string;
     refs: Record<string, string>;

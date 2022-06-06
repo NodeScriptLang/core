@@ -7,14 +7,8 @@ export class Graph implements t.Graph {
 
     static schema = GraphSchema;
 
-    label!: string;
-    category!: string[];
-    description!: string;
-    deprecated!: string;
-    hidden!: boolean;
+    metadata!: t.NodeMetadata;
     rootNodeId!: string;
-    params: Record<string, t.ParamMetadata> = {};
-    result: t.DataSchema<any> = { type: 'any' };
     nodes: Node[];
     refs: Record<string, string> = {};
 
