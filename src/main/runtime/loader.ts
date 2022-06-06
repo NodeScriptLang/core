@@ -34,21 +34,21 @@ export class GraphLoader implements t.GraphLoader {
         }
         if (uri.startsWith('core:')) {
             // Do not import core:
-            return existing ?? this.unresolved(uri);
+            return existing ?? this.createUnresolvedDef(uri);
         }
         const res = await import(uri);
         // TODO throw if node does not exist or cannot be decoded?
         if (!res.node) {
-            return this.unresolved(uri);
+            return this.createUnresolvedDef(uri);
         }
         const nodeDef = NodeDefSchema.decode(res.node);
-        this.defineOperator(uri, nodeDef);
+        this.defineNode(uri, nodeDef);
         return nodeDef;
     }
 
     resolveNodeDef(uri: string): t.NodeDef {
         const def = this.getNodeDef(uri);
-        return def ?? this.unresolved(uri);
+        return def ?? this.createUnresolvedDef(uri);
     }
 
     getNodeDef(uri: string) {
@@ -56,26 +56,36 @@ export class GraphLoader implements t.GraphLoader {
     }
 
     defineOperator(uri: string, op: t.Operator): t.NodeDef {
-        const def: t.NodeDef = {
+        const metadata: t.NodeMetadata = {
             category: [],
             description: '',
             deprecated: '',
             hidden: false,
-            ...op,
+            ...op.metadata,
         };
-        this.nodeDefs.set(uri, def);
-        return def;
+        const nodeDef = {
+            metadata,
+            compute: op.compute,
+        };
+        this.nodeDefs.set(uri, nodeDef);
+        return nodeDef;
     }
 
-    unresolved(uri: string): t.NodeDef {
+    protected defineNode(uri: string, nodeDef: t.NodeDef) {
+        this.nodeDefs.set(uri, nodeDef);
+    }
+
+    protected createUnresolvedDef(uri: string): t.NodeDef {
         return {
-            label: 'Unresolved',
-            description: '',
-            deprecated: '',
-            category: [],
-            hidden: true,
-            params: {},
-            result: { type: 'any' },
+            metadata: {
+                label: 'Unresolved',
+                description: '',
+                deprecated: '',
+                category: [],
+                hidden: true,
+                params: {},
+                result: { type: 'any' },
+            },
             compute() {
                 throw new UnresolvedNodeError(`Node definition ${uri} not found`);
             },

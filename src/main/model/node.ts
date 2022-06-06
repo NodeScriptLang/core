@@ -221,7 +221,7 @@ export class Node implements t.Node {
 
     protected initProps(specs: t.Prop[]) {
         const props: Prop[] = [];
-        for (const key of Object.keys(this.$def.params)) {
+        for (const key of Object.keys(this.$def.metadata.params)) {
             const spec = specs.find(_ => _.key === key) ?? { key };
             const prop = new Prop(this, spec);
             props.push(prop);

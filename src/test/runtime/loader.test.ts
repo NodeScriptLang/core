@@ -8,14 +8,18 @@ describe('GraphLoader', () => {
     it('loads modules from URL', async () => {
         const loader = new GraphLoader();
         const def = await loader.loadNodeDef(runtime.defs['math.add']);
-        assert.deepStrictEqual(def.label, 'Math.Add');
-        assert.deepStrictEqual(def.category, []);
-        assert.deepStrictEqual(def.description, 'Computes a sum of two numbers.');
-        assert.deepStrictEqual(def.params, {
-            a: { schema: { type: 'number' } },
-            b: { schema: { type: 'number' } },
+        assert.deepStrictEqual(def.metadata, {
+            label: 'Math.Add',
+            category: [],
+            description: 'Computes a sum of two numbers.',
+            deprecated: '',
+            hidden: false,
+            params: {
+                a: { schema: { type: 'number' } },
+                b: { schema: { type: 'number' } },
+            },
+            result: { type: 'number' },
         });
-        assert.deepStrictEqual(def.result, { type: 'number' });
         assert.strictEqual(typeof def.compute, 'function');
     });
 
@@ -30,7 +34,7 @@ describe('GraphLoader', () => {
             }
         });
         const def = loader.resolveNodeDef(runtime.defs['math.add']);
-        assert.deepStrictEqual(def.label, 'Math.Add');
+        assert.deepStrictEqual(def.metadata.label, 'Math.Add');
         assert.strictEqual(typeof def.compute, 'function');
     });
 
@@ -53,7 +57,7 @@ describe('GraphLoader', () => {
         });
         const node = graph.getNodeById('node1');
         const def = node!.$def;
-        assert.deepStrictEqual(def.label, 'Math.Add');
+        assert.deepStrictEqual(def.metadata.label, 'Math.Add');
         assert.strictEqual(typeof def.compute, 'function');
     });
 

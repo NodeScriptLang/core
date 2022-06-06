@@ -49,7 +49,7 @@ export class Prop implements t.Prop {
     }
 
     get $param(): t.ParamMetadata {
-        return this.$node.$def.params[this.$paramKey] ?? {
+        return this.$node.$def.metadata.params[this.$paramKey] ?? {
             schema: { type: 'any' },
         };
     }

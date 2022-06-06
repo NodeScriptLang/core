@@ -95,21 +95,15 @@ class GraphCompilerContext {
     private emitExportNode() {
         this.emitComment('Node Definition');
         this.code.block('export const node = {', '};', () => {
-            this.emitGraphProp('label');
-            this.emitGraphProp('category');
-            this.emitGraphProp('description');
-            this.emitGraphProp('deprecated');
-            this.emitGraphProp('hidden');
-            this.emitGraphProp('params');
-            this.emitGraphProp('result');
+            this.emitGraphMetadata();
             this.code.block('async compute(params, ctx) {', '}', () => {
                 this.emitComputeBody();
             });
         });
     }
 
-    private emitGraphProp<K extends keyof Graph>(key: K) {
-        this.code.line(`${key}: ${JSON.stringify(this.graph[key])},`);
+    private emitGraphMetadata() {
+        this.code.line(`metadata: ${JSON.stringify(this.graph.metadata)},`);
     }
 
     private emitComputeBody() {
@@ -204,7 +198,7 @@ class GraphCompilerContext {
     private emitResultNode(node: Node) {
         const sym = this.getNodeSym(node.id);
         const prop = node.getBasePropByKey('value')!;
-        const expr = this.singlePropExpr(prop, this.graph.result);
+        const expr = this.singlePropExpr(prop, this.graph.metadata.result);
         this.code.line(`async function ${sym}(ctx) {` +
             `return ${expr};` +
         `}`);
@@ -342,7 +336,7 @@ class GraphCompilerContext {
         let sourceSchema: t.DataSchema = { type: 'string' };
         const linkNode = prop.getLinkNode();
         if (linkNode) {
-            sourceSchema = linkNode.$def.result;
+            sourceSchema = linkNode.$def.metadata.result;
         }
         const needsTypeConversion = !isSchemaCompatible(targetSchema, sourceSchema);
         if (needsTypeConversion) {
@@ -390,7 +384,7 @@ class GraphCompilerContext {
         if (!linkNode) {
             return `() => ${this.convertTypeExpr(param.default ?? '', param.schema)}`;
         }
-        const targetSchema = linkNode.$def.result;
+        const targetSchema = linkNode.$def.metadata.result;
         const linkSym = this.getNodeSym(linkNode.id);
         const schemaCompatible = isSchemaCompatible(param.schema, targetSchema);
         return schemaCompatible ?

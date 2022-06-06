@@ -4,27 +4,29 @@ export const node: Operator<{
     array: unknown[];
     fn: Lambda<{ item: unknown; index: number }, unknown>;
 }, unknown[]> = {
-    label: 'Lambda.Map',
-    description: 'Executes a function for each array element and returns an array of results.',
-    params: {
-        array: {
-            schema: {
-                type: 'array',
-                items: { type: 'any' },
+    metadata: {
+        label: 'Lambda.Map',
+        description: 'Executes a function for each array element and returns an array of results.',
+        params: {
+            array: {
+                schema: {
+                    type: 'array',
+                    items: { type: 'any' },
+                },
             },
-        },
-        fn: {
-            kind: 'lambda',
-            schema: { type: 'any' },
-            scope: {
-                item: { type: 'any' },
-                index: { type: 'number' },
+            fn: {
+                kind: 'lambda',
+                schema: { type: 'any' },
+                scope: {
+                    item: { type: 'any' },
+                    index: { type: 'number' },
+                }
             }
-        }
-    },
-    result: {
-        type: 'array',
-        items: { type: 'any' },
+        },
+        result: {
+            type: 'array',
+            items: { type: 'any' },
+        },
     },
     async compute(params) {
         const result: unknown[] = [];
