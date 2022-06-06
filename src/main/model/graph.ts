@@ -37,8 +37,6 @@ export class Graph implements t.Graph {
         });
     }
 
-    compute() {}
-
     resolveUri(ref: string): string {
         const uri = this.refs[ref] ?? '';
         return uri;
