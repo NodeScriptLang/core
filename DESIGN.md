@@ -78,9 +78,9 @@ Graph Compiler would take a Graph and compile it into a definition module that c
 
 ## Dependency resolution
 
-Node reference their corresponding node definitions via `ref` field.
+Each node must have a corresponding node definition so that it can be computed and rendered by the editor. Nodes reference their corresponding node definitions via `ref` field.
 
-Each graph maps refs to URLs where to load the node definition modules from. Such map is maintained in the `dependencies` object.
+Each graph maps refs to URLs where to load the definition modules from. Such map is maintained in the `refs` object.
 
 ```yaml
 graph:
@@ -91,12 +91,14 @@ graph:
     - ref: foo
       props:
         # ...
-  dependencies:
-    - ref: object
-      url: https://nodescript.land/-/stdlib/object.js?v=1.2.3
-    - ref: foo
-      url: https://unpkg.com/my-awesome-module/foo-node.js
+  refs:
+    object: https://nodescript.land/-/stdlib/object.js?v=1.2.3
+    foo: https://unpkg.com/my-awesome-module/foo-node.js
 ```
+
+In this example `object` ref resolves to `https://nodescript.land/-/stdlib/object.js?v=1.2.3`.
+
+You can think of `ref` as a graph-local variable name, its only purpose is to avoid duplicating URLs when the same definition is used a lot.
 
 ## Runtime Requirements
 
