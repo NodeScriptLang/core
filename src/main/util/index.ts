@@ -1,6 +1,5 @@
 // This file is auto-generated
 export * from './clamp.js';
-export * from './errors.js';
 export * from './eval.js';
 export * from './id.js';
 export * from './multimap.js';
