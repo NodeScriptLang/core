@@ -36,7 +36,7 @@ export class GraphLoader implements t.GraphLoader {
             // Do not import core:
             return existing ?? this.createUnresolvedDef(uri);
         }
-        const res = await import(uri);
+        const res = await import(/* webpackIgnore: true */ uri);
         // TODO throw if node does not exist or cannot be decoded?
         if (!res.node) {
             return this.createUnresolvedDef(uri);

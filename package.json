@@ -12,8 +12,7 @@
         "./nodes": "./out/main/nodes/index.js"
     },
     "files": [
-        "out/main/**/*",
-        "bundle.js"
+        "out/main/**/*"
     ],
     "scripts": {
         "clean": "rm -rf out *.tsbuildinfo",
@@ -27,7 +26,7 @@
         "test:dev": "nodemon --config nodemon.test.json",
         "bundle": "esbuild out/main/index.js --bundle --keep-names --minify --outfile=bundle.js",
         "preversion": "npm run lint",
-        "version": "run-s compile bundle",
+        "version": "run-s compile",
         "postversion": "npm publish --access=public && git push --tags origin main"
     },
     "engines": {

@@ -1,5 +1,5 @@
 export async function evalEsmModule(code: string) {
-    return await import(codeToUrl(code));
+    return await import(/* webpackIgnore: true */ codeToUrl(code));
 }
 
 export function codeToUrl(code: string) {

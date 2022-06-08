@@ -1,6 +1,6 @@
 import { Graph, Node, NodeLink, Prop } from '../model/index.js';
 import * as t from '../types/index.js';
-import { isSchemaCompatible, MultiMap, NotFoundError } from '../util/index.js';
+import { isSchemaCompatible, MultiMap } from '../util/index.js';
 import { CodeBuilder } from './code.js';
 
 export interface GraphCompilerOptions {
@@ -26,7 +26,7 @@ export class GraphCompiler {
     compileEsm(graph: Graph, options: Partial<GraphCompilerOptions> = {}) {
         const node = graph.getNodeById(options.rootNodeId ?? graph.rootNodeId);
         if (!node) {
-            throw new NotFoundError('Node');
+            throw new CompilerError('Root node not found');
         }
         const gcc = new GraphCompilerContext(graph, node, options);
         return gcc.compileEsm();

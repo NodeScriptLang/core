@@ -10,6 +10,8 @@
         "forceConsistentCasingInFileNames": true,
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
+        // Note: it's important to preserve webpackIgnore: true comments near dynamic imports
+        "removeComments": false,
         "composite": true,
         "allowJs": true,
         "checkJs": false,
