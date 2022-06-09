@@ -29,7 +29,7 @@ export class GraphLoader implements t.GraphLoader {
     async loadNodeDef(uri: string): Promise<t.NodeDef> {
         const existing = this.getNodeDef(uri);
         if (existing) {
-            // No not import twice
+            // Do not import twice
             return existing;
         }
         if (uri.startsWith('core:')) {
