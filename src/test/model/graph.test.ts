@@ -1,36 +1,38 @@
-// import assert from 'assert';
-// import * as t from '../../main/types/model.js';
-// import { Node } from '../../main/model/node.js';
-import { assert } from 'console';
-import { Graph } from '../../main/model/graph.js';
+import assert from 'assert';
+
 import { GraphLoader } from '../../main/runtime/loader.js';
 import { runtime } from '../runtime.js';
-// import { DeepPartial } from '../../main/types/deep-partial.js';
 
 describe('Graph', () => {
 
     describe('createNode', () => {
 
-        it('adds the node'); // create a node, call the func, check the node exists
-        it('adds a URI to refs', async () => {
-        // PLAN: create a uri, call the func, check the ref equals the uri
+        it('adds the node to the graph', async () => {
             const loader = new GraphLoader();
-            const graph = await loader.loadGraph({
-                nodes: [
-                    { ref: 'n1' }
-                ],
-                refs: {
-                    'n1': runtime.defs['math.add'],
-                }
+            const graph = await loader.loadGraph();
+            assert.strictEqual(graph.nodes.length, 0);
+            const node = await graph.createNode({
+                uri: runtime.defs['any'],
+                node: {},
             });
-            // 1. setup - your expected result
-            const testUri = 'http://somekindofurl';
-            // 2. exert - call the func being tested
-            const res = await graph.createNode({ uri: testUri, node: { …nodeSpec }});
-            const uri = res.$uri;
-            // 3. verify - probably with an assert func
-            assert.deepStrictEqual(uri, testUri);
+            assert.ok(node);
+            assert.strictEqual(graph.nodes.length, 1);
+            assert.strictEqual(graph.nodes[0], node);
         });
+
+        it('adds a URI to refs', async () => {
+            const loader = new GraphLoader();
+            const graph = await loader.loadGraph();
+            assert.strictEqual(Object.keys(graph.refs).length, 0);
+            const uri = runtime.defs['math.add'];
+            const node = await graph.createNode({
+                uri,
+                node: {},
+            });
+            assert.strictEqual(Object.keys(graph.refs).length, 1);
+            assert.strictEqual(graph.refs[node.ref], uri);
+        });
+
         it('does not add the same URI twice'); // create node with a uri, call func with same uri, check that the uri is not the same? or that there are not two of them? how? - look at node structure
     });
 

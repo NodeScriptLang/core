@@ -34,7 +34,7 @@ describe('GraphLoader', () => {
             }
         });
         const def = loader.resolveNodeDef(runtime.defs['math.add']);
-        assert.deepStrictEqual(def.metadata.label, 'Math.Add');
+        assert.strictEqual(def.metadata.label, 'Math.Add');
         assert.strictEqual(typeof def.compute, 'function');
     });
 
@@ -57,7 +57,7 @@ describe('GraphLoader', () => {
         });
         const node = graph.getNodeById('node1');
         const def = node!.$def;
-        assert.deepStrictEqual(def.metadata.label, 'Math.Add');
+        assert.strictEqual(def.metadata.label, 'Math.Add');
         assert.strictEqual(typeof def.compute, 'function');
     });
 

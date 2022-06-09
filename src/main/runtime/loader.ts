@@ -13,7 +13,7 @@ export class GraphLoader implements t.GraphLoader {
         this.defineOperator('core:Local', systemNodes.Local);
     }
 
-    async loadGraph(spec: t.GraphSpec): Promise<Graph> {
+    async loadGraph(spec: t.GraphSpec = {}): Promise<Graph> {
         const { refs = {} } = spec;
         const promises = [];
         for (const uri of Object.values(refs)) {
