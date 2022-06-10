@@ -69,15 +69,72 @@ describe('Graph', () => {
             assert.notEqual(graph.refs[node1.ref], graph.refs[node2.ref]);
         });
 
-        // it('does not create a node with the wrong type of URI');
     });
-
 
     describe('deleteNode', () => {
 
-        it('removes the node'); // create, a graph, create a node, test the delete func on this new node, then check if the node is still existing .length 0 (create graph with node in it)
-        it('removes unused refs'); // **not yet implemented** create a ref that is unused, call the delete on this ref, check the ref is not there.
-        it('does not remove used refs'); // **not yet implemented**create a ref that is used, call the delete on this ref, check the ref is still there.
+        it('removes the correct node', async () => {
+            const loader = new GraphLoader();
+            const graph = await loader.loadGraph({
+                nodes: [
+                    {
+                        id: 'res',
+                        ref: 'add',
+                        props: [
+                            { key: 'a', linkId: 'p' },
+                            { key: 'b', linkId: 'p' },
+                        ]
+                    },
+                    {
+                        id: 'p',
+                        ref: 'string',
+                        props: [
+                            { key: 'value', value: '42' },
+                        ]
+                    }
+                ],
+                refs: {
+                    add: runtime.defs['math.add'],
+                    string: runtime.defs['string'],
+                }
+            });
+            assert.strictEqual(Object.keys(graph.nodes).length, 2);
+            await graph.deleteNode('res');
+            assert.strictEqual(Object.keys(graph.nodes).length, 1);
+            assert.strictEqual(graph.nodes[0]['id'], 'p');
+        });
+        it('only removes unused refs', async () => {
+            const loader = new GraphLoader();
+            const graph = await loader.loadGraph({
+                nodes: [
+                    {
+                        id: 'res',
+                        ref: 'add',
+                        props: [
+                            { key: 'a', linkId: 'p' },
+                            { key: 'b', linkId: 'p' },
+                        ]
+                    },
+                    {
+                        id: 'p',
+                        ref: 'string',
+                        props: [
+                            { key: 'value', value: '42' },
+                        ]
+                    }
+                ],
+                refs: {
+                    add: runtime.defs['math.add'],
+                    string: runtime.defs['string'],
+                }
+            });
+            assert.strictEqual(Object.keys(graph.nodes).length, 2);
+            assert.strictEqual(Object.keys(graph.refs).length, 2);
+            await graph.deleteNode('res');
+            assert.strictEqual(Object.keys(graph.nodes).length, 1);
+            assert.strictEqual(Object.keys(graph.refs).length, 1);
+            assert.strictEqual(Object.keys(graph.refs)[0], 'string');
+        });
 
     });
 

@@ -1,3 +1,4 @@
+import { node } from '../../test/defs/any.js';
 import { GraphSchema } from '../schema/index.js';
 import * as t from '../types/index.js';
 import { MultiMap, serialize, shortId } from '../util/index.js';
@@ -73,6 +74,12 @@ export class Graph implements t.Graph {
         const i = this.nodes.findIndex(_ => _.id === nodeId);
         if (i > -1) {
             this.nodes.splice(i, 1);
+            for (const elem of Object.keys(this.refs)) {
+                const res = this.nodes.find(node => node.ref === elem);
+                if (res === undefined) {
+                    delete this.refs[elem];
+                }
+            }
             return true;
         }
         return false;
