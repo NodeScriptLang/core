@@ -99,10 +99,11 @@ describe('Graph', () => {
                 }
             });
             assert.strictEqual(Object.keys(graph.nodes).length, 2);
-            await graph.deleteNode('res');
+            graph.deleteNode('res');
             assert.strictEqual(Object.keys(graph.nodes).length, 1);
             assert.strictEqual(graph.nodes[0]['id'], 'p');
         });
+
         it('only removes unused refs', async () => {
             const loader = new GraphLoader();
             const graph = await loader.loadGraph({
@@ -130,7 +131,7 @@ describe('Graph', () => {
             });
             assert.strictEqual(Object.keys(graph.nodes).length, 2);
             assert.strictEqual(Object.keys(graph.refs).length, 2);
-            await graph.deleteNode('res');
+            graph.deleteNode('res');
             assert.strictEqual(Object.keys(graph.nodes).length, 1);
             assert.strictEqual(Object.keys(graph.refs).length, 1);
             assert.strictEqual(Object.keys(graph.refs)[0], 'string');
