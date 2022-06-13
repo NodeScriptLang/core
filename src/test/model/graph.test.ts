@@ -141,9 +141,92 @@ describe('Graph', () => {
 
     describe('invariants', () => {
 
-        it('removes extra properties not supported by node definition');
-        it('ensures the correct order properties');
-        it('initializes all properties with default values');
+        it('removes extra properties not supported by node definition', async () => {
+            const loader = new GraphLoader();
+            const graph = await loader.loadGraph({
+                nodes: [
+                    {
+                        id: 'res',
+                        ref: 'add',
+                        props: [
+                            { key: 'c', value: '10' },
+                            { key: 'a', value: '12' },
+                            { key: 'b', value: '21' },
+                        ]
+                    }
+                ],
+                refs: {
+                    add: runtime.defs['math.add'],
+                }
+            });
+            const node = graph.getNodeById('res');
+            assert.strictEqual(node?.props.length, 2);
+            assert.strictEqual(node?.props[0].key, 'a');
+            assert.strictEqual(node?.props[1].key, 'b');
+        });
+
+        it('keeps firstmost properties when extra properties are present', async () => {
+            const loader = new GraphLoader();
+            const graph = await loader.loadGraph({
+                nodes: [
+                    {
+                        id: 'p',
+                        ref: 'string',
+                        props: [
+                            { key: 'value', value: '42' },
+                            { key: 'value', value: '68' },
+                        ]
+                    }
+                ],
+                refs: {
+                    string: runtime.defs['string'],
+                }
+            });
+            const node = graph.getNodeById('p');
+            assert.strictEqual(node?.props.length, 1);
+            assert.strictEqual(node?.props[0].value, '42');
+        });
+
+        it('ensures the correct order of properties', async () => {
+            const loader = new GraphLoader();
+            const graph = await loader.loadGraph({
+                nodes: [
+                    {
+                        id: 'res',
+                        ref: 'add',
+                        props: [
+                            { key: 'b', value: '21' },
+                            { key: 'a', value: '12' },
+                        ]
+                    }
+                ],
+                refs: {
+                    add: runtime.defs['math.add']
+                }
+            });
+            const node = graph.getNodeById('res');
+            assert.strictEqual(node?.props[0].key, 'a');
+            assert.strictEqual(node?.props[1].key, 'b');
+        });
+
+        it('initializes all node properties with default values', async () => {
+            const loader = new GraphLoader();
+            const graph = await loader.loadGraph({
+                nodes: [
+                    {
+                        id: 'res',
+                        ref: 'add',
+                    }
+                ],
+                refs: {
+                    add: runtime.defs['math.add']
+                }
+            });
+            const node = graph.getNodeById('res');
+            assert.strictEqual(node?.props.length, 2);
+            assert.strictEqual(node?.props[0].key, 'a');
+            assert.strictEqual(node?.props[1].key, 'b');
+        });
 
     });
 
