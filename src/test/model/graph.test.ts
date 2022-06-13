@@ -149,9 +149,9 @@ describe('Graph', () => {
                         id: 'res',
                         ref: 'add',
                         props: [
+                            { key: 'c', value: '10' },
                             { key: 'a', value: '12' },
                             { key: 'b', value: '21' },
-                            { key: 'c', value: '10' },
                         ]
                     }
                 ],
@@ -170,15 +170,6 @@ describe('Graph', () => {
             const graph = await loader.loadGraph({
                 nodes: [
                     {
-                        id: 'res',
-                        ref: 'add',
-                        props: [
-                            { key: 'c', value: '10' },
-                            { key: 'a', value: '12' },
-                            { key: 'b', value: '21' },
-                        ]
-                    },
-                    {
                         id: 'p',
                         ref: 'string',
                         props: [
@@ -188,17 +179,12 @@ describe('Graph', () => {
                     }
                 ],
                 refs: {
-                    add: runtime.defs['math.add'],
                     string: runtime.defs['string'],
                 }
             });
-            const node1 = graph.getNodeById('res');
-            const node2 = graph.getNodeById('p');
-            assert.strictEqual(node1?.props.length, 2);
-            assert.strictEqual(node2?.props.length, 1);
-            assert.strictEqual(node1?.props[0].key, 'a');
-            assert.strictEqual(node1?.props[1].key, 'b');
-            assert.strictEqual(node2?.props[0].value, '42');
+            const node = graph.getNodeById('p');
+            assert.strictEqual(node?.props.length, 1);
+            assert.strictEqual(node?.props[0].value, '42');
         });
 
         it('ensures the correct order of properties', async () => {
