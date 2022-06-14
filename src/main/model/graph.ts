@@ -55,6 +55,11 @@ export class Graph implements t.Graph {
         return this.rootNodeId ? this.getNodeById(this.rootNodeId) : null;
     }
 
+    /**
+     * Given a Uri, adds a node to the graph.
+     * Checks if ref corresponding to the Uri exists on the graph object,
+     * if it doesn't, this new ref is added when the node is created.
+     */
     async createNode(spec: t.AddNodeSpec) {
         await this.$loader.loadNodeDef(spec.uri);
         const ref = this.getRefForUri(spec.uri);
@@ -68,6 +73,9 @@ export class Graph implements t.Graph {
         this.$nodeMap.set(node.id, node);
     }
 
+    /**
+     * Deletes both the node & its corresponding ref if unused by any other node
+     */
     deleteNode(nodeId: string) {
         this.$nodeMap.delete(nodeId);
         const i = this.nodes.findIndex(_ => _.id === nodeId);
@@ -84,6 +92,9 @@ export class Graph implements t.Graph {
         return false;
     }
 
+    /**
+     * Returns an array of the nodes that exist without output links to any other node.
+     */
     rightmostNodes(): Node[] {
         const candidates = new Set(this.nodes);
         for (const node of this.nodes) {
@@ -100,6 +111,11 @@ export class Graph implements t.Graph {
         }
     }
 
+    /**
+     * Returns a map of linked nodes.
+     * It checks each node, if there is a link to a node
+     * then it is added to the map of links.
+     */
     computeLinkMap() {
         const map = new MultiMap<string, NodeLink>();
         for (const node of this.nodes) {
@@ -118,6 +134,10 @@ export class Graph implements t.Graph {
         return map;
     }
 
+    /**
+     * Returns an array of nodes in a particular order
+     * in which the nodes will be evaluated by the compiler, depe
+     */
     computeOrder(nodeId: string = this.rootNodeId): Node[] {
         const order: Node[] = [];
         const node = this.getNodeById(nodeId ?? this.rootNodeId);
