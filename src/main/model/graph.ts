@@ -26,12 +26,6 @@ export class Graph implements t.Graph {
 
     toJSON() {
         return serialize(this, {
-            label: '',
-            description: '',
-            deprecated: '',
-            hidden: false,
-            category: [],
-            params: {},
             rootNodeId: '',
             refs: {},
         });
