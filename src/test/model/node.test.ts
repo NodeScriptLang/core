@@ -7,7 +7,7 @@ describe('Node', () => {
 
     describe('canLinkTo', () => {
 
-        it.only('specifies whether a property is linkable or not', async () => {
+        it('specifies whether a property is linkable or not', async () => {
             const loader = new GraphLoader();
             const graph = await loader.loadGraph({
                 nodes: [
