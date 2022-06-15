@@ -56,9 +56,7 @@ export class Graph implements t.Graph {
     }
 
     /**
-     * Given a Uri, adds a node to the graph.
-     * Checks if ref corresponding to the Uri exists on the graph object,
-     * if it doesn't, this new ref is added when the node is created.
+     * Loads input uri to the graph's ref if none exists, & returns the created node.
      */
     async createNode(spec: t.AddNodeSpec) {
         await this.$loader.loadNodeDef(spec.uri);
@@ -93,7 +91,7 @@ export class Graph implements t.Graph {
     }
 
     /**
-     * Returns an array of the nodes that exist without output links to any other node.
+     * Returns an array of the nodes that have no outbound links.
      */
     rightmostNodes(): Node[] {
         const candidates = new Set(this.nodes);
@@ -112,9 +110,7 @@ export class Graph implements t.Graph {
     }
 
     /**
-     * Returns a map of linked nodes.
-     * It checks each node, if there is a link to a node
-     * then it is added to the map of links.
+     * Returns a map of all outbound links for each node.
      */
     computeLinkMap() {
         const map = new MultiMap<string, NodeLink>();
@@ -135,8 +131,7 @@ export class Graph implements t.Graph {
     }
 
     /**
-     * Returns an array of nodes in a particular order
-     * in which the nodes will be evaluated by the compiler, depe
+     * Returns the nodes in the order they are evaluated by the compiler.
      */
     computeOrder(nodeId: string = this.rootNodeId): Node[] {
         const order: Node[] = [];

@@ -88,8 +88,8 @@ export class Prop implements t.Prop {
     }
 
     /*
-    * Returns the node if a linkId exists on its properties (i.e has inbound link/s)
-    */
+     * Returns the node identified by its linkId.
+     */
     getLinkNode(): Node | null {
         if (this.linkId) {
             return this.$graph.getNodeById(this.linkId);
