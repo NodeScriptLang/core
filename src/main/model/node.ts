@@ -40,7 +40,6 @@ export class Node implements t.Node {
     toJSON() {
         return serialize(this, {
             collapsed: false,
-            scopeId: '',
         });
     }
 
@@ -91,7 +90,7 @@ export class Node implements t.Node {
     }
 
     /**
-     * Props used in actual computation; may include base props and/or entries
+     * Props used in actual computation; may include base props and/or entries.
      */
     *computedProps(): Iterable<Prop> {
         for (const prop of this.props) {

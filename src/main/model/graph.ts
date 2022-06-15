@@ -26,12 +26,6 @@ export class Graph implements t.Graph {
 
     toJSON() {
         return serialize(this, {
-            label: '',
-            description: '',
-            deprecated: '',
-            hidden: false,
-            category: [],
-            params: {},
             rootNodeId: '',
             refs: {},
         });
@@ -73,7 +67,7 @@ export class Graph implements t.Graph {
     }
 
     /**
-     * Deletes both the node & its corresponding ref if unused by any other node
+     * Deletes both the node & its corresponding ref if unused by any other node.
      */
     deleteNode(nodeId: string) {
         this.$nodeMap.delete(nodeId);
