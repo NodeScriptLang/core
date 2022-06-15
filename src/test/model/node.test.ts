@@ -7,7 +7,7 @@ describe('Node', () => {
 
     describe('canLinkTo', () => {
 
-        it('specifies whether a property is linkable or not', async () => {
+        it.only('specifies whether a property is linkable or not', async () => {
             const loader = new GraphLoader();
             const graph = await loader.loadGraph({
                 nodes: [
@@ -30,12 +30,10 @@ describe('Node', () => {
                     string: runtime.defs['string'],
                 }
             });
-            const node1 = graph.getNodeById('res');
-            const node2 = graph.getNodeById('p');
-            const res1 = node2 ? node1?.canLinkTo(node2) : null;
-            const res2 = node1 ? node2?.canLinkTo(node1) : null;
-            assert.strictEqual(res1, true);
-            assert.strictEqual(res2, false);
+            const node1 = graph.getNodeById('res')!;
+            const node2 = graph.getNodeById('p')!;
+            assert.strictEqual(node1?.canLinkTo(node2), true);
+            assert.strictEqual(node2?.canLinkTo(node1), false);
         });
 
     });
