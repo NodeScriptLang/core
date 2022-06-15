@@ -34,7 +34,6 @@ export class Node implements t.Node {
         const node = Node.schema.decode(spec);
         Object.assign(this, node);
         this.props = this.initProps(node.props);
-        this.applyInvariants();
     }
 
     toJSON() {
@@ -228,8 +227,9 @@ export class Node implements t.Node {
         return props;
     }
 
-    protected applyInvariants() {
+    applyInvariants() {
         this.w = clamp(this.w, Node.MIN_W, Node.MAX_W);
+        // Loops are not allowed between the nodes
         for (const prop of this.props) {
             const linkNode = prop.getLinkNode();
             if (linkNode) {
