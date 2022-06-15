@@ -26,6 +26,12 @@ export class Graph implements t.Graph {
 
     toJSON() {
         return serialize(this, {
+            label: '',
+            description: '',
+            deprecated: '',
+            hidden: false,
+            category: [],
+            params: {},
             rootNodeId: '',
             refs: {},
         });
@@ -49,6 +55,10 @@ export class Graph implements t.Graph {
         return this.rootNodeId ? this.getNodeById(this.rootNodeId) : null;
     }
 
+    /**
+     * Uses uri to load node definition & add graph ref if none exists.
+     * Returns the created node.
+     */
     async createNode(spec: t.AddNodeSpec) {
         await this.$loader.loadNodeDef(spec.uri);
         const ref = this.getRefForUri(spec.uri);
@@ -62,6 +72,9 @@ export class Graph implements t.Graph {
         this.$nodeMap.set(node.id, node);
     }
 
+    /**
+     * Deletes both the node & its corresponding ref if unused by any other node
+     */
     deleteNode(nodeId: string) {
         this.$nodeMap.delete(nodeId);
         const i = this.nodes.findIndex(_ => _.id === nodeId);
@@ -78,6 +91,9 @@ export class Graph implements t.Graph {
         return false;
     }
 
+    /**
+     * Returns an array of the nodes that have no outbound links.
+     */
     rightmostNodes(): Node[] {
         const candidates = new Set(this.nodes);
         for (const node of this.nodes) {
@@ -94,6 +110,9 @@ export class Graph implements t.Graph {
         }
     }
 
+    /**
+     * Returns a map of all outbound links for each node.
+     */
     computeLinkMap() {
         const map = new MultiMap<string, NodeLink>();
         for (const node of this.nodes) {
@@ -112,6 +131,9 @@ export class Graph implements t.Graph {
         return map;
     }
 
+    /**
+     * Returns the nodes in the order they are evaluated by the compiler.
+     */
     computeOrder(nodeId: string = this.rootNodeId): Node[] {
         const order: Node[] = [];
         const node = this.getNodeById(nodeId ?? this.rootNodeId);

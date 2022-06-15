@@ -40,6 +40,7 @@ export class Node implements t.Node {
     toJSON() {
         return serialize(this, {
             collapsed: false,
+            scopeId: '',
         });
     }
 

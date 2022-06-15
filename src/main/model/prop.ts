@@ -87,6 +87,9 @@ export class Prop implements t.Prop {
         return this.isSupportsEntries() && !this.getLinkNode();
     }
 
+    /*
+     * Returns the node identified by its linkId.
+     */
     getLinkNode(): Node | null {
         if (this.linkId) {
             return this.$graph.getNodeById(this.linkId);
