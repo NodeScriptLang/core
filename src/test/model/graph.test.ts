@@ -201,7 +201,7 @@ describe('Graph', () => {
                     }
                 ],
                 refs: {
-                    add: runtime.defs['math.add']
+                    add: runtime.defs['math.add'],
                 }
             });
             const node = graph.getNodeById('res');
@@ -219,13 +219,49 @@ describe('Graph', () => {
                     }
                 ],
                 refs: {
-                    add: runtime.defs['math.add']
+                    add: runtime.defs['math.add'],
                 }
             });
             const node = graph.getNodeById('res');
             assert.strictEqual(node?.props.length, 2);
             assert.strictEqual(node?.props[0].key, 'a');
             assert.strictEqual(node?.props[1].key, 'b');
+        });
+
+    });
+
+    describe('removeLink', () => {
+
+        /* loops shouldn’t be allowed, so if you init a graph
+         * with nodes linking to each other, it should remove one of the links
+         */
+        it('removes second link of two looped nodes', async () => {
+            const loader = new GraphLoader();
+            const graph = await loader.loadGraph({
+                nodes: [
+                    {
+                        id: 'res',
+                        ref: 'string',
+                        props: [
+                            { key: 'value', value: '42', linkId: 'p' },
+                        ]
+                    },
+                    {
+                        id: 'p',
+                        ref: 'string',
+                        props: [
+                            { key: 'value', value: '42', linkId: 'res' },
+                        ]
+                    }
+                ],
+                refs: {
+                    string: runtime.defs['string']
+                }
+            });
+            const node1 = graph.getNodeById('res');
+            const node2 = graph.getNodeById('p');
+            assert.strictEqual(node1?.props[0].linkId, 'p');
+            assert.strictEqual(node2?.props[0].linkId, '');
         });
 
     });

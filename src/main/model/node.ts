@@ -234,7 +234,7 @@ export class Node implements t.Node {
         for (const prop of this.props) {
             const linkNode = prop.getLinkNode();
             if (linkNode) {
-                if (!linkNode.canLinkTo(this)) {
+                if (!this.canLinkTo(linkNode)) {
                     prop.linkId = '';
                 }
             }
