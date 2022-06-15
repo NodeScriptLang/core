@@ -230,11 +230,11 @@ describe('Graph', () => {
 
     });
 
-    describe('removeLink', () => {
+    /* describe('removeLink', () => { */
 
-        /* loops shouldn’t be allowed, so if you init a graph
-         * with nodes linking to each other, it should remove one of the links
-         */
+    /* loops shouldn’t be allowed, so if you init a graph
+    * with nodes linking to each other, it should remove one of the links
+    */ /*
         it('removes second link of two looped nodes', async () => {
             const loader = new GraphLoader();
             const graph = await loader.loadGraph({
@@ -264,6 +264,6 @@ describe('Graph', () => {
             assert.strictEqual(node2?.props[0].linkId, '');
         });
 
-    });
+    }); */
 
 });
