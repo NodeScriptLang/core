@@ -230,7 +230,7 @@ describe('Graph', () => {
 
     });
 
-    describe('removeLink', () => { */
+    describe('removeLink', () => {
 
         it.skip('removes second link of two looped nodes', async () => {
             const loader = new GraphLoader();
