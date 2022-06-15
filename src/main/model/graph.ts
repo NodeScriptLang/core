@@ -56,7 +56,8 @@ export class Graph implements t.Graph {
     }
 
     /**
-     * Loads input uri to the graph's ref if none exists, & returns the created node.
+     * Uses uri to load node definition & add graph ref if none exists.
+     * Returns the created node.
      */
     async createNode(spec: t.AddNodeSpec) {
         await this.$loader.loadNodeDef(spec.uri);
