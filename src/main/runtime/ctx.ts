@@ -38,7 +38,7 @@ export abstract class BaseContext implements t.GraphEvalContext {
 export class GraphEvalContext extends BaseContext {
     $nodeEvaluated = new Event<t.NodeResult>();
 
-    getLocal(): any {
+    getLocal(_key: string): any {
         return null;
     }
 }
