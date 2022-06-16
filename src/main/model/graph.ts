@@ -22,6 +22,7 @@ export class Graph implements t.Graph {
             const node = new Node(this, spec);
             this.addNodeRaw(node);
         }
+        this.applyInvariants();
     }
 
     toJSON() {
@@ -58,6 +59,7 @@ export class Graph implements t.Graph {
         const ref = this.getRefForUri(spec.uri);
         const node = new Node(this, { ...spec.node, ref });
         this.addNodeRaw(node);
+        this.applyInvariants();
         return node;
     }
 
@@ -161,6 +163,12 @@ export class Graph implements t.Graph {
         const ref = shortId();
         this.refs[ref] = uri;
         return ref;
+    }
+
+    applyInvariants() {
+        for (const node of this.nodes) {
+            node.applyInvariants();
+        }
     }
 
 }
