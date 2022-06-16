@@ -228,7 +228,7 @@ describe('Graph', () => {
             assert.strictEqual(node?.props[1].key, 'b');
         });
 
-        it('removes one of the links of two looped nodes', async () => {
+        it('removes the first link of two looped nodes', async () => {
             const loader = new GraphLoader();
             const graph = await loader.loadGraph({
                 nodes: [
