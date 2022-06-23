@@ -5,7 +5,6 @@ export const Param: t.Operator<{
 }, any> = {
     metadata: {
         label: 'Parameter',
-        category: ['Graph'],
         params: {
             key: {
                 schema: {

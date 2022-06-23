@@ -5,7 +5,6 @@ export const Local: t.Operator<{
 }, any> = {
     metadata: {
         label: 'Local',
-        category: ['Graph'],
         params: {
             key: {
                 schema: {

@@ -5,7 +5,6 @@ export const Comment: t.Operator<{
 }, any> = {
     metadata: {
         label: 'Comment',
-        category: ['Graph'],
         params: {
             comment: {
                 schema: {

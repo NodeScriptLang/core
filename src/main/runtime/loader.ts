@@ -57,7 +57,6 @@ export class GraphLoader implements t.GraphLoader {
 
     defineOperator(uri: string, op: t.Operator): t.NodeDef {
         const metadata: t.NodeMetadata = {
-            category: [],
             description: '',
             deprecated: '',
             hidden: false,
@@ -81,7 +80,6 @@ export class GraphLoader implements t.GraphLoader {
                 label: 'Unresolved',
                 description: '',
                 deprecated: '',
-                category: [],
                 hidden: true,
                 params: {},
                 result: { type: 'any' },

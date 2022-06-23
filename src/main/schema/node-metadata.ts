@@ -9,10 +9,6 @@ export const NodeMetadataSchema = new Schema<t.NodeMetadata>({
     type: 'object',
     properties: {
         label: { type: 'string' },
-        category: {
-            type: 'array',
-            items: { type: 'string' },
-        },
         description: { type: 'string' },
         deprecated: { type: 'string' },
         hidden: { type: 'boolean' },

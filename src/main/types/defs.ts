@@ -3,7 +3,6 @@ import { DataSchema } from './data.js';
 
 export type NodeMetadata = {
     label: string;
-    category: string[];
     description: string;
     deprecated: string;
     hidden: boolean;
