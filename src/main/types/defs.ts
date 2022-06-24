@@ -1,14 +1,6 @@
 import { GraphEvalContext } from './ctx.js';
 import { DataSchema } from './data.js';
-
-export type NodeMetadata = {
-    label: string;
-    description: string;
-    deprecated: string;
-    hidden: boolean;
-    params: Record<string, ParamMetadata>;
-    result: DataSchema<any>;
-};
+import { NodeMetadata } from './metadata.js';
 
 export type NodeDef = {
     metadata: NodeMetadata;
@@ -58,17 +50,4 @@ export type LambdaParamDef<P = unknown, R = unknown> = {
     };
     label?: string;
     default?: R;
-};
-
-export type ParamMetadata = {
-    kind?: 'lambda';
-    schema: DataSchema;
-    scope?: Record<string, DataSchema>;
-    default?: string;
-    label?: string;
-    addItemLabel?: string;
-    removeItemLabel?: string;
-    keyPlaceholder?: string;
-    valuePlaceholder?: string;
-    hideEntries?: boolean;
 };

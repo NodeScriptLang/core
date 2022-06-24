@@ -1,4 +1,4 @@
-import { DataSchema, DataType } from '../types/data.js';
+import { DataSchemaSpec, DataType } from '../types/data.js';
 
 export function parseAny(str: string) {
     const s = String(str ?? '').trim();
@@ -51,7 +51,7 @@ export function checkType(data: unknown, allowedTypes: DataType | DataType[]) {
     throw new InvalidTypeError(`Expected ${types.join(' or ')}, instead got ${actualType}`);
 }
 
-export function isSchemaCompatible(desiredSchema: DataSchema<unknown>, actualSchema: DataSchema<unknown>): boolean {
+export function isSchemaCompatible(desiredSchema: DataSchemaSpec, actualSchema: DataSchemaSpec): boolean {
     switch (desiredSchema.type) {
         case 'any':
             return true;

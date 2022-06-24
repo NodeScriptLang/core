@@ -109,7 +109,7 @@ export class Prop implements t.Prop {
      * If the prop is an entry, returns the subschema (i.e. `items` if the base prop
      * is an array or `additionalProperties` if the base prop is an object)
      */
-    getTargetSchema(): t.DataSchema {
+    getTargetSchema(): t.DataSchemaSpec {
         const baseSchema = this.$param.schema;
         if (this.isEntry()) {
             if (baseSchema.type === 'array') {

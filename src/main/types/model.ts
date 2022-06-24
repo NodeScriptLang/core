@@ -1,5 +1,5 @@
 import { DeepPartial } from './deep-partial.js';
-import { NodeMetadata } from './defs.js';
+import { NodeMetadata } from './metadata.js';
 
 export interface Graph {
     metadata: NodeMetadata;

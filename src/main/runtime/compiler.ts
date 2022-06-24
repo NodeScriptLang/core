@@ -328,12 +328,12 @@ class GraphCompilerContext {
         this.code.line(`${JSON.stringify(prop.key)}: ${expr},`);
     }
 
-    private singlePropExpr(prop: Prop, targetSchema: t.DataSchema = prop.getTargetSchema()) {
+    private singlePropExpr(prop: Prop, targetSchema: t.DataSchemaSpec = prop.getTargetSchema()) {
         if (prop.isLambda()) {
             return this.lambdaPropExpr(prop);
         }
         let expr = this.rawPropExpr(prop);
-        let sourceSchema: t.DataSchema = { type: 'string' };
+        let sourceSchema: t.DataSchemaSpec = { type: 'string' };
         const linkNode = prop.getLinkNode();
         if (linkNode) {
             sourceSchema = linkNode.$def.metadata.result;
@@ -345,7 +345,7 @@ class GraphCompilerContext {
         return expr;
     }
 
-    private convertTypeExpr(expr: string, targetSchema: t.DataSchema) {
+    private convertTypeExpr(expr: string, targetSchema: t.DataSchemaSpec) {
         return `${this.sym.convertType}(${expr}, ${JSON.stringify(targetSchema)})`;
     }
 
