@@ -6,7 +6,7 @@ export type NodeMetadata = {
     description: string;
     deprecated: string;
     hidden: boolean;
-    params: Record<string, ParamDef>;
+    params: Record<string, ParamMetadata>;
     result: DataSchema<any>;
 };
 
