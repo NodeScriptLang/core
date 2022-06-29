@@ -6,6 +6,7 @@ export interface Graph {
     nodes: Node[];
     rootNodeId: string;
     refs: Record<string, string>;
+    editorData: Record<string, any>;
 }
 
 export type GraphSpec = DeepPartial<Graph>;
