@@ -13,4 +13,3 @@ out/
 _dev
 _archive/
 *.tsbuildinfo
-bundle.js
