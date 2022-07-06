@@ -1,14 +1,5 @@
 import { DataSchemaSpec } from './data.js';
 
-export type NodeMetadata = {
-    label: string;
-    description: string;
-    deprecated: string;
-    hidden: boolean;
-    params: Record<string, ParamMetadata>;
-    result: DataSchemaSpec;
-};
-
 export type ParamMetadata = {
     kind?: 'lambda';
     schema: DataSchemaSpec;

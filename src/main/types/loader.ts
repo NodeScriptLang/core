@@ -1,5 +1,5 @@
-import { NodeDef } from './defs.js';
 import { Graph, GraphSpec } from './model.js';
+import { NodeDef } from './node-def.js';
 
 export interface GraphLoader {
     loadGraph(spec: GraphSpec): Promise<Graph>;

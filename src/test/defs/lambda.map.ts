@@ -1,4 +1,4 @@
-import { Lambda, Operator } from '../../main/types/defs.js';
+import { Lambda, Operator } from '../../main/types/index.js';
 
 export const node: Operator<{
     array: unknown[];

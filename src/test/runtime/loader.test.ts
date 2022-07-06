@@ -11,8 +11,6 @@ describe('GraphLoader', () => {
         assert.deepStrictEqual(def.metadata, {
             label: 'Math.Add',
             description: 'Computes a sum of two numbers.',
-            deprecated: '',
-            hidden: false,
             params: {
                 a: { schema: { type: 'number' } },
                 b: { schema: { type: 'number' } },

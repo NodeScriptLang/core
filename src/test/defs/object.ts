@@ -1,4 +1,4 @@
-import { Operator } from '../../main/types/defs.js';
+import { Operator } from '../../main/types/index.js';
 
 export const node: Operator<{
     properties: any;

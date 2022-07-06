@@ -43,7 +43,7 @@ Graphs are compiled into *definitions* — ESM modules with `export const node: 
 A definition module can also be written in TypeScript or JavaScript, for example:
 
 ```ts
-import { Operator } from '../../main/types/defs.js';
+import { Operator } from '../../main/types/index.js';
 
 export const node: Operator<{
     a: number;
