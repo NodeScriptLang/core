@@ -7,3 +7,4 @@ export * from './node-result.js';
 export * from './node.js';
 export * from './param-metadata.js';
 export * from './prop.js';
+export * from './version.js';

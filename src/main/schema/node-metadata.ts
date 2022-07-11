@@ -3,6 +3,7 @@ import { Schema } from 'airtight';
 import * as t from '../types/index.js';
 import { DataSchemaSchema } from './data-schema.js';
 import { ParamMetadataSchema } from './param-metadata.js';
+import { VersionSchema } from './version.js';
 
 export const NodeMetadataSchema = new Schema<t.NodeMetadata>({
     id: 'NodeMetadata',
@@ -10,7 +11,7 @@ export const NodeMetadataSchema = new Schema<t.NodeMetadata>({
     properties: {
         channel: { type: 'string', default: 'universe' },
         name: { type: 'string' },
-        version: { type: 'string', default: '1.0.0' },
+        version: VersionSchema.schema,
         label: { type: 'string' },
         description: { type: 'string' },
         deprecated: {
