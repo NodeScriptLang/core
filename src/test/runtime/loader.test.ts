@@ -9,6 +9,9 @@ describe('GraphLoader', () => {
         const loader = new GraphLoader();
         const def = await loader.loadNodeDef(runtime.defs['math.add']);
         assert.deepStrictEqual(def.metadata, {
+            channel: 'universe',
+            name: '',
+            version: '1.0.0',
             label: 'Math.Add',
             description: 'Computes a sum of two numbers.',
             params: {
