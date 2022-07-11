@@ -8,14 +8,9 @@ export const NodeMetadataSchema = new Schema<t.NodeMetadata>({
     id: 'NodeMetadata',
     type: 'object',
     properties: {
-        name: {
-            type: 'string',
-            optional: true,
-        },
-        version: {
-            type: 'string',
-            optional: true,
-        },
+        channel: { type: 'string', default: 'universe' },
+        name: { type: 'string' },
+        version: { type: 'string', default: '1.0.0' },
         label: { type: 'string' },
         description: { type: 'string' },
         deprecated: {
