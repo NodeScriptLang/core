@@ -5,6 +5,7 @@ export type NodeMetadata = {
     channel: string;
     name: string;
     version: string;
+    tags: string[];
     label: string;
     description: string;
     deprecated?: string;

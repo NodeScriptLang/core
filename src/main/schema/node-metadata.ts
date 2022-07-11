@@ -12,6 +12,10 @@ export const NodeMetadataSchema = new Schema<t.NodeMetadata>({
         channel: { type: 'string', default: 'universe' },
         name: { type: 'string' },
         version: VersionSchema.schema,
+        tags: {
+            type: 'array',
+            items: { type: 'string' },
+        },
         label: { type: 'string' },
         description: { type: 'string' },
         deprecated: {

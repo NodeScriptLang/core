@@ -12,6 +12,7 @@ describe('GraphLoader', () => {
             channel: 'universe',
             name: '',
             version: '1.0.0',
+            tags: [],
             label: 'Math.Add',
             description: 'Computes a sum of two numbers.',
             params: {
