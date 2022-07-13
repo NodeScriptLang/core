@@ -12,7 +12,7 @@ export type OperatorMetadata<Params = any, Result = any> =
     Partial<NodeMetadata> & {
         label: string;
         params: ParamDefs<Params>;
-        result: DataSchema<Result>;
-    };
+        result: Result extends Promise<infer R> ? DataSchema<R> : DataSchema<Result>;
+    } & (Result extends Promise<any> ? { async: true } : {});
 
-export type OperatorCompute<P, R> = (this: void, params: P, ctx: GraphEvalContext) => R | Promise<R>;
+export type OperatorCompute<P, R> = (this: void, params: P, ctx: GraphEvalContext) => R;

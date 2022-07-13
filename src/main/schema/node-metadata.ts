@@ -18,6 +18,10 @@ export const NodeMetadataSchema = new Schema<t.NodeMetadata>({
         },
         label: { type: 'string' },
         description: { type: 'string' },
+        keywords: {
+            type: 'array',
+            items: { type: 'string' },
+        },
         deprecated: {
             type: 'string',
             optional: true,
@@ -25,6 +29,10 @@ export const NodeMetadataSchema = new Schema<t.NodeMetadata>({
         hidden: {
             type: 'boolean',
             optional: true,
+        },
+        async: {
+            type: 'boolean',
+            optional: true
         },
         params: {
             type: 'object',

@@ -15,6 +15,7 @@ describe('GraphLoader', () => {
             tags: [],
             label: 'Math.Add',
             description: 'Computes a sum of two numbers.',
+            keywords: ['math', 'add', 'plus', 'sum'],
             params: {
                 a: { schema: { type: 'number' } },
                 b: { schema: { type: 'number' } },

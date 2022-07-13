@@ -8,8 +8,10 @@ export type NodeMetadata = {
     tags: string[];
     label: string;
     description: string;
+    keywords: string[];
     deprecated?: string;
     hidden?: boolean;
     params: Record<string, ParamMetadata>;
     result: DataSchemaSpec;
+    async?: boolean;
 };

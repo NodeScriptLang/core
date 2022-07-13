@@ -7,6 +7,7 @@ export const node: Operator<{
     metadata: {
         label: 'Math.Add',
         description: 'Computes a sum of two numbers.',
+        keywords: ['math', 'add', 'plus', 'sum'],
         params: {
             a: {
                 schema: {

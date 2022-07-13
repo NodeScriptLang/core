@@ -3,10 +3,11 @@ import { Lambda, Operator } from '../../main/types/index.js';
 export const node: Operator<{
     array: unknown[];
     fn: Lambda<{ item: unknown; index: number }, unknown>;
-}, unknown[]> = {
+}, Promise<unknown[]>> = {
     metadata: {
         label: 'Lambda.Map',
         description: 'Executes a function for each array element and returns an array of results.',
+        async: true,
         params: {
             array: {
                 schema: {
