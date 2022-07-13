@@ -51,6 +51,11 @@ export class Graph implements t.Graph {
         return this.rootNodeId ? this.getNodeById(this.rootNodeId) : null;
     }
 
+    setRootNode(nodeId: string | null) {
+        const node = nodeId ? this.getNodeById(nodeId) : null;
+        this.rootNodeId = node ? node.id : '';
+    }
+
     /**
      * Uses uri to load node definition & add graph ref if none exists.
      * Returns the created node.
@@ -71,8 +76,14 @@ export class Graph implements t.Graph {
 
     /**
      * Deletes both the node & its corresponding ref if unused by any other node.
+     *
+     * Note: deleting root node is not allowed, it should be unassigned first
+     * using setRootNode
      */
     deleteNode(nodeId: string) {
+        if (this.rootNodeId === nodeId) {
+            return;
+        }
         this.$nodeMap.delete(nodeId);
         const i = this.nodes.findIndex(_ => _.id === nodeId);
         if (i > -1) {
