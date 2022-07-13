@@ -10,8 +10,9 @@ export type NodeMetadata = {
     description: string;
     keywords: string[];
     deprecated?: string;
-    hidden?: boolean;
+    async?: boolean;
     params: Record<string, ParamMetadata>;
     result: DataSchemaSpec;
-    async?: boolean;
+    hidden?: boolean;
+    hideOutputSocket?: boolean;
 };

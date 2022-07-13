@@ -26,10 +26,6 @@ export const NodeMetadataSchema = new Schema<t.NodeMetadata>({
             type: 'string',
             optional: true,
         },
-        hidden: {
-            type: 'boolean',
-            optional: true,
-        },
         async: {
             type: 'boolean',
             optional: true
@@ -40,5 +36,13 @@ export const NodeMetadataSchema = new Schema<t.NodeMetadata>({
             additionalProperties: ParamMetadataSchema.schema,
         },
         result: DataSchemaSchema.schema as any,
+        hidden: {
+            type: 'boolean',
+            optional: true,
+        },
+        hideOutputSocket: {
+            type: 'boolean',
+            optional: true,
+        },
     }
 });
