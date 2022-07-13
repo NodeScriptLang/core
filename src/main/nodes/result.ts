@@ -14,7 +14,7 @@ export const Result: t.Operator<{
         },
         result: { type: 'any' },
         hidden: true,
-        hideOutputSocket: true,
+        hideOutboundSocket: true,
     },
     compute() {},
 };

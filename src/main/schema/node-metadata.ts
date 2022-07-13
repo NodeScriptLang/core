@@ -40,7 +40,7 @@ export const NodeMetadataSchema = new Schema<t.NodeMetadata>({
             type: 'boolean',
             optional: true,
         },
-        hideOutputSocket: {
+        hideOutboundSocket: {
             type: 'boolean',
             optional: true,
         },
