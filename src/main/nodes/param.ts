@@ -14,6 +14,7 @@ export const Param: t.Operator<{
             }
         },
         result: { type: 'any' },
+        hidden: true,
     },
     compute() {}
 };

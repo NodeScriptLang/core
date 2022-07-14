@@ -257,6 +257,38 @@ describe('Graph', () => {
             assert.strictEqual(node2?.props[0].linkId, 'res');
         });
 
+        it('sets metadata.async = false when all nodes are sync', async () => {
+            const loader = new GraphLoader();
+            const graph = await loader.loadGraph({
+                nodes: [
+                    { ref: 'add' },
+                    { ref: 'string' },
+                ],
+                refs: {
+                    string: runtime.defs['string'],
+                    add: runtime.defs['math.add'],
+                }
+            });
+            assert.strictEqual(graph.metadata.async, false);
+        });
+
+        it('sets metadata.async = true if at least one node is async', async () => {
+            const loader = new GraphLoader();
+            const graph = await loader.loadGraph({
+                nodes: [
+                    { ref: 'add' },
+                    { ref: 'string' },
+                    { ref: 'map' },
+                ],
+                refs: {
+                    string: runtime.defs['string'],
+                    add: runtime.defs['math.add'],
+                    map: runtime.defs['lambda.map'],
+                }
+            });
+            assert.strictEqual(graph.metadata.async, true);
+        });
+
     });
 
 });

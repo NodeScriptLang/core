@@ -86,17 +86,18 @@ export class Graph implements t.Graph {
         }
         this.$nodeMap.delete(nodeId);
         const i = this.nodes.findIndex(_ => _.id === nodeId);
-        if (i > -1) {
-            this.nodes.splice(i, 1);
-            for (const key of Object.keys(this.refs)) {
-                const res = this.nodes.find(node => node.ref === key);
-                if (!res) {
-                    delete this.refs[key];
-                }
-            }
-            return true;
+        if (i === -1) {
+            return false;
         }
-        return false;
+        this.nodes.splice(i, 1);
+        for (const key of Object.keys(this.refs)) {
+            const res = this.nodes.find(node => node.ref === key);
+            if (!res) {
+                delete this.refs[key];
+            }
+        }
+        this.applyInvariants();
+        return true;
     }
 
     /**
@@ -181,6 +182,7 @@ export class Graph implements t.Graph {
         for (const node of this.nodes) {
             node.applyInvariants();
         }
+        this.metadata.async = this.nodes.some(_ => _.$def.metadata.async);
     }
 
 }

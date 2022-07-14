@@ -13,6 +13,7 @@ export const Local: t.Operator<{
             }
         },
         result: { type: 'any' },
+        hidden: true,
     },
     compute() {}
 };
