@@ -278,12 +278,12 @@ describe('Graph', () => {
                 nodes: [
                     { ref: 'add' },
                     { ref: 'string' },
-                    { ref: 'map' },
+                    { ref: 'promise' },
                 ],
                 refs: {
                     string: runtime.defs['string'],
                     add: runtime.defs['math.add'],
-                    map: runtime.defs['lambda.map'],
+                    promise: runtime.defs['promise'],
                 }
             });
             assert.strictEqual(graph.metadata.async, true);

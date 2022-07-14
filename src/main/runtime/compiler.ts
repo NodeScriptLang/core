@@ -46,6 +46,8 @@ class GraphCompilerContext {
     order: Node[] = [];
     // The cached dependency map of a graph
     linkMap: MultiMap<string, NodeLink>;
+    // Whether the outcome is asynchronous or not
+    async: boolean;
 
     // Commonly used symbols
     sym = {
@@ -67,6 +69,7 @@ class GraphCompilerContext {
         };
         this.order = graph.computeOrder(rootNode.id);
         this.linkMap = graph.computeLinkMap();
+        this.async = this.order.some(_ => _.$def.metadata.async);
     }
 
     compileEsm() {
@@ -96,7 +99,7 @@ class GraphCompilerContext {
         this.emitComment('Node Definition');
         this.code.block('export const node = {', '};', () => {
             this.emitGraphMetadata();
-            this.code.block('async compute(params, ctx) {', '}', () => {
+            this.code.block(`${this.asyncSym()}compute(params, ctx) {`, '}', () => {
                 this.emitComputeBody();
             });
         });
@@ -139,7 +142,7 @@ class GraphCompilerContext {
         if (node.$uri.startsWith('core:')) {
             return this.emitCoreNode(node);
         }
-        this.code.block(`async function ${sym}(ctx) {`, `}`, () => {
+        this.code.block(`${this.asyncSym()}function ${sym}(ctx) {`, `}`, () => {
             if (this.isNodeCached(node.id)) {
                 this.code.line(`const $c = ctx.$cache.get("${node.id}");`);
                 this.code.line('if ($c) return $c;');
@@ -199,7 +202,7 @@ class GraphCompilerContext {
         const sym = this.getNodeSym(node.id);
         const prop = node.getBasePropByKey('value')!;
         const expr = this.singlePropExpr(prop, this.graph.metadata.result);
-        this.code.line(`async function ${sym}(ctx) {` +
+        this.code.line(`${this.asyncSym()}function ${sym}(ctx) {` +
             `return ${expr};` +
         `}`);
     }
@@ -207,7 +210,7 @@ class GraphCompilerContext {
     private emitLocalNode(node: Node) {
         const sym = this.getNodeSym(node.id);
         const prop = node.getBasePropByKey('key')!;
-        this.code.line(`async function ${sym}(ctx) {` +
+        this.code.line(`${this.asyncSym()}function ${sym}(ctx) {` +
             `return ctx.getLocal(${JSON.stringify(prop.value)});` +
         `}`);
     }
@@ -224,10 +227,10 @@ class GraphCompilerContext {
         if (this.options.introspect) {
             this.code.line(`${this.sym.nodeEvaluated}.emit({` +
                 `nodeId: ${JSON.stringify(node.id)},` +
-                `result: await ${resSym}` +
+                `result: ${this.awaitSym()}${resSym}` +
             `});`);
         }
-        this.code.line(`return await ${resSym};`);
+        this.code.line(`return ${this.awaitSym()}${resSym};`);
     }
 
     private emitExpandedNode(node: Node) {
@@ -271,7 +274,7 @@ class GraphCompilerContext {
             this.code.block(`const ${tempSym} = ${defSym}.compute({`, `}, ctx);`, () => {
                 this.emitNodeProps(node);
             });
-            this.code.line(`${resSym}.push(await ${tempSym});`);
+            this.code.line(`${resSym}.push(${this.awaitSym()}${tempSym});`);
         });
         if (this.isNodeCached(node.id)) {
             this.code.line(`ctx.$cache.set("${node.id}", ${resSym});`);
@@ -375,7 +378,7 @@ class GraphCompilerContext {
             return `params[${JSON.stringify(key)}]`;
         }
         const sym = this.getNodeSym(node.id);
-        return `await ${sym}(ctx)`;
+        return `${this.awaitSym()}${sym}(ctx)`;
     }
 
     private lambdaPropExpr(prop: Prop) {
@@ -423,6 +426,14 @@ class GraphCompilerContext {
 
     private isNodeCached(nodeId: string) {
         return this.linkMap.get(nodeId).size > 1;
+    }
+
+    private asyncSym() {
+        return this.async ? 'async ' : '';
+    }
+
+    private awaitSym() {
+        return this.async ? 'await ' : '';
     }
 
 }

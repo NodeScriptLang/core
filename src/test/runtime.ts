@@ -17,6 +17,7 @@ export class TestRuntime {
         'object': this.makeUrl('/out/test/defs/object.js'),
         'array': this.makeUrl('/out/test/defs/array.js'),
         'any': this.makeUrl('/out/test/defs/any.js'),
+        'promise': this.makeUrl('/out/test/defs/promise.js'),
         'math.add': this.makeUrl('/out/test/defs/math.add.js'),
         'lambda.map': this.makeUrl('/out/test/defs/lambda.map.js'),
     };

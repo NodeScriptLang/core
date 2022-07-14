@@ -745,4 +745,91 @@ describe('GraphCompiler', () => {
 
     });
 
+    describe('sync/async', () => {
+
+        it('compiles sync function when the tree is sync (even if there are other async nodes)', async () => {
+            const graph = await runtime.loadGraph({
+                nodes: [
+                    {
+                        id: 'p1',
+                        ref: 'number',
+                        props: [
+                            { key: 'value', value: '42' },
+                        ]
+                    },
+                    {
+                        id: 'res',
+                        ref: 'add',
+                        props: [
+                            { key: 'a', linkId: 'p1' },
+                            { key: 'b', value: '1' },
+                        ]
+                    },
+                    {
+                        id: 'promise',
+                        ref: 'promise',
+                        props: [
+                            { key: 'value', linkId: 'res' },
+                        ]
+                    }
+                ],
+                refs: {
+                    number: runtime.defs['number'],
+                    add: runtime.defs['math.add'],
+                    promise: runtime.defs['promise'],
+                }
+            });
+            const code = new GraphCompiler().compileEsm(graph, { rootNodeId: 'res' });
+            const { node } = await evalEsmModule(code);
+            const ctx = new GraphEvalContext();
+            const res = await node.compute({}, ctx);
+            assert.strictEqual(res, 43);
+            assert.strictEqual(/async\s+/.test(code), false);
+            assert.strictEqual(/await\s+/.test(code), false);
+        });
+
+        it('compiles async function if one of the nodes is async', async () => {
+            const graph = await runtime.loadGraph({
+                rootNodeId: 'res',
+                nodes: [
+                    {
+                        id: 'p1',
+                        ref: 'number',
+                        props: [
+                            { key: 'value', value: '42' },
+                        ]
+                    },
+                    {
+                        id: 'res',
+                        ref: 'add',
+                        props: [
+                            { key: 'a', linkId: 'p1' },
+                            { key: 'b', value: '1' },
+                        ]
+                    },
+                    {
+                        id: 'promise',
+                        ref: 'promise',
+                        props: [
+                            { key: 'value', linkId: 'res' },
+                        ]
+                    }
+                ],
+                refs: {
+                    number: runtime.defs['number'],
+                    add: runtime.defs['math.add'],
+                    promise: runtime.defs['promise'],
+                }
+            });
+            const code = new GraphCompiler().compileEsm(graph, { rootNodeId: 'promise' });
+            const { node } = await evalEsmModule(code);
+            const ctx = new GraphEvalContext();
+            const res = await node.compute({}, ctx);
+            assert.strictEqual(res, 43);
+            assert.strictEqual(/async\s+/.test(code), true);
+            assert.strictEqual(/await\s+/.test(code), true);
+        });
+
+    });
+
 });
