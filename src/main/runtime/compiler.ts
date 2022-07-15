@@ -139,9 +139,6 @@ class GraphCompilerContext {
         this.emitComment(`${node.ref} ${node.id}`);
         const sym = this.nextSym('r');
         this.symtable.set(`node:${node.id}`, sym);
-        if (node.$uri.startsWith('core:')) {
-            return this.emitCoreNode(node);
-        }
         this.code.block(`${this.asyncSym()}function ${sym}(ctx) {`, `}`, () => {
             if (this.isNodeCached(node.id)) {
                 this.code.line(`const $c = ctx.$cache.get("${node.id}");`);
@@ -159,32 +156,33 @@ class GraphCompilerContext {
         });
     }
 
-    private emitCoreNode(node: Node) {
-        switch (node.$uri) {
-            // Param nodes are not emitted, "params" sym is accessed in-place
-            case 'core:Param':
-                return;
-            // Comment nodes are discarded
-            case 'core:Comment':
-                return;
-            case 'core:Result':
-                return this.emitResultNode(node);
-            case 'core:Local':
-                return this.emitLocalNode(node);
-        }
-    }
-
     private emitNodeBody(node: Node) {
+        const resSym = '$r';
         const emitBody = () => {
-            if (node.isExpanded()) {
-                this.emitExpandedNode(node);
-            } else {
-                this.emitRegularNode(node);
+            switch (node.$uri) {
+                case 'core:Param': return this.emitParamNode(node, resSym);
+                case 'core:Local': return this.emitLocalNode(node, resSym);
+                case 'core:Result': return this.emitResultNode(node, resSym);
+                case 'core:Comment': return;
+                default:
+                    if (node.isExpanded()) {
+                        this.emitExpandedNode(node, resSym);
+                    } else {
+                        this.emitRegularNode(node, resSym);
+                    }
             }
         };
+        this.code.line(`let ${resSym};`);
         if (this.options.introspect) {
             this.code.block('try {', '}', () => {
                 emitBody();
+                if (this.options.introspect) {
+                    this.code.line(`${this.sym.nodeEvaluated}.emit({` +
+                        `nodeId: ${JSON.stringify(node.id)},` +
+                        `result: ${this.awaitSym()}${resSym}` +
+                        `});`);
+                }
+                this.code.line(`return ${resSym};`);
             });
             this.code.block('catch (error) {', '}', () => {
                 this.code.line(`${this.sym.nodeEvaluated}.emit({` +
@@ -195,52 +193,48 @@ class GraphCompilerContext {
             });
         } else {
             emitBody();
+            this.code.line(`return ${resSym};`);
         }
     }
 
-    private emitResultNode(node: Node) {
-        const sym = this.getNodeSym(node.id);
+    private emitParamNode(node: Node, resSym: string) {
+        const prop = node.getBasePropByKey('key');
+        const key = prop?.value;
+        if (key) {
+            this.code.line(`${resSym} = params[${JSON.stringify(key)}]`);
+        } else {
+            this.code.line(`${resSym} = undefined;`);
+        }
+    }
+
+    private emitLocalNode(node: Node, resSym: string) {
+        const prop = node.getBasePropByKey('key')!;
+        this.code.line(`${resSym} = ctx.getLocal(${JSON.stringify(prop.value)});`);
+    }
+
+    private emitResultNode(node: Node, resSym: string) {
         const prop = node.getBasePropByKey('value')!;
         const expr = this.singlePropExpr(prop, this.graph.metadata.result);
-        this.code.line(`${this.asyncSym()}function ${sym}(ctx) {` +
-            `return ${expr};` +
-        `}`);
+        this.code.line(`${resSym} = ${expr};`);
     }
 
-    private emitLocalNode(node: Node) {
-        const sym = this.getNodeSym(node.id);
-        const prop = node.getBasePropByKey('key')!;
-        this.code.line(`${this.asyncSym()}function ${sym}(ctx) {` +
-            `return ctx.getLocal(${JSON.stringify(prop.value)});` +
-        `}`);
-    }
-
-    private emitRegularNode(node: Node) {
+    private emitRegularNode(node: Node, resSym: string) {
         const defSym = this.getDefSym(node.ref);
-        const resSym = `$r`;
-        this.code.block(`const ${resSym} = ${defSym}.compute({`, `}, ctx);`, () => {
+        this.code.block(`${resSym} = ${defSym}.compute({`, `}, ctx);`, () => {
             this.emitNodeProps(node);
         });
         if (this.isNodeCached(node.id)) {
             this.code.line(`ctx.$cache.set("${node.id}", ${resSym});`);
         }
-        if (this.options.introspect) {
-            this.code.line(`${this.sym.nodeEvaluated}.emit({` +
-                `nodeId: ${JSON.stringify(node.id)},` +
-                `result: ${this.awaitSym()}${resSym}` +
-            `});`);
-        }
-        this.code.line(`return ${this.awaitSym()}${resSym};`);
     }
 
-    private emitExpandedNode(node: Node) {
+    private emitExpandedNode(node: Node, resSym: string) {
         const defSym = this.getDefSym(node.ref);
-        const resSym = '$r';
         // Expanded nodes always produce an array by
         // repeating the computation per each value of expanded property
         const props = [...node.computedProps()];
         const expandProps = props.filter(_ => _.isExpanded());
-        this.code.line(`const ${resSym} = []`);
+        this.code.line(`${resSym} = []`);
         const expSyms: string[] = [];
         for (const prop of expandProps) {
             const propSym = this.nextSym('p');
@@ -279,13 +273,6 @@ class GraphCompilerContext {
         if (this.isNodeCached(node.id)) {
             this.code.line(`ctx.$cache.set("${node.id}", ${resSym});`);
         }
-        if (this.options.introspect) {
-            this.code.line(`${this.sym.nodeEvaluated}.emit({` +
-                `nodeId: ${JSON.stringify(node.id)},` +
-                `result: ${resSym}` +
-            `});`);
-        }
-        this.code.line(`return ${resSym};`);
     }
 
     private emitNodeProps(node: Node) {
@@ -372,11 +359,6 @@ class GraphCompilerContext {
     }
 
     private nodeResultExpr(node: Node) {
-        if (node.$uri === 'core:Param') {
-            const prop = node.getBasePropByKey('key');
-            const key = prop ? prop.value : '';
-            return `params[${JSON.stringify(key)}]`;
-        }
         const sym = this.getNodeSym(node.id);
         return `${this.awaitSym()}${sym}(ctx)`;
     }

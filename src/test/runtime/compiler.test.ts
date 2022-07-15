@@ -38,16 +38,24 @@ describe('GraphCompiler', () => {
                 rootNodeId: 'res',
                 nodes: [
                     {
+                        id: 'p1',
+                        ref: 'param',
+                        props: [
+                            { key: 'key', value: 'value' },
+                        ]
+                    },
+                    {
                         id: 'res',
                         ref: 'add',
                         props: [
-                            { key: 'a', value: '12' },
+                            { key: 'a', linkId: 'p1' },
                             { key: 'b', value: '21' },
                         ]
                     }
                 ],
                 refs: {
                     add: runtime.defs['math.add'],
+                    param: 'core:Param',
                 }
             });
             const code = new GraphCompiler().compileEsm(graph, {
@@ -57,9 +65,12 @@ describe('GraphCompiler', () => {
             const ctx = new GraphEvalContext();
             const nodeResults: t.NodeResult[] = [];
             ctx.$nodeEvaluated.on(_ => nodeResults.push(_));
-            const res = await node.compute({}, ctx);
+            const res = await node.compute({
+                value: 12
+            }, ctx);
             assert.strictEqual(res, 33);
             assert.deepStrictEqual(nodeResults, [
+                { nodeId: 'p1', result: 12 },
                 { nodeId: 'res', result: 33 },
             ]);
         });
