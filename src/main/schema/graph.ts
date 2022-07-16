@@ -19,10 +19,5 @@ export const GraphSchema = new Schema<t.Graph>({
             properties: {},
             additionalProperties: { type: 'string' },
         },
-        editorData: {
-            type: 'object',
-            properties: {},
-            additionalProperties: { type: 'any' },
-        }
     },
 });
