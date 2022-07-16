@@ -9,7 +9,7 @@ describe('GraphLoader', () => {
         const loader = new GraphLoader();
         const def = await loader.loadNodeDef(runtime.defs['math.add']);
         assert.deepStrictEqual(def.metadata, {
-            channel: 'universe',
+            channel: 'sandbox',
             name: '',
             version: '1.0.0',
             tags: [],
