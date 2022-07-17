@@ -3,6 +3,10 @@ import * as systemNodes from '../nodes/index.js';
 import { NodeDefSchema } from '../schema/node-def.js';
 import * as t from '../types/index.js';
 
+export interface GraphLoaderOptions {
+    ignoreFailedDefs?: boolean;
+}
+
 export class GraphLoader implements t.GraphLoader {
     nodeDefs = new Map<string, t.NodeDef>();
 
@@ -13,14 +17,26 @@ export class GraphLoader implements t.GraphLoader {
         this.defineOperator('core:Local', systemNodes.Local);
     }
 
-    async loadGraph(spec: t.GraphSpec = {}): Promise<Graph> {
+    async loadGraph(
+        spec: t.GraphSpec = {},
+        options: GraphLoaderOptions = {},
+    ): Promise<Graph> {
+        const { ignoreFailedDefs = false } = options;
         const { refs = {} } = spec;
         const promises = [];
         for (const uri of Object.values(refs)) {
             if (!uri) {
                 continue;
             }
-            promises.push(this.loadNodeDef(uri));
+            const promise = this.loadNodeDef(uri)
+                .catch(error => {
+                    if (!ignoreFailedDefs) {
+                        return;
+                        // TODO log error
+                    }
+                    throw error;
+                });
+            promises.push(promise);
         }
         await Promise.all(promises);
         return new Graph(this, spec);
