@@ -30,7 +30,7 @@ export class GraphLoader implements t.GraphLoader {
             }
             const promise = this.loadNodeDef(uri)
                 .catch(error => {
-                    if (!ignoreFailedDefs) {
+                    if (ignoreFailedDefs) {
                         return;
                         // TODO log error
                     }
