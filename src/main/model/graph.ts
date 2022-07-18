@@ -28,7 +28,6 @@ export class Graph implements t.Graph {
     toJSON() {
         return serialize(this, {
             rootNodeId: '',
-            refs: {},
         });
     }
 
