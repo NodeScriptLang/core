@@ -16,8 +16,8 @@ export interface Node {
     ref: string;
     pos: { x: number; y: number };
     w: number;
-    collapsed: boolean;
     props: Prop[];
+    aux: Record<string, any>;
 }
 
 export type NodeSpec = DeepPartial<Node>;

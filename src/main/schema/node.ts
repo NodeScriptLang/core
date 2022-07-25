@@ -13,10 +13,14 @@ export const NodeSchema = new Schema<t.Node>({
         ref: { type: 'string' },
         pos: PointSchema.schema,
         w: { type: 'integer', default: 5, minimum: 3, maximum: 20 },
-        collapsed: { type: 'boolean' },
         props: {
             type: 'array',
             items: PropSchema.schema,
         },
+        aux: {
+            type: 'object',
+            properties: {},
+            additionalProperties: { type: 'any' },
+        }
     }
 });

@@ -26,7 +26,7 @@ export class Node implements t.Node {
     ref!: string;
     pos!: Point;
     w!: number;
-    collapsed!: boolean;
+    aux: Record<string, any> = {};
 
     props: Prop[] = [];
 
@@ -37,9 +37,7 @@ export class Node implements t.Node {
     }
 
     toJSON() {
-        return serialize(this, {
-            collapsed: false,
-        });
+        return serialize(this, {});
     }
 
     get $uri() {
@@ -164,10 +162,6 @@ export class Node implements t.Node {
                 };
             }
         }
-    }
-
-    setCollapsed(collapsed: boolean) {
-        this.collapsed = collapsed;
     }
 
     setPos(newPos: Point) {
