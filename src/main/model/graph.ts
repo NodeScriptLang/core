@@ -11,6 +11,7 @@ export class Graph implements t.Graph {
     rootNodeId!: string;
     nodes: Node[];
     refs: Record<string, string> = {};
+    aux: Record<string, any> = {};
 
     protected $nodeMap = new Map<string, Node>();
 

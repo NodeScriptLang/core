@@ -44,13 +44,5 @@ export const NodeMetadataSchema = new Schema<t.NodeMetadata>({
             type: 'boolean',
             optional: true,
         },
-        aux: {
-            type: 'object',
-            properties: {},
-            additionalProperties: {
-                type: 'any',
-            },
-            optional: true,
-        }
     }
 });
