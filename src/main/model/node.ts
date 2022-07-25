@@ -1,7 +1,5 @@
 import { NodeSchema } from '../schema/node.js';
 import * as t from '../types/index.js';
-import { clamp } from '../util/clamp.js';
-import { Point } from '../util/point.js';
 import { serialize } from '../util/serialize.js';
 import { Graph } from './graph.js';
 import { Prop } from './prop.js';
@@ -19,13 +17,9 @@ export type NodeLink = {
 export class Node implements t.Node {
 
     static schema = NodeSchema;
-    static MIN_W = 3;
-    static MAX_W = 20;
 
     id!: string;
     ref!: string;
-    pos!: Point;
-    w!: number;
     aux: Record<string, any> = {};
 
     props: Prop[] = [];
@@ -164,14 +158,6 @@ export class Node implements t.Node {
         }
     }
 
-    setPos(newPos: Point) {
-        this.pos = newPos;
-    }
-
-    setWidth(newW: number) {
-        this.w = clamp(newW, Node.MIN_W, Node.MAX_W);
-    }
-
     setPropKey(propId: string, newKey: string) {
         const prop = this.getPropById(propId);
         if (prop && prop.isEntry()) {
@@ -222,7 +208,6 @@ export class Node implements t.Node {
     }
 
     applyInvariants() {
-        this.w = clamp(this.w, Node.MIN_W, Node.MAX_W);
         // Loops are not allowed between the nodes
         for (const prop of this.props) {
             const linkNode = prop.getLinkNode();

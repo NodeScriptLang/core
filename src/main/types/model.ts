@@ -14,8 +14,6 @@ export type GraphSpec = DeepPartial<Graph>;
 export interface Node {
     id: string;
     ref: string;
-    pos: { x: number; y: number };
-    w: number;
     props: Prop[];
     aux: Record<string, any>;
 }
