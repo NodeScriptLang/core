@@ -3,5 +3,5 @@ export async function evalEsmModule(code: string) {
 }
 
 export function codeToUrl(code: string) {
-    return `data:text/javascript;base64,${btoa(code)}`;
+    return `data:text/javascript;${encodeURIComponent(code)}`;
 }
