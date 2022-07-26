@@ -20,6 +20,7 @@ export class TestRuntime {
         'promise': this.makeUrl('/out/test/defs/promise.js'),
         'math.add': this.makeUrl('/out/test/defs/math.add.js'),
         'lambda.map': this.makeUrl('/out/test/defs/lambda.map.js'),
+        'param.default': this.makeUrl('/out/test/defs/param.default.js'),
     };
 
     makeUrl(path: string) {

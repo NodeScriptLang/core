@@ -69,6 +69,32 @@ describe('Graph', () => {
             assert.notEqual(graph.refs[node1.ref], graph.refs[node2.ref]);
         });
 
+        it('sets the default param value if not explicitly specified', async () => {
+            const loader = new GraphLoader();
+            const graph = await loader.loadGraph();
+            const node = await graph.createNode({
+                uri: runtime.defs['param.default'],
+                node: {},
+            });
+            assert.strictEqual(node.props[0].key, 'value');
+            assert.strictEqual(node.props[0].value, 'Hello');
+        });
+
+        it('sets the actual param value when explicitly specified', async () => {
+            const loader = new GraphLoader();
+            const graph = await loader.loadGraph();
+            const node = await graph.createNode({
+                uri: runtime.defs['param.default'],
+                node: {
+                    props: [
+                        { key: 'value', value: 'Bye' }
+                    ]
+                },
+            });
+            assert.strictEqual(node.props[0].key, 'value');
+            assert.strictEqual(node.props[0].value, 'Bye');
+        });
+
     });
 
     describe('deleteNode', () => {

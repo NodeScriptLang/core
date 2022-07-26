@@ -199,8 +199,11 @@ export class Node implements t.Node {
 
     protected initProps(specs: t.Prop[]) {
         const props: Prop[] = [];
-        for (const key of Object.keys(this.$def.metadata.params)) {
-            const spec = specs.find(_ => _.key === key) ?? { key };
+        for (const [key, param] of Object.entries(this.$def.metadata.params)) {
+            const spec = specs.find(_ => _.key === key) ?? {
+                key,
+                value: param.schema.default ?? '',
+            };
             const prop = new Prop(this, spec);
             props.push(prop);
         }
