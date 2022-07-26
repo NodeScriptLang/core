@@ -47,5 +47,9 @@ export const ParamMetadataSchema = new Schema<t.ParamMetadata>({
             type: 'boolean',
             optional: true,
         },
+        hideValue: {
+            type: 'boolean',
+            optional: true,
+        },
     }
 });

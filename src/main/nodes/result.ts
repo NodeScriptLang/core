@@ -10,6 +10,7 @@ export const Result: t.Operator<{
                 schema: {
                     type: 'any',
                 },
+                hideValue: true,
             }
         },
         result: { type: 'any' },

@@ -244,8 +244,8 @@ class GraphCompilerContext {
             const linkNode = prop.getLinkNode()!;
             const linkExpr = this.nodeResultExpr(linkNode);
             const linkExpanded = linkNode.isExpanded();
-            // Each expanded property needs to be awaited and converted into an array;
-            // taking `prop.linkKey` into an account
+            // Each expanded property needs to be awaited and converted into an array
+            // taking `prop.linkKey` into account
             let expr;
             if (linkExpanded) {
                 // The linked result is already an array, no need to convert

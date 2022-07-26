@@ -19,6 +19,7 @@ export type SimpleParamDef<T = unknown> = {
     keyPlaceholder?: string;
     valuePlaceholder?: string;
     hideEntries?: boolean;
+    hideValue?: boolean;
 };
 
 export type LambdaParamDef<P = unknown, R = unknown> = {
