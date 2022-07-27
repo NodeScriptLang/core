@@ -15,4 +15,5 @@ export type NodeMetadata = {
     result: DataSchemaSpec;
     hidden?: boolean;
     hideOutboundSocket?: boolean;
+    labelParam?: string;
 };

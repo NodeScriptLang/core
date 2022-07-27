@@ -44,5 +44,9 @@ export const NodeMetadataSchema = new Schema<t.NodeMetadata>({
             type: 'boolean',
             optional: true,
         },
+        labelParam: {
+            type: 'string',
+            optional: true,
+        },
     }
 });
