@@ -165,6 +165,124 @@ describe('Graph', () => {
 
     });
 
+    describe('detachNode', () => {
+
+        it('recreates the links attached to the first property', async () => {
+            const loader = new GraphLoader();
+            const graph = await loader.loadGraph({
+                nodes: [
+                    {
+                        id: 'res',
+                        ref: 'res',
+                        props: [
+                            { key: 'value', linkId: 'add' },
+                        ]
+                    },
+                    {
+                        id: 'obj',
+                        ref: 'obj',
+                        props: [
+                            {
+                                key: 'properties',
+                                entries: [
+                                    { key: 'foo', linkId: 'add' },
+                                    { key: 'bar', linkId: 'add' },
+                                ]
+                            },
+                        ]
+                    },
+                    {
+                        id: 'add',
+                        ref: 'add',
+                        props: [
+                            { key: 'a', linkId: 'a' },
+                            { key: 'b', linkId: 'b' },
+                        ]
+                    },
+                    {
+                        id: 'a',
+                        ref: 'number',
+                        props: [
+                            { key: 'value', value: '42' },
+                        ]
+                    },
+                    {
+                        id: 'b',
+                        ref: 'number',
+                        props: [
+                            { key: 'value', value: '37' },
+                        ]
+                    }
+                ],
+                refs: {
+                    add: runtime.defs['math.add'],
+                    number: runtime.defs['number'],
+                    obj: runtime.defs['object'],
+                    res: 'core:Result',
+                }
+            });
+            const resNode = graph.getNodeById('res')!;
+            assert.strictEqual(resNode.props[0].linkId, 'add');
+            graph.detachNode('add');
+            assert.strictEqual(resNode.props[0].linkId, 'a');
+            const objNode = graph.getNodeById('obj')!;
+            assert.strictEqual(objNode.props[0].entries[0].linkId, 'a');
+            assert.strictEqual(objNode.props[0].entries[1].linkId, 'a');
+        });
+
+        it('recreates the links through the first connected entry', async () => {
+            const loader = new GraphLoader();
+            const graph = await loader.loadGraph({
+                nodes: [
+                    {
+                        id: 'res',
+                        ref: 'res',
+                        props: [
+                            { key: 'value', linkId: 'obj' },
+                        ]
+                    },
+                    {
+                        id: 'obj',
+                        ref: 'obj',
+                        props: [
+                            {
+                                key: 'properties',
+                                entries: [
+                                    { key: 'foo', linkId: 'a' },
+                                    { key: 'bar', linkId: 'b' },
+                                ]
+                            },
+                        ]
+                    },
+                    {
+                        id: 'a',
+                        ref: 'number',
+                        props: [
+                            { key: 'value', value: '42' },
+                        ]
+                    },
+                    {
+                        id: 'b',
+                        ref: 'number',
+                        props: [
+                            { key: 'value', value: '37' },
+                        ]
+                    }
+                ],
+                refs: {
+                    number: runtime.defs['number'],
+                    obj: runtime.defs['object'],
+                    res: 'core:Result',
+                }
+            });
+            const resNode = graph.getNodeById('res')!;
+            assert.strictEqual(resNode.props[0].linkId, 'obj');
+            graph.detachNode('obj');
+            assert.strictEqual(resNode.props[0].linkId, 'a');
+        });
+
+    });
+
     describe('invariants', () => {
 
         it('removes extra properties not supported by node definition', async () => {

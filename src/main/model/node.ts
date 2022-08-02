@@ -197,6 +197,27 @@ export class Node implements t.Node {
         }
     }
 
+    /**
+     * Returns the property that will be used to reroute the links
+     * when the node is muted or detached.
+     *
+     * Unless specified explicitly in NodeMetadata, the first property
+     * (or the first linked entry of the first property) is used for bypassing/rewiring.
+     */
+    getBypassProp(): Prop | null {
+        const firstProp = this.props[0];
+        if (!firstProp) {
+            return null;
+        }
+        if (firstProp.isUsesEntries()) {
+            return firstProp.entries.find(_ => !!_.getLinkNode()) ?? null;
+        }
+        if (firstProp.getLinkNode()) {
+            return firstProp;
+        }
+        return null;
+    }
+
     protected initProps(specs: t.Prop[]) {
         const props: Prop[] = [];
         for (const [key, param] of Object.entries(this.$def.metadata.params)) {
@@ -218,6 +239,8 @@ export class Node implements t.Node {
                 if (!linkNode.canLinkTo(this)) {
                     prop.linkId = '';
                 }
+            } else {
+                prop.linkId = '';
             }
         }
     }

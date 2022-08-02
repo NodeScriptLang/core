@@ -74,10 +74,13 @@ export class Graph implements t.Graph {
     }
 
     /**
-     * Deletes both the node & its corresponding ref if unused by any other node.
+     * Deletes the node.
+     *
+     * If its corresponding `ref` is no longer used, ref is also removed,
+     * thus guaranteeing that there are no extraneous refs left in graph.
      *
      * Note: deleting root node is not allowed, it should be unassigned first
-     * using setRootNode
+     * using `setRootNode`.
      */
     deleteNode(nodeId: string) {
         if (this.rootNodeId === nodeId) {
@@ -97,6 +100,28 @@ export class Graph implements t.Graph {
         }
         this.applyInvariants();
         return true;
+    }
+
+    /**
+     * Detaches the node from all other nodes.
+     * All the outbound links, which would otherwise be just removed,
+     * are re-created from the node plugged into its "bypass" prop.
+     *
+     * See Node.getBypassProp() for the exact definition of which prop is chosen.
+     */
+    detachNode(nodeId: string) {
+        const node = this.getNodeById(nodeId);
+        if (!node) {
+            return;
+        }
+        const outboundLinks = this.computeLinkMap().get(nodeId);
+        const prop = node.getBypassProp();
+        const linkNode = prop?.getLinkNode();
+        if (linkNode) {
+            for (const link of outboundLinks) {
+                link.prop.linkId = linkNode.id;
+            }
+        }
     }
 
     /**
