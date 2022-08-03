@@ -5,6 +5,7 @@ export * from './deep-partial.js';
 export * from './event.js';
 export * from './loader.js';
 export * from './model.js';
+export * from './node-cache-mode.js';
 export * from './node-def.js';
 export * from './node-hooks.js';
 export * from './node-metadata.js';

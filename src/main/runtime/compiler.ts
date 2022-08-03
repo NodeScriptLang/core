@@ -140,7 +140,7 @@ class GraphCompilerContext {
         const sym = this.nextSym('r');
         this.symtable.set(`node:${node.id}`, sym);
         this.code.block(`${this.asyncSym()}function ${sym}(ctx) {`, `}`, () => {
-            if (this.isNodeCached(node.id)) {
+            if (this.isNodeCached(node)) {
                 this.code.line(`const $c = ctx.$cache.get("${node.id}");`);
                 this.code.line('if ($c) return $c;');
                 this.code.block('try {', '}', () => {
@@ -223,7 +223,7 @@ class GraphCompilerContext {
         this.code.block(`${resSym} = ${defSym}.compute({`, `}, ctx);`, () => {
             this.emitNodeProps(node);
         });
-        if (this.isNodeCached(node.id)) {
+        if (this.isNodeCached(node)) {
             this.code.line(`ctx.$cache.set("${node.id}", ${resSym});`);
         }
     }
@@ -270,7 +270,7 @@ class GraphCompilerContext {
             });
             this.code.line(`${resSym}.push(${this.awaitSym()}${tempSym});`);
         });
-        if (this.isNodeCached(node.id)) {
+        if (this.isNodeCached(node)) {
             this.code.line(`ctx.$cache.set("${node.id}", ${resSym});`);
         }
     }
@@ -406,8 +406,16 @@ class GraphCompilerContext {
         }
     }
 
-    private isNodeCached(nodeId: string) {
-        return this.linkMap.get(nodeId).size > 1;
+    private isNodeCached(node: Node) {
+        const cache = node.$def.metadata.cache ?? 'auto';
+        switch (cache) {
+            case 'auto':
+                return this.linkMap.get(node.id).size > 1;
+            case 'always':
+                return true;
+            case 'never':
+                return false;
+        }
     }
 
     private asyncSym() {
