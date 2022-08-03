@@ -1,6 +1,7 @@
 // This file is auto-generated
 export * from './data-schema.js';
 export * from './graph.js';
+export * from './node-cache-mode.js';
 export * from './node-def.js';
 export * from './node-hooks.js';
 export * from './node-metadata.js';
