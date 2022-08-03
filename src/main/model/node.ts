@@ -112,6 +112,10 @@ export class Node implements t.Node {
         return [...this.computedProps()].some(_ => _.isExpanded());
     }
 
+    getOutboundLinks(linkMap = this.$graph.computeLinkMap()) {
+        return linkMap.get(this.id);
+    }
+
     *leftNodes(visited: Set<string> = new Set()): Iterable<Node> {
         if (visited.has(this.id)) {
             return;
