@@ -48,6 +48,9 @@ class GraphCompilerContext {
     linkMap: MultiMap<string, NodeLink>;
     // Whether the outcome is asynchronous or not
     async: boolean;
+    // Async/await keywords
+    asyncSym: string;
+    awaitSym: string;
 
     // Commonly used symbols
     sym = {
@@ -70,6 +73,8 @@ class GraphCompilerContext {
         this.order = graph.computeOrder(rootNode.id);
         this.linkMap = graph.computeLinkMap();
         this.async = this.order.some(_ => _.$def.metadata.async);
+        this.asyncSym = this.async ? 'async ' : '';
+        this.awaitSym = this.async ? 'await ' : '';
     }
 
     compileEsm() {
@@ -99,7 +104,7 @@ class GraphCompilerContext {
         this.emitComment('Node Definition');
         this.code.block('export const node = {', '};', () => {
             this.emitGraphMetadata();
-            this.code.block(`${this.asyncSym()}compute(params, ctx) {`, '}', () => {
+            this.code.block(`${this.asyncSym}compute(params, ctx) {`, '}', () => {
                 this.emitComputeBody();
             });
         });
@@ -139,16 +144,16 @@ class GraphCompilerContext {
         this.emitComment(`${node.ref} ${node.id}`);
         const sym = this.nextSym('r');
         this.symtable.set(`node:${node.id}`, sym);
-        this.code.block(`${this.asyncSym()}function ${sym}(ctx) {`, `}`, () => {
+        this.code.block(`${this.asyncSym}function ${sym}(ctx) {`, `}`, () => {
             if (this.isNodeCached(node)) {
                 this.code.line(`const $c = ctx.$cache.get("${node.id}");`);
-                this.code.line('if ($c) return $c;');
+                this.code.line('if ($c) { if ($c.error) { throw $c.error } return $c.result }');
                 this.code.block('try {', '}', () => {
                     this.emitNodeBody(node);
                 });
-                this.code.block('catch (err) {', '}', () => {
-                    this.code.line(`ctx.$cache.set("${node.id}", Promise.reject(err));`);
-                    this.code.line(`throw err;`);
+                this.code.block('catch (error) {', '}', () => {
+                    this.code.line(`ctx.$cache.set("${node.id}", { error });`);
+                    this.code.line(`throw error;`);
                 });
             } else {
                 this.emitNodeBody(node);
@@ -179,15 +184,15 @@ class GraphCompilerContext {
                 if (this.options.introspect) {
                     this.code.line(`${this.sym.nodeEvaluated}.emit({` +
                         `nodeId: ${JSON.stringify(node.id)},` +
-                        `result: ${this.awaitSym()}${resSym}` +
-                        `});`);
+                        `result: ${resSym}` +
+                    `});`);
                 }
                 this.code.line(`return ${resSym};`);
             });
             this.code.block('catch (error) {', '}', () => {
                 this.code.line(`${this.sym.nodeEvaluated}.emit({` +
                     `nodeId: ${JSON.stringify(node.id)},` +
-                    `error,` +
+                    `error` +
                 `});`);
                 this.code.line('throw error;');
             });
@@ -220,11 +225,11 @@ class GraphCompilerContext {
 
     private emitRegularNode(node: Node, resSym: string) {
         const defSym = this.getDefSym(node.ref);
-        this.code.block(`${resSym} = ${defSym}.compute({`, `}, ctx);`, () => {
+        this.code.block(`${resSym} = ${this.awaitSym}${defSym}.compute({`, `}, ctx);`, () => {
             this.emitNodeProps(node);
         });
         if (this.isNodeCached(node)) {
-            this.code.line(`ctx.$cache.set("${node.id}", ${resSym});`);
+            this.code.line(`ctx.$cache.set("${node.id}", { result: ${resSym} });`);
         }
     }
 
@@ -265,13 +270,13 @@ class GraphCompilerContext {
         const cond = expSyms.map(s => `i < ${s}.length`).join(' && ');
         this.code.block(`for (let i = 0;${cond};i++) {`, `}`, () => {
             const tempSym = `$t`;
-            this.code.block(`const ${tempSym} = ${defSym}.compute({`, `}, ctx);`, () => {
+            this.code.block(`const ${tempSym} = ${this.awaitSym}${defSym}.compute({`, `}, ctx);`, () => {
                 this.emitNodeProps(node);
             });
-            this.code.line(`${resSym}.push(${this.awaitSym()}${tempSym});`);
+            this.code.line(`${resSym}.push(${tempSym});`);
         });
         if (this.isNodeCached(node)) {
-            this.code.line(`ctx.$cache.set("${node.id}", ${resSym});`);
+            this.code.line(`ctx.$cache.set("${node.id}", { result: ${resSym} });`);
         }
     }
 
@@ -360,7 +365,7 @@ class GraphCompilerContext {
 
     private nodeResultExpr(node: Node) {
         const sym = this.getNodeSym(node.id);
-        return `${this.awaitSym()}${sym}(ctx)`;
+        return `${this.awaitSym}${sym}(ctx)`;
     }
 
     private lambdaPropExpr(prop: Prop) {
@@ -416,14 +421,6 @@ class GraphCompilerContext {
             case 'never':
                 return false;
         }
-    }
-
-    private asyncSym() {
-        return this.async ? 'async ' : '';
-    }
-
-    private awaitSym() {
-        return this.async ? 'await ' : '';
     }
 
 }

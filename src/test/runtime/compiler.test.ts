@@ -637,7 +637,7 @@ describe('GraphCompiler', () => {
                 { nodeId: 'res', result: 84 },
             ]);
             assert.deepStrictEqual(ctx.$cache.size, 1);
-            assert.deepStrictEqual(ctx.$cache.get('p'), '42');
+            assert.deepStrictEqual(ctx.$cache.get('p'), { result: '42' });
         });
 
         it('does not cache node when its result is only used once', async () => {
