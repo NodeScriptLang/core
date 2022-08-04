@@ -79,6 +79,7 @@ class GraphCompilerContext {
         this.async = this.order.some(_ => _.$def.metadata.async);
         this.asyncSym = this.async ? 'async ' : '';
         this.awaitSym = this.async ? 'await ' : '';
+        this.prepareSymbols();
     }
 
     compileEsm() {
@@ -145,8 +146,7 @@ class GraphCompilerContext {
 
     private emitNode(node: Node) {
         this.emitComment(`${node.ref} ${node.id}`);
-        const sym = this.nextSym('r');
-        this.symtable.set(`node:${node.id}`, sym);
+        const sym = this.getNodeSym(node.id);
         this.code.block(`${this.asyncSym}function ${sym}(params, ctx) {`, `}`, () => {
             this.emitNodePreamble(node);
             if (this.isNodeCached(node)) {
@@ -433,6 +433,13 @@ class GraphCompilerContext {
                 return true;
             case 'never':
                 return false;
+        }
+    }
+
+    private prepareSymbols() {
+        for (const node of this.order) {
+            const sym = this.nextSym('r');
+            this.symtable.set(`node:${node.id}`, sym);
         }
     }
 
