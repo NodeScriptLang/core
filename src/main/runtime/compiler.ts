@@ -7,6 +7,7 @@ export interface GraphCompilerOptions {
     rootNodeId: string;
     comments: boolean;
     introspect: boolean;
+    emitNodeMap: boolean;
 }
 
 /**
@@ -54,9 +55,9 @@ class GraphCompilerContext {
 
     // Commonly used symbols
     sym = {
-        nodeEvaluated: this.nextSym('o'),
-        toArray: this.nextSym('o'),
         convertType: this.nextSym('o'),
+        toArray: this.nextSym('o'),
+        nodeEvaluated: this.nextSym('o'),
     };
 
     constructor(
@@ -68,6 +69,7 @@ class GraphCompilerContext {
             rootNodeId: rootNode.id,
             comments: false,
             introspect: false,
+            emitNodeMap: false,
             ...options
         };
         this.order = graph.computeOrder(rootNode.id);
@@ -79,7 +81,11 @@ class GraphCompilerContext {
 
     compileEsm() {
         this.emitImports();
+        this.emitNodeFunctions();
         this.emitExportNode();
+        if (this.options.emitNodeMap) {
+            this.emitNodeMap();
+        }
         return this.code.toString();
     }
 
@@ -100,38 +106,33 @@ class GraphCompilerContext {
         }
     }
 
+    private emitNodeFunctions() {
+        for (const node of this.order) {
+            this.emitNode(node);
+        }
+    }
+
+    private emitNodeMap() {
+        this.emitComment('Node Map');
+        this.code.line('export const nodeMap = new Map()');
+        for (const node of this.order) {
+            const sym = this.getNodeSym(node.id);
+            this.code.line(`nodeMap.set(${JSON.stringify(node.id)}, ${sym})`);
+        }
+    }
+
     private emitExportNode() {
         this.emitComment('Node Definition');
         this.code.block('export const node = {', '};', () => {
             this.emitGraphMetadata();
             this.code.block(`${this.asyncSym}compute(params, ctx) {`, '}', () => {
-                this.emitComputeBody();
+                this.emitResult();
             });
         });
     }
 
     private emitGraphMetadata() {
         this.code.line(`metadata: ${JSON.stringify(this.graph.metadata)},`);
-    }
-
-    private emitComputeBody() {
-        this.emitCtxLocals();
-        for (const node of this.order) {
-            this.emitNode(node);
-        }
-        this.emitResult();
-    }
-
-    private emitCtxLocals() {
-        // These locals are accessed by the code within `compute` function
-        this.symtable.set('nodeEvaluated', this.sym.nodeEvaluated);
-        this.symtable.set('toArray', this.sym.toArray);
-        this.symtable.set('convertType', this.sym.convertType);
-        this.code.line(`const {` +
-          `$nodeEvaluated: ${this.sym.nodeEvaluated},` +
-          `$toArray: ${this.sym.toArray},` +
-          `$convertType: ${this.sym.convertType},` +
-        `} = ctx;`);
     }
 
     private emitResult() {
@@ -144,7 +145,8 @@ class GraphCompilerContext {
         this.emitComment(`${node.ref} ${node.id}`);
         const sym = this.nextSym('r');
         this.symtable.set(`node:${node.id}`, sym);
-        this.code.block(`${this.asyncSym}function ${sym}(ctx) {`, `}`, () => {
+        this.code.block(`${this.asyncSym}function ${sym}(params, ctx) {`, `}`, () => {
+            this.emitNodePreamble(node);
             if (this.isNodeCached(node)) {
                 this.code.line(`const $c = ctx.$cache.get("${node.id}");`);
                 this.code.line('if ($c) { if ($c.error) { throw $c.error } return $c.result }');
@@ -159,6 +161,14 @@ class GraphCompilerContext {
                 this.emitNodeBody(node);
             }
         });
+    }
+
+    private emitNodePreamble(node: Node) {
+        this.code.line(`const {` +
+            `$convertType:${this.sym.convertType},` +
+            `$toArray:${this.sym.toArray},` +
+            `$nodeEvaluated:${this.sym.nodeEvaluated},` +
+        `} = ctx;`);
     }
 
     private emitNodeBody(node: Node) {
@@ -365,7 +375,7 @@ class GraphCompilerContext {
 
     private nodeResultExpr(node: Node) {
         const sym = this.getNodeSym(node.id);
-        return `${this.awaitSym}${sym}(ctx)`;
+        return `${this.awaitSym}${sym}(params, ctx)`;
     }
 
     private lambdaPropExpr(prop: Prop) {
@@ -377,10 +387,11 @@ class GraphCompilerContext {
         const targetSchema = linkNode.$def.metadata.result;
         const linkSym = this.getNodeSym(linkNode.id);
         const schemaCompatible = isSchemaCompatible(param.schema, targetSchema);
-        return schemaCompatible ?
-            `p => ctx.$scoped(p, ${linkSym})` :
-            `p => Promise.resolve(ctx.$scoped(p, ${linkSym}))` +
-                `.then(res => ${this.convertTypeExpr('res', targetSchema)})`;
+        return `${this.asyncSym}(p) => {
+            const childCtx = ctx.$newScope(p);
+            const res = ${this.awaitSym}${linkSym}(params, childCtx);
+            return ${schemaCompatible ? 'res' : this.convertTypeExpr(`res`, targetSchema)};
+        }`;
     }
 
     private getNodeSym(nodeId: string) {
