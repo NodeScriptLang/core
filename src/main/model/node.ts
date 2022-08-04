@@ -243,8 +243,6 @@ export class Node implements t.Node {
                 if (!linkNode.canLinkTo(this)) {
                     prop.linkId = '';
                 }
-            } else {
-                prop.linkId = '';
             }
         }
     }
