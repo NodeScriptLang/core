@@ -8,6 +8,7 @@ export interface GraphCompilerOptions {
     comments: boolean;
     introspect: boolean;
     emitNodeMap: boolean;
+    emitAll: boolean;
 }
 
 /**
@@ -70,9 +71,10 @@ class GraphCompilerContext {
             comments: false,
             introspect: false,
             emitNodeMap: false,
+            emitAll: false,
             ...options
         };
-        this.order = graph.computeOrder(rootNode.id);
+        this.order = this.options.emitAll ? graph.nodes : graph.computeOrder(rootNode.id);
         this.linkMap = graph.computeLinkMap();
         this.async = this.order.some(_ => _.$def.metadata.async);
         this.asyncSym = this.async ? 'async ' : '';
