@@ -16,12 +16,11 @@ export abstract class BaseContext implements t.GraphEvalContext {
     abstract getLocal(key: string): any;
     abstract $nodeEvaluated: Event<t.NodeResult>;
 
-    $scoped<T>(locals: Record<string, any>, fn: (ctx: t.GraphEvalContext) => T): T {
-        const ctx = new ScopeEvalContext(this, locals);
-        return fn(ctx);
+    $newScope(locals: Record<string, any>): BaseContext {
+        return new ScopeEvalContext(this, locals);
     }
 
-    $toArray<T>(value: unknown): T[] {
+    $toArray(value: unknown): unknown[] {
         return Array.isArray(value) ? value : [value];
     }
 

@@ -843,4 +843,65 @@ describe('GraphCompiler', () => {
 
     });
 
+    describe('node map', () => {
+
+        it('emits nodeMap', async () => {
+            const graph = await runtime.loadGraph({
+                nodes: [
+                    {
+                        id: 'p1',
+                        ref: 'param',
+                        props: [
+                            { key: 'key', value: 'value' },
+                        ]
+                    },
+                    {
+                        id: 'plus1',
+                        ref: 'add',
+                        props: [
+                            { key: 'a', linkId: 'p1' },
+                            { key: 'b', value: '1' },
+                        ]
+                    },
+                    {
+                        id: 'plus2',
+                        ref: 'add',
+                        props: [
+                            { key: 'a', linkId: 'p1' },
+                            { key: 'b', value: '2' },
+                        ]
+                    },
+                    {
+                        id: 'mul2',
+                        ref: 'add',
+                        props: [
+                            { key: 'a', linkId: 'p1' },
+                            { key: 'b', linkId: 'p1' },
+                        ]
+                    },
+                ],
+                refs: {
+                    add: runtime.defs['math.add'],
+                    param: 'core:Param',
+                }
+            });
+            const code = new GraphCompiler().compileEsm(graph, {
+                rootNodeId: 'plus1',
+                emitAll: true,
+                emitNodeMap: true,
+            });
+            const { nodeMap } = await evalEsmModule(code);
+            const ctx = new GraphEvalContext();
+            const p1 = await nodeMap.get('p1')({ value: 42 }, ctx);
+            assert.strictEqual(p1, 42);
+            const plus1 = await nodeMap.get('plus1')({ value: 42 }, ctx);
+            assert.strictEqual(plus1, 43);
+            const plus2 = await nodeMap.get('plus2')({ value: 42 }, ctx);
+            assert.strictEqual(plus2, 44);
+            const mul2 = await nodeMap.get('mul2')({ value: 80 }, ctx);
+            assert.strictEqual(mul2, 160);
+        });
+
+    });
+
 });
