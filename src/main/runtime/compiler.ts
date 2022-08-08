@@ -425,7 +425,7 @@ class GraphCompilerContext {
     }
 
     private isNodeCached(node: Node) {
-        const cache = node.$def.metadata.cache ?? 'auto';
+        const cache = node.$def.metadata.cacheMode ?? 'auto';
         switch (cache) {
             case 'auto':
                 return this.linkMap.get(node.id).size > 1;

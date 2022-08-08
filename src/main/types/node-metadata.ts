@@ -1,5 +1,6 @@
 import { DataSchemaSpec } from './data.js';
 import { NodeCacheMode } from './node-cache-mode.js';
+import { NodeEvalMode } from './node-eval-mode.js';
 import { ParamMetadata } from './param-metadata.js';
 
 export type NodeMetadata = {
@@ -17,5 +18,6 @@ export type NodeMetadata = {
     hidden?: boolean;
     hideOutboundSocket?: boolean;
     labelParam?: string;
-    cache: NodeCacheMode;
+    cacheMode: NodeCacheMode;
+    evalMode: NodeEvalMode;
 };

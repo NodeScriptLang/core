@@ -21,7 +21,8 @@ describe('GraphLoader', () => {
                 b: { schema: { type: 'number' } },
             },
             result: { type: 'number' },
-            cache: 'auto',
+            cacheMode: 'auto',
+            evalMode: 'auto',
         });
         assert.strictEqual(typeof def.compute, 'function');
     });

@@ -81,7 +81,8 @@ export class GraphLoader implements t.GraphLoader {
             keywords: [],
             deprecated: '',
             hidden: false,
-            cache: 'auto',
+            cacheMode: 'auto',
+            evalMode: 'auto',
             ...op.metadata,
         };
         const nodeDef = {
@@ -110,7 +111,8 @@ export class GraphLoader implements t.GraphLoader {
                 hidden: true,
                 params: {},
                 result: { type: 'any' },
-                cache: 'auto',
+                cacheMode: 'auto',
+                evalMode: 'auto',
             },
             compute() {
                 throw new UnresolvedNodeError(`Node definition ${uri} not found`);

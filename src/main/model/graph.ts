@@ -60,9 +60,17 @@ export class Graph implements t.Graph {
      * Returns the created node.
      */
     async createNode(spec: t.AddNodeSpec) {
-        await this.$loader.loadNodeDef(spec.uri);
+        const def = await this.$loader.loadNodeDef(spec.uri);
         const ref = this.getRefForUri(spec.uri);
-        const node = new Node(this, { ...spec.node, ref });
+        const evalMode = def.metadata.evalMode;
+        const node = new Node(this, {
+            ...spec.node,
+            ref,
+            aux: {
+                evalMode,
+                ...spec.node?.aux,
+            }
+        });
         this.addNodeRaw(node);
         this.applyInvariants();
         return node;

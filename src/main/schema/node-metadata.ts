@@ -3,6 +3,7 @@ import { Schema } from 'airtight';
 import * as t from '../types/index.js';
 import { DataSchemaSchema } from './data-schema.js';
 import { NodeCacheModeSchema } from './node-cache-mode.js';
+import { NodeEvalModeSchema } from './node-eval-mode.js';
 import { ParamMetadataSchema } from './param-metadata.js';
 import { VersionSchema } from './version.js';
 
@@ -49,6 +50,7 @@ export const NodeMetadataSchema = new Schema<t.NodeMetadata>({
             type: 'string',
             optional: true,
         },
-        cache: NodeCacheModeSchema.schema,
+        cacheMode: NodeCacheModeSchema.schema,
+        evalMode: NodeEvalModeSchema.schema,
     }
 });
