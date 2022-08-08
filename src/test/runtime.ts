@@ -9,7 +9,7 @@ import * as t from '../main/types/index.js';
  * Warning: if runtime is modified, make sure it is fully restored.
  */
 export class TestRuntime {
-    httpPort = Number(process.env.PORT) || 8084;
+    httpPort = Number(process.env.PORT) || 8080;
 
     defs = {
         'string': this.makeUrl('/out/test/defs/string.js'),
