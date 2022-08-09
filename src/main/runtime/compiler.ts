@@ -181,6 +181,7 @@ class GraphCompilerContext {
                 case 'core:Local': return this.emitLocalNode(node, resSym);
                 case 'core:Result': return this.emitResultNode(node, resSym);
                 case 'core:Comment': return;
+                case 'core:Frame': return;
                 default:
                     if (node.isExpanded()) {
                         this.emitExpandedNode(node, resSym);

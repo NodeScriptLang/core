@@ -12,9 +12,10 @@ export class GraphLoader implements t.GraphLoader {
 
     constructor() {
         this.defineOperator('core:Comment', systemNodes.Comment);
+        this.defineOperator('core:Frame', systemNodes.Frame);
+        this.defineOperator('core:Local', systemNodes.Local);
         this.defineOperator('core:Param', systemNodes.Param);
         this.defineOperator('core:Result', systemNodes.Result);
-        this.defineOperator('core:Local', systemNodes.Local);
     }
 
     async loadGraph(
