@@ -1,5 +1,6 @@
 import { Graph, Node, NodeLink, Prop } from '../model/index.js';
 import * as t from '../types/index.js';
+import { NodeEvalMode } from '../types/index.js';
 import { isSchemaCompatible, MultiMap } from '../util/index.js';
 import { CodeBuilder } from './code.js';
 
@@ -9,6 +10,7 @@ export interface GraphCompilerOptions {
     introspect: boolean;
     emitNodeMap: boolean;
     emitAll: boolean;
+    evalMode: NodeEvalMode;
 }
 
 /**
@@ -72,6 +74,7 @@ class GraphCompilerContext {
             introspect: false,
             emitNodeMap: false,
             emitAll: false,
+            evalMode: 'auto',
             ...options
         };
         this.order = this.options.emitAll ? graph.nodes : graph.computeOrder(rootNode.id);
@@ -178,6 +181,9 @@ class GraphCompilerContext {
         this.code.line(`let ${resSym};`);
         if (this.options.introspect) {
             this.code.block('try {', '}', () => {
+                if (this.options.evalMode === 'manual') {
+                    this.code.line(`ctx.checkPendingNode(${JSON.stringify(node.id)});`);
+                }
                 this.code.line(`${this.sym.nodeEvaluated}.emit({` +
                     `nodeId: ${JSON.stringify(node.id)},` +
                     `progress: 0` +

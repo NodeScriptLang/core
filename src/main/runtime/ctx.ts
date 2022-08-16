@@ -15,6 +15,7 @@ export abstract class BaseContext implements t.GraphEvalContext {
 
     abstract getLocal(key: string): any;
     abstract nodeEvaluated: Event<t.NodeResult>;
+    abstract pendingNodeIds: Set<string>;
 
     newScope(locals: Record<string, any>): BaseContext {
         return new ScopeEvalContext(this, locals);
@@ -31,6 +32,12 @@ export abstract class BaseContext implements t.GraphEvalContext {
     convertType<T>(value: unknown, schema: t.DataSchema<T>): T {
         return new Schema<T>(schema as any).decode(value);
     }
+
+    checkPendingNode(nodeId: string) {
+        if (this.pendingNodeIds.has(nodeId)) {
+            throw new NodePendingError('Node evaluation is suspended.');
+        }
+    }
 }
 
 /**
@@ -40,6 +47,7 @@ export abstract class BaseContext implements t.GraphEvalContext {
  */
 export class GraphEvalContext extends BaseContext {
     nodeEvaluated = new Event<t.NodeResult>();
+    pendingNodeIds = new Set<string>();
 
     getLocal(_key: string): any {
         return null;
@@ -65,6 +73,7 @@ export class ScopeEvalContext extends BaseContext {
     }
 
     get nodeEvaluated() { return this.parent.nodeEvaluated; }
+    get pendingNodeIds() { return this.parent.pendingNodeIds; }
 
     getLocal(key: string): any {
         const local = this.locals.get(key);
@@ -74,4 +83,9 @@ export class ScopeEvalContext extends BaseContext {
         return this.parent.getLocal(key);
     }
 
+}
+
+export class NodePendingError extends Error {
+    name = this.constructor.name;
+    code = 'EPENDING';
 }
