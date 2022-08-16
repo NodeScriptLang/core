@@ -8,5 +8,6 @@ export const NodeResultSchema = new Schema<t.NodeResult>({
         nodeId: { type: 'string' },
         result: { type: 'any', optional: true },
         error: { type: 'any', optional: true },
+        progress: { type: 'number', optional: true },
     }
 });

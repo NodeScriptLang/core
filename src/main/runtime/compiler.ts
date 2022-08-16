@@ -150,50 +150,39 @@ class GraphCompilerContext {
         this.code.block(`${this.asyncSym}function ${sym}(params, ctx) {`, `}`, () => {
             this.emitNodePreamble(node);
             if (this.isNodeCached(node)) {
-                this.code.line(`const $c = ctx.$cache.get("${node.id}");`);
+                this.code.line(`const $c = ctx.cache.get("${node.id}");`);
                 this.code.line('if ($c) { if ($c.error) { throw $c.error } return $c.result }');
                 this.code.block('try {', '}', () => {
-                    this.emitNodeBody(node);
+                    this.emitNodeBodyIntrospect(node);
                 });
                 this.code.block('catch (error) {', '}', () => {
-                    this.code.line(`ctx.$cache.set("${node.id}", { error });`);
+                    this.code.line(`ctx.cache.set("${node.id}", { error });`);
                     this.code.line(`throw error;`);
                 });
             } else {
-                this.emitNodeBody(node);
+                this.emitNodeBodyIntrospect(node);
             }
         });
     }
 
     private emitNodePreamble(node: Node) {
         this.code.line(`const {` +
-            `$convertType:${this.sym.convertType},` +
-            `$toArray:${this.sym.toArray},` +
-            `$nodeEvaluated:${this.sym.nodeEvaluated},` +
+            `convertType:${this.sym.convertType},` +
+            `toArray:${this.sym.toArray},` +
+            `nodeEvaluated:${this.sym.nodeEvaluated},` +
         `} = ctx;`);
     }
 
-    private emitNodeBody(node: Node) {
+    private emitNodeBodyIntrospect(node: Node) {
         const resSym = '$r';
-        const emitBody = () => {
-            switch (node.$uri) {
-                case 'core:Param': return this.emitParamNode(node, resSym);
-                case 'core:Local': return this.emitLocalNode(node, resSym);
-                case 'core:Result': return this.emitResultNode(node, resSym);
-                case 'core:Comment': return;
-                case 'core:Frame': return;
-                default:
-                    if (node.isExpanded()) {
-                        this.emitExpandedNode(node, resSym);
-                    } else {
-                        this.emitRegularNode(node, resSym);
-                    }
-            }
-        };
         this.code.line(`let ${resSym};`);
         if (this.options.introspect) {
             this.code.block('try {', '}', () => {
-                emitBody();
+                this.code.line(`${this.sym.nodeEvaluated}.emit({` +
+                    `nodeId: ${JSON.stringify(node.id)},` +
+                    `progress: 0` +
+                `});`);
+                this.emitNodeBodyRaw(node, resSym);
                 if (this.options.introspect) {
                     this.code.line(`${this.sym.nodeEvaluated}.emit({` +
                         `nodeId: ${JSON.stringify(node.id)},` +
@@ -210,8 +199,24 @@ class GraphCompilerContext {
                 this.code.line('throw error;');
             });
         } else {
-            emitBody();
+            this.emitNodeBodyRaw(node, resSym);
             this.code.line(`return ${resSym};`);
+        }
+    }
+
+    private emitNodeBodyRaw(node: Node, resSym: string) {
+        switch (node.$uri) {
+            case 'core:Param': return this.emitParamNode(node, resSym);
+            case 'core:Local': return this.emitLocalNode(node, resSym);
+            case 'core:Result': return this.emitResultNode(node, resSym);
+            case 'core:Comment': return;
+            case 'core:Frame': return;
+            default:
+                if (node.isExpanded()) {
+                    this.emitExpandedNode(node, resSym);
+                } else {
+                    this.emitRegularNode(node, resSym);
+                }
         }
     }
 
@@ -242,7 +247,7 @@ class GraphCompilerContext {
             this.emitNodeProps(node);
         });
         if (this.isNodeCached(node)) {
-            this.code.line(`ctx.$cache.set("${node.id}", { result: ${resSym} });`);
+            this.code.line(`ctx.cache.set("${node.id}", { result: ${resSym} });`);
         }
     }
 
@@ -280,8 +285,16 @@ class GraphCompilerContext {
             }
             this.code.line(`const ${propSym} = ${expr}`);
         }
-        const cond = expSyms.map(s => `i < ${s}.length`).join(' && ');
-        this.code.block(`for (let i = 0;${cond};i++) {`, `}`, () => {
+        this.code.line(`const $l = Math.min(${
+            expSyms.map(s => `${s}.length`).join(',')
+        });`);
+        this.code.block(`for (let $i = 0; $i < $l; $i++) {`, `}`, () => {
+            if (this.options.introspect) {
+                this.code.line(`${this.sym.nodeEvaluated}.emit({` +
+                    `nodeId: ${JSON.stringify(node.id)},` +
+                    `progress: $i / $l` +
+                `});`);
+            }
             const tempSym = `$t`;
             this.code.block(`const ${tempSym} = ${this.awaitSym}${defSym}.compute({`, `}, ctx);`, () => {
                 this.emitNodeProps(node);
@@ -289,7 +302,7 @@ class GraphCompilerContext {
             this.code.line(`${resSym}.push(${tempSym});`);
         });
         if (this.isNodeCached(node)) {
-            this.code.line(`ctx.$cache.set("${node.id}", { result: ${resSym} });`);
+            this.code.line(`ctx.cache.set("${node.id}", { result: ${resSym} });`);
         }
     }
 
@@ -362,7 +375,7 @@ class GraphCompilerContext {
         const expSym = this.symtable.get(`prop:${prop.id}`);
         if (expSym) {
             // Property was expanded
-            return `${expSym}[i]`;
+            return `${expSym}[$i]`;
         }
         // The rest only applies to non-expanded properties
         let expr = JSON.stringify(String(prop.value));
@@ -391,7 +404,7 @@ class GraphCompilerContext {
         const linkSym = this.getNodeSym(linkNode.id);
         const schemaCompatible = isSchemaCompatible(param.schema, targetSchema);
         return `${this.asyncSym}(p) => {
-            const childCtx = ctx.$newScope(p);
+            const childCtx = ctx.newScope(p);
             const res = ${this.awaitSym}${linkSym}(params, childCtx);
             return ${schemaCompatible ? 'res' : this.convertTypeExpr(`res`, targetSchema)};
         }`;

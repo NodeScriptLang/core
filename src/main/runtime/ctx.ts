@@ -1,4 +1,4 @@
-import { Schema } from 'airtight';
+import { getType, Schema } from 'airtight';
 import { Event } from 'typesafe-event';
 
 import * as t from '../types/index.js';
@@ -11,20 +11,24 @@ import * as t from '../types/index.js';
 export abstract class BaseContext implements t.GraphEvalContext {
     // Each context maintains its own cache. Subscopes have separate caches
     // and do not delegate to parent contexts.
-    $cache = new Map<string, any>();
+    cache = new Map<string, any>();
 
     abstract getLocal(key: string): any;
-    abstract $nodeEvaluated: Event<t.NodeResult>;
+    abstract nodeEvaluated: Event<t.NodeResult>;
 
-    $newScope(locals: Record<string, any>): BaseContext {
+    newScope(locals: Record<string, any>): BaseContext {
         return new ScopeEvalContext(this, locals);
     }
 
-    $toArray(value: unknown): unknown[] {
+    toArray(value: unknown): unknown[] {
         return Array.isArray(value) ? value : [value];
     }
 
-    $convertType<T>(value: unknown, schema: t.DataSchema<T>): T {
+    getType(value: unknown): t.DataType {
+        return getType(value);
+    }
+
+    convertType<T>(value: unknown, schema: t.DataSchema<T>): T {
         return new Schema<T>(schema as any).decode(value);
     }
 }
@@ -35,7 +39,7 @@ export abstract class BaseContext implements t.GraphEvalContext {
  * Has no locals.
  */
 export class GraphEvalContext extends BaseContext {
-    $nodeEvaluated = new Event<t.NodeResult>();
+    nodeEvaluated = new Event<t.NodeResult>();
 
     getLocal(_key: string): any {
         return null;
@@ -60,7 +64,7 @@ export class ScopeEvalContext extends BaseContext {
         this.locals = new Map(Object.entries(locals));
     }
 
-    get $nodeEvaluated() { return this.parent.$nodeEvaluated; }
+    get nodeEvaluated() { return this.parent.nodeEvaluated; }
 
     getLocal(key: string): any {
         const local = this.locals.get(key);

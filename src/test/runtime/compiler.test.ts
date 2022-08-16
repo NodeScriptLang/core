@@ -64,12 +64,14 @@ describe('GraphCompiler', () => {
             const { node } = await evalEsmModule(code);
             const ctx = new GraphEvalContext();
             const nodeResults: t.NodeResult[] = [];
-            ctx.$nodeEvaluated.on(_ => nodeResults.push(_));
+            ctx.nodeEvaluated.on(_ => nodeResults.push(_));
             const res = await node.compute({
                 value: 12
             }, ctx);
             assert.strictEqual(res, 33);
             assert.deepStrictEqual(nodeResults, [
+                { nodeId: 'res', progress: 0 },
+                { nodeId: 'p1', progress: 0 },
                 { nodeId: 'p1', result: 12 },
                 { nodeId: 'res', result: 33 },
             ]);
@@ -596,6 +598,55 @@ describe('GraphCompiler', () => {
             assert.deepStrictEqual(res, [44]);
         });
 
+        it('emits progress', async () => {
+            const graph = await runtime.loadGraph({
+                rootNodeId: 'res',
+                nodes: [
+                    {
+                        id: 'res',
+                        ref: 'any',
+                        props: [
+                            { key: 'value', linkId: 'arr', expand: true },
+                        ]
+                    },
+                    {
+                        id: 'arr',
+                        ref: 'array',
+                        props: [
+                            {
+                                key: 'items',
+                                entries: [
+                                    { key: 'value', value: '1' },
+                                    { key: 'value', value: '2' },
+                                    { key: 'value', value: '42' },
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                refs: {
+                    array: runtime.defs['array'],
+                    any: runtime.defs['any'],
+                }
+            });
+            const code = new GraphCompiler().compileEsm(graph, { introspect: true });
+            const { node } = await evalEsmModule(code);
+            const ctx = new GraphEvalContext();
+            const results: t.NodeResult[] = [];
+            ctx.nodeEvaluated.on(_ => results.push(_));
+            const res = await node.compute({}, ctx);
+            assert.deepStrictEqual(res, ['1', '2', '42']);
+            assert.deepStrictEqual(results, [
+                { nodeId: 'res', progress: 0 },
+                { nodeId: 'arr', progress: 0 },
+                { nodeId: 'arr', result: ['1', '2', '42'] },
+                { nodeId: 'res', progress: 0 },
+                { nodeId: 'res', progress: 1 / 3 },
+                { nodeId: 'res', progress: 2 / 3 },
+                { nodeId: 'res', result: ['1', '2', '42'] },
+            ]);
+        });
+
     });
 
     describe('node cache', () => {
@@ -629,15 +680,17 @@ describe('GraphCompiler', () => {
             const { node } = await evalEsmModule(code);
             const ctx = new GraphEvalContext();
             const results: t.NodeResult[] = [];
-            ctx.$nodeEvaluated.on(_ => results.push(_));
+            ctx.nodeEvaluated.on(_ => results.push(_));
             const res = await node.compute({}, ctx);
             assert.deepStrictEqual(res, 84);
             assert.deepStrictEqual(results, [
+                { nodeId: 'res', progress: 0 },
+                { nodeId: 'p', progress: 0 },
                 { nodeId: 'p', result: '42' },
                 { nodeId: 'res', result: 84 },
             ]);
-            assert.deepStrictEqual(ctx.$cache.size, 1);
-            assert.deepStrictEqual(ctx.$cache.get('p'), { result: '42' });
+            assert.deepStrictEqual(ctx.cache.size, 1);
+            assert.deepStrictEqual(ctx.cache.get('p'), { result: '42' });
         });
 
         it('does not cache node when its result is only used once', async () => {
@@ -669,14 +722,16 @@ describe('GraphCompiler', () => {
             const { node } = await evalEsmModule(code);
             const ctx = new GraphEvalContext();
             const results: t.NodeResult[] = [];
-            ctx.$nodeEvaluated.on(_ => results.push(_));
+            ctx.nodeEvaluated.on(_ => results.push(_));
             const res = await node.compute({}, ctx);
             assert.deepStrictEqual(res, 54);
             assert.deepStrictEqual(results, [
+                { nodeId: 'res', progress: 0 },
+                { nodeId: 'p', progress: 0 },
                 { nodeId: 'p', result: '42' },
                 { nodeId: 'res', result: 54 },
             ]);
-            assert.deepStrictEqual(ctx.$cache.size, 0);
+            assert.deepStrictEqual(ctx.cache.size, 0);
         });
 
     });
