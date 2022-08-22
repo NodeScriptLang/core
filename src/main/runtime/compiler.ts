@@ -249,7 +249,7 @@ class GraphCompilerContext {
 
     private emitRegularNode(node: Node, resSym: string) {
         const defSym = this.getDefSym(node.ref);
-        this.code.block(`${resSym} = ${this.awaitSym}${defSym}.compute({`, `}, ctx);`, () => {
+        this.code.block(`${resSym} = ${this.awaitSym}${defSym}.compute({`, `}, ctx.newScope());`, () => {
             this.emitNodeProps(node);
         });
         if (this.isNodeCached(node)) {
@@ -302,7 +302,7 @@ class GraphCompilerContext {
                 `});`);
             }
             const tempSym = `$t`;
-            this.code.block(`const ${tempSym} = ${this.awaitSym}${defSym}.compute({`, `}, ctx);`, () => {
+            this.code.block(`const ${tempSym} = ${this.awaitSym}${defSym}.compute({`, `}, ctx.newScope());`, () => {
                 this.emitNodeProps(node);
             });
             this.code.line(`${resSym}.push(${tempSym});`);

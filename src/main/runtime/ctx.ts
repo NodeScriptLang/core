@@ -17,7 +17,7 @@ export abstract class BaseContext implements t.GraphEvalContext {
     abstract nodeEvaluated: Event<t.NodeResult>;
     abstract pendingNodeIds: Set<string>;
 
-    newScope(locals: Record<string, any>): BaseContext {
+    newScope(locals: Record<string, any> = {}): BaseContext {
         return new ScopeEvalContext(this, locals);
     }
 
