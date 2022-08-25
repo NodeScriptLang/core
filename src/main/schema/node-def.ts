@@ -10,6 +10,7 @@ export const NodeDefSchema = new Schema<t.NodeDef>({
     properties: {
         metadata: NodeMetadataSchema.schema,
         compute: { type: 'any' },
+        compile: { type: 'any', optional: true },
         hooks: {
             ...NodeHooksSchema.schema,
             optional: true,

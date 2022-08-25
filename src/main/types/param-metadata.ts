@@ -12,4 +12,5 @@ export type ParamMetadata = {
     valuePlaceholder?: string;
     hideEntries?: boolean;
     hideValue?: boolean;
+    renderer?: string;
 };

@@ -10,10 +10,6 @@ export const DataSchemaSchema = new Schema<t.DataSchemaSpec>({
             type: 'string',
             default: 'any',
         },
-        kind: {
-            type: 'string',
-            optional: true,
-        },
         enum: {
             type: 'array',
             items: { type: 'string' },

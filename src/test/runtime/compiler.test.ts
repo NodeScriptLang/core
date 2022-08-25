@@ -959,4 +959,50 @@ describe('GraphCompiler', () => {
 
     });
 
+    describe('custom compiling', () => {
+
+        it('compiles nodes with custom compile()', async () => {
+            const graph = await runtime.loadGraph({
+                nodes: [
+                    {
+                        id: 'res',
+                        ref: 'eval',
+                        props: [
+                            {
+                                key: 'args',
+                                entries: [
+                                    { key: 'a', linkId: 'h' },
+                                    { key: 'b', value: 'World' },
+                                ]
+                            },
+                            {
+                                key: 'code',
+                                value: 'return a + b;',
+                            }
+                        ]
+                    },
+                    {
+                        id: 'h',
+                        ref: 'string',
+                        props: [
+                            { key: 'value', value: 'Hello' }
+                        ]
+                    },
+                ],
+                refs: {
+                    string: runtime.defs['string'],
+                    eval: runtime.defs['eval'],
+                }
+            });
+            const code = new GraphCompiler().compileEsm(graph, {
+                rootNodeId: 'res',
+            });
+            const { node } = await evalEsmModule(code);
+            const ctx = new GraphEvalContext();
+            const result = node.compute({}, ctx);
+            assert.strictEqual(result, 'HelloWorld');
+        });
+
+    });
+
 });

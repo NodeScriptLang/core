@@ -51,5 +51,9 @@ export const ParamMetadataSchema = new Schema<t.ParamMetadata>({
             type: 'boolean',
             optional: true,
         },
+        renderer: {
+            type: 'string',
+            optional: true,
+        }
     }
 });

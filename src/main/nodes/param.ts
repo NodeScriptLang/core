@@ -9,7 +9,6 @@ export const Param: t.Operator<{
             key: {
                 schema: {
                     type: 'string',
-                    kind: 'param',
                 },
             }
         },

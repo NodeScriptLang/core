@@ -6,6 +6,7 @@ export * from './event.js';
 export * from './loader.js';
 export * from './model.js';
 export * from './node-cache-mode.js';
+export * from './node-compile.js';
 export * from './node-def.js';
 export * from './node-eval-mode.js';
 export * from './node-hooks.js';

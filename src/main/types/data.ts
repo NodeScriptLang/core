@@ -13,7 +13,6 @@ export type DataSchemaType = DataSchema['type'];
 
 export type DataSchemaSpec = {
     type: DataSchemaType;
-    kind?: string;
     enum?: string[];
     default?: any;
     properties?: {
@@ -38,14 +37,12 @@ export type AnyDataSchema = {
 
 export type StringDataSchema = {
     type: 'string';
-    kind?: StringPropKind;
     enum?: string[];
     default?: string;
 };
 
 export type NumberDataSchema = {
     type: 'number';
-    kind?: NumberPropKind;
     default?: number;
 };
 
@@ -66,7 +63,3 @@ export type ArrayDataSchema<T> = {
     type: 'array';
     items: DataSchema<T>;
 };
-
-export type NumberPropKind = 'float' | 'integer';
-
-export type StringPropKind = 'default' | 'key' | 'param' | 'variable' | 'javascript' | 'json' | 'yaml' | 'selector';

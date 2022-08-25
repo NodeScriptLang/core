@@ -18,6 +18,7 @@ export class TestRuntime {
         'array': this.makeUrl('/out/test/defs/array.js'),
         'any': this.makeUrl('/out/test/defs/any.js'),
         'promise': this.makeUrl('/out/test/defs/promise.js'),
+        'eval': this.makeUrl('/out/test/defs/eval.js'),
         'math.add': this.makeUrl('/out/test/defs/math.add.js'),
         'lambda.map': this.makeUrl('/out/test/defs/lambda.map.js'),
         'param.default': this.makeUrl('/out/test/defs/param.default.js'),

@@ -1,6 +1,6 @@
 import { Graph, Node, NodeLink, Prop } from '../model/index.js';
 import * as t from '../types/index.js';
-import { NodeEvalMode } from '../types/index.js';
+import { NodeCompile, NodeEvalMode } from '../types/index.js';
 import { isSchemaCompatible, MultiMap } from '../util/index.js';
 import { CodeBuilder } from './code.js';
 
@@ -248,17 +248,13 @@ class GraphCompilerContext {
     }
 
     private emitRegularNode(node: Node, resSym: string) {
-        const defSym = this.getDefSym(node.ref);
-        this.code.block(`${resSym} = ${this.awaitSym}${defSym}.compute({`, `}, ctx.newScope());`, () => {
-            this.emitNodeProps(node);
-        });
+        this.emitNodeCompute(node, resSym);
         if (this.isNodeCached(node)) {
             this.code.line(`ctx.cache.set("${node.id}", { result: ${resSym} });`);
         }
     }
 
     private emitExpandedNode(node: Node, resSym: string) {
-        const defSym = this.getDefSym(node.ref);
         // Expanded nodes always produce an array by
         // repeating the computation per each value of expanded property
         const props = [...node.computedProps()];
@@ -302,9 +298,8 @@ class GraphCompilerContext {
                 `});`);
             }
             const tempSym = `$t`;
-            this.code.block(`const ${tempSym} = ${this.awaitSym}${defSym}.compute({`, `}, ctx.newScope());`, () => {
-                this.emitNodeProps(node);
-            });
+            this.code.line(`let ${tempSym};`);
+            this.emitNodeCompute(node, tempSym);
             this.code.line(`${resSym}.push(${tempSym});`);
         });
         if (this.isNodeCached(node)) {
@@ -312,13 +307,48 @@ class GraphCompilerContext {
         }
     }
 
+    private emitNodeCompute(node: Node, resSym: string) {
+        if (node.$def.compile) {
+            return this.emitCustomCompiledNode(node, node.$def.compile, resSym);
+        }
+        const defSym = this.getDefSym(node.ref);
+        this.code.block(`${resSym} = ${this.awaitSym}${defSym}.compute({`, `}, ctx.newScope());`, () => {
+            this.emitNodeProps(node);
+        });
+    }
+
+    private emitCustomCompiledNode(node: Node, compileFn: NodeCompile, resSym: string) {
+        compileFn(node, {
+            sym: {
+                result: resSym,
+                ctx: 'ctx',
+            },
+            emitLine: str => {
+                this.code.line(str);
+            },
+            emitBlock: (start, end, fn) => {
+                this.code.block(start, end, fn);
+            },
+            emitProp: key => {
+                const prop = node.getBasePropByKey(key);
+                if (prop) {
+                    this.emitNodeProp(node, prop);
+                }
+            }
+        });
+    }
+
     private emitNodeProps(node: Node) {
         for (const prop of node.props) {
-            if (prop.isUsesEntries()) {
-                this.emitEntries(prop);
-            } else {
-                this.emitSingleProp(prop);
-            }
+            this.emitNodeProp(node, prop);
+        }
+    }
+
+    private emitNodeProp(node: Node, prop: Prop) {
+        if (prop.isUsesEntries()) {
+            this.emitEntries(prop);
+        } else {
+            this.emitSingleProp(prop);
         }
     }
 
