@@ -1,6 +1,4 @@
 import { DataSchemaSpec } from './data.js';
-import { NodeCacheMode } from './node-cache-mode.js';
-import { NodeEvalMode } from './node-eval-mode.js';
 import { ParamMetadata } from './param-metadata.js';
 
 export type NodeMetadata = {
@@ -20,4 +18,11 @@ export type NodeMetadata = {
     labelParam?: string;
     cacheMode: NodeCacheMode;
     evalMode: NodeEvalMode;
+    resizeMode: NodeResizeMode;
 };
+
+export type NodeEvalMode = 'auto' | 'manual';
+
+export type NodeCacheMode = 'auto' | 'always' | 'never';
+
+export type NodeResizeMode = 'horizontal' | 'all' | 'none';
