@@ -206,7 +206,7 @@ export class Node implements t.Node {
      * Unless specified explicitly in NodeMetadata, the first property
      * (or the first linked entry of the first property) is used for bypassing/rewiring.
      */
-    getBypassProp(): Prop | null {
+    getDefaultProp(): Prop | null {
         const firstProp = this.props[0];
         if (!firstProp) {
             return null;

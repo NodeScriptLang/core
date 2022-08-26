@@ -123,7 +123,7 @@ export class Graph implements t.Graph {
             return;
         }
         const outboundLinks = this.computeLinkMap().get(nodeId);
-        const prop = node.getBypassProp();
+        const prop = node.getDefaultProp();
         const linkNode = prop?.getLinkNode();
         if (linkNode) {
             for (const link of outboundLinks) {
