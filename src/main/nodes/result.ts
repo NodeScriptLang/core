@@ -5,6 +5,7 @@ export const Result: t.Operator<{
 }, any> = {
     metadata: {
         label: 'Result',
+        resizeMode: 'none',
         params: {
             value: {
                 schema: {
