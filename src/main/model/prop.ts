@@ -20,7 +20,6 @@ export class Prop implements t.Prop {
     key!: string;
     value!: string;
     linkId!: string;
-    linkKey!: string;
     expand!: boolean;
     entries: Prop[];
 
@@ -34,7 +33,6 @@ export class Prop implements t.Prop {
         return serialize(this, {
             value: '',
             linkId: '',
-            linkKey: '',
             expand: false,
             entries: [],
         });

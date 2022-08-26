@@ -164,7 +164,6 @@ export class Graph implements t.Graph {
                         node,
                         prop,
                         linkNode,
-                        linkKey: prop.linkKey,
                     });
                 }
             }

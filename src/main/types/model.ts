@@ -25,7 +25,6 @@ export interface Prop {
     key: string;
     value: string;
     linkId: string;
-    linkKey: string;
     expand: boolean;
     entries?: Prop[];
 }

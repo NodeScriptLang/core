@@ -8,7 +8,6 @@ export type NodeLink = {
     node: Node;
     prop: Prop;
     linkNode: Node;
-    linkKey: string;
 };
 
 /**
@@ -156,7 +155,6 @@ export class Node implements t.Node {
                     node: this,
                     prop,
                     linkNode,
-                    linkKey: prop.linkKey,
                 };
             }
         }

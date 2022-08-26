@@ -11,7 +11,6 @@ export const PropSchema = new Schema<t.Prop>({
         key: { type: 'string' },
         value: { type: 'string' },
         linkId: { type: 'string' },
-        linkKey: { type: 'string' },
         expand: { type: 'boolean' },
         entries: {
             type: 'array',
