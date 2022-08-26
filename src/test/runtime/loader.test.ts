@@ -23,6 +23,7 @@ describe('GraphLoader', () => {
             result: { type: 'number' },
             cacheMode: 'auto',
             evalMode: 'auto',
+            resizeMode: 'horizontal',
         });
         assert.strictEqual(typeof def.compute, 'function');
     });
