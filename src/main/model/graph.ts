@@ -113,9 +113,7 @@ export class Graph implements t.Graph {
     /**
      * Detaches the node from all other nodes.
      * All the outbound links, which would otherwise be just removed,
-     * are re-created from the node plugged into its "bypass" prop.
-     *
-     * See Node.getBypassProp() for the exact definition of which prop is chosen.
+     * are re-created from the node plugged into its default prop.
      */
     detachNode(nodeId: string) {
         const node = this.getNodeById(nodeId);
@@ -124,10 +122,11 @@ export class Graph implements t.Graph {
         }
         const outboundLinks = this.computeLinkMap().get(nodeId);
         const prop = node.getDefaultProp();
-        const linkNode = prop?.getLinkNode();
-        if (linkNode) {
+        const links = prop?.getInboundLinks() ?? [];
+        const inboundLink = links[0];
+        if (inboundLink) {
             for (const link of outboundLinks) {
-                link.prop.linkId = linkNode.id;
+                link.prop.linkId = inboundLink.linkNode.id;
             }
         }
     }
@@ -157,7 +156,7 @@ export class Graph implements t.Graph {
     computeLinkMap() {
         const map = new MultiMap<string, NodeLink>();
         for (const node of this.nodes) {
-            for (const prop of node.computedProps()) {
+            for (const prop of node.actualProps()) {
                 const linkNode = prop.getLinkNode();
                 if (linkNode) {
                     map.add(linkNode.id, {
@@ -185,7 +184,7 @@ export class Graph implements t.Graph {
 
     protected _computeOrder(order: Node[], node: Node) {
         order.unshift(node);
-        for (const prop of node.computedProps()) {
+        for (const prop of node.actualProps()) {
             const linkNode = prop.getLinkNode();
             if (linkNode) {
                 const i = order.findIndex(_ => _.id === linkNode.id);

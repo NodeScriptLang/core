@@ -2,7 +2,7 @@ import { PropSchema } from '../schema/prop.js';
 import * as t from '../types/index.js';
 import { serialize } from '../util/serialize.js';
 import { humanize } from '../util/string.js';
-import { Node } from './node.js';
+import { Node, NodeLink } from './node.js';
 
 export type PropParent = Node | Prop;
 
@@ -93,6 +93,23 @@ export class Prop implements t.Prop {
             return this.$graph.getNodeById(this.linkId);
         }
         return null;
+    }
+
+    /**
+     * Returns all links used in actual computation.
+     */
+    getInboundLinks(): NodeLink[] {
+        const linkNode = this.getLinkNode();
+        if (linkNode) {
+            return [
+                {
+                    node: this.$node,
+                    prop: this,
+                    linkNode
+                }
+            ];
+        }
+        return this.entries.flatMap(e => e.getInboundLinks());
     }
 
     canExpand() {

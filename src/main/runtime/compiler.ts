@@ -257,7 +257,7 @@ class GraphCompilerContext {
     private emitExpandedNode(node: Node, resSym: string) {
         // Expanded nodes always produce an array by
         // repeating the computation per each value of expanded property
-        const props = [...node.computedProps()];
+        const props = [...node.actualProps()];
         const expandProps = props.filter(_ => _.isExpanded());
         this.code.line(`${resSym} = []`);
         const expSyms: string[] = [];

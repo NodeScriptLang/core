@@ -82,7 +82,7 @@ export class Node implements t.Node {
     /**
      * Props used in actual computation; may include base props and/or entries.
      */
-    *computedProps(): Iterable<Prop> {
+    *actualProps(): Iterable<Prop> {
         for (const prop of this.props) {
             if (prop.isUsesEntries()) {
                 yield* prop.entries;
@@ -108,7 +108,7 @@ export class Node implements t.Node {
     }
 
     isExpanded() {
-        return [...this.computedProps()].some(_ => _.isExpanded());
+        return [...this.actualProps()].some(_ => _.isExpanded());
     }
 
     getOutboundLinks(linkMap = this.$graph.computeLinkMap()) {
@@ -148,15 +148,8 @@ export class Node implements t.Node {
     }
 
     *inboundLinks(): Iterable<NodeLink> {
-        for (const prop of this.allProps()) {
-            const linkNode = prop.getLinkNode();
-            if (linkNode) {
-                yield {
-                    node: this,
-                    prop,
-                    linkNode,
-                };
-            }
+        for (const prop of this.props) {
+            yield* prop.getInboundLinks();
         }
     }
 
@@ -203,21 +196,12 @@ export class Node implements t.Node {
      * Returns the property that will be used to reroute the links
      * when the node is muted or detached.
      *
-     * Unless specified explicitly in NodeMetadata, the first property
-     * (or the first linked entry of the first property) is used for bypassing/rewiring.
+     * Unless specified explicitly in NodeMetadata, the first property is used.
      */
     getDefaultProp(): Prop | null {
         const firstProp = this.props[0];
-        if (!firstProp) {
-            return null;
-        }
-        if (firstProp.isUsesEntries()) {
-            return firstProp.entries.find(_ => !!_.getLinkNode()) ?? null;
-        }
-        if (firstProp.getLinkNode()) {
-            return firstProp;
-        }
-        return null;
+        // TODO add support to customize via NodeMetadata
+        return firstProp ?? null;
     }
 
     protected initProps(specs: t.Prop[]) {
