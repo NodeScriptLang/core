@@ -28,11 +28,7 @@ export interface GraphCompilerOptions {
 export class GraphCompiler {
 
     compileEsm(graph: Graph, options: Partial<GraphCompilerOptions> = {}) {
-        const node = graph.getNodeById(options.rootNodeId ?? graph.rootNodeId);
-        if (!node) {
-            throw new CompilerError('Root node not found');
-        }
-        const gcc = new GraphCompilerContext(graph, node, options);
+        const gcc = new GraphCompilerContext(graph, options);
         return gcc.compileEsm();
     }
 
@@ -65,11 +61,10 @@ class GraphCompilerContext {
 
     constructor(
         readonly graph: Graph,
-        readonly rootNode: Node,
         options: Partial<GraphCompilerOptions> = {},
     ) {
         this.options = {
-            rootNodeId: rootNode.id,
+            rootNodeId: '',
             comments: false,
             introspect: false,
             emitNodeMap: false,
@@ -77,7 +72,7 @@ class GraphCompilerContext {
             evalMode: 'auto',
             ...options
         };
-        this.order = this.options.emitAll ? graph.nodes : graph.computeOrder(rootNode.id);
+        this.order = this.computeOrder();
         this.linkMap = graph.computeLinkMap();
         this.async = this.order.some(_ => _.$def.metadata.async);
         this.asyncSym = this.async ? 'async ' : '';
@@ -93,6 +88,20 @@ class GraphCompilerContext {
             this.emitNodeMap();
         }
         return this.code.toString();
+    }
+
+    get rootNode() {
+        return this.graph.getNodeById(this.options.rootNodeId);
+    }
+
+    private computeOrder() {
+        if (this.options.emitAll) {
+            return this.graph.nodes;
+        }
+        if (this.rootNode) {
+            return this.graph.computeOrder(this.rootNode.id);
+        }
+        return [];
     }
 
     private emitImports() {
@@ -143,8 +152,12 @@ class GraphCompilerContext {
 
     private emitResult() {
         this.emitComment('Result');
-        const expr = this.nodeResultExpr(this.rootNode);
-        this.code.line(`return ${expr};`);
+        if (this.rootNode) {
+            const expr = this.nodeResultExpr(this.rootNode);
+            this.code.line(`return ${expr};`);
+        } else {
+            this.code.line(`return undefined;`);
+        }
     }
 
     private emitNode(node: Node) {

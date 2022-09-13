@@ -172,7 +172,7 @@ export class Graph implements t.Graph {
      */
     computeOrder(nodeId: string = this.rootNodeId): Node[] {
         const order: Node[] = [];
-        const node = this.getNodeById(nodeId ?? this.rootNodeId);
+        const node = this.getNodeById(nodeId);
         if (node) {
             this._computeOrder(order, node);
         }
