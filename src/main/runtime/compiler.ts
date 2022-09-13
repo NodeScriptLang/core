@@ -64,7 +64,7 @@ class GraphCompilerContext {
         options: Partial<GraphCompilerOptions> = {},
     ) {
         this.options = {
-            rootNodeId: '',
+            rootNodeId: this.graph.rootNodeId,
             comments: false,
             introspect: false,
             emitNodeMap: false,
