@@ -86,20 +86,17 @@ export class Graph implements t.Graph {
      *
      * If its corresponding `ref` is no longer used, ref is also removed,
      * thus guaranteeing that there are no extraneous refs left in graph.
-     *
-     * Note: deleting root node is not allowed, it should be unassigned first
-     * using `setRootNode`.
      */
     deleteNode(nodeId: string) {
-        if (this.rootNodeId === nodeId) {
-            return;
-        }
         this.$nodeMap.delete(nodeId);
         const i = this.nodes.findIndex(_ => _.id === nodeId);
         if (i === -1) {
             return false;
         }
         this.nodes.splice(i, 1);
+        if (this.rootNodeId === nodeId) {
+            this.rootNodeId = '';
+        }
         for (const key of Object.keys(this.refs)) {
             const res = this.nodes.find(node => node.ref === key);
             if (!res) {

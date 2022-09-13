@@ -15,7 +15,6 @@ export class GraphLoader implements t.GraphLoader {
         this.defineOperator('core:Frame', systemNodes.Frame);
         this.defineOperator('core:Local', systemNodes.Local);
         this.defineOperator('core:Param', systemNodes.Param);
-        this.defineOperator('core:Result', systemNodes.Result);
     }
 
     async loadGraph(

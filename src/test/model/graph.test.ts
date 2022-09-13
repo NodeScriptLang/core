@@ -173,7 +173,7 @@ describe('Graph', () => {
                 nodes: [
                     {
                         id: 'res',
-                        ref: 'res',
+                        ref: 'any',
                         props: [
                             { key: 'value', linkId: 'add' },
                         ]
@@ -218,7 +218,7 @@ describe('Graph', () => {
                     add: runtime.defs['math.add'],
                     number: runtime.defs['number'],
                     obj: runtime.defs['object'],
-                    res: 'core:Result',
+                    any: runtime.defs['any'],
                 }
             });
             const resNode = graph.getNodeById('res')!;
@@ -236,7 +236,7 @@ describe('Graph', () => {
                 nodes: [
                     {
                         id: 'res',
-                        ref: 'res',
+                        ref: 'any',
                         props: [
                             { key: 'value', linkId: 'obj' },
                         ]
@@ -272,7 +272,7 @@ describe('Graph', () => {
                 refs: {
                     number: runtime.defs['number'],
                     obj: runtime.defs['object'],
-                    res: 'core:Result',
+                    any: runtime.defs['any'],
                 }
             });
             const resNode = graph.getNodeById('res')!;

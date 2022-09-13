@@ -214,7 +214,6 @@ class GraphCompilerContext {
         switch (node.$uri) {
             case 'core:Param': return this.emitParamNode(node, resSym);
             case 'core:Local': return this.emitLocalNode(node, resSym);
-            case 'core:Result': return this.emitResultNode(node, resSym);
             case 'core:Comment': return;
             case 'core:Frame': return;
             default:
@@ -239,12 +238,6 @@ class GraphCompilerContext {
     private emitLocalNode(node: Node, resSym: string) {
         const prop = node.getBasePropByKey('key')!;
         this.code.line(`${resSym} = ctx.getLocal(${JSON.stringify(prop.value)});`);
-    }
-
-    private emitResultNode(node: Node, resSym: string) {
-        const prop = node.getBasePropByKey('value')!;
-        const expr = this.singlePropExpr(prop, this.graph.metadata.result);
-        this.code.line(`${resSym} = ${expr};`);
     }
 
     private emitRegularNode(node: Node, resSym: string) {
@@ -376,7 +369,8 @@ class GraphCompilerContext {
         this.code.line(`${JSON.stringify(prop.key)}: ${expr},`);
     }
 
-    private singlePropExpr(prop: Prop, targetSchema: t.DataSchemaSpec = prop.getTargetSchema()) {
+    private singlePropExpr(prop: Prop) {
+        const targetSchema: t.DataSchemaSpec = prop.getTargetSchema();
         if (prop.isLambda()) {
             return this.lambdaPropExpr(prop);
         }

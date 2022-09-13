@@ -3,4 +3,3 @@ export * from './comment.js';
 export * from './frame.js';
 export * from './local.js';
 export * from './param.js';
-export * from './result.js';
