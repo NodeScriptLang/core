@@ -1,5 +1,6 @@
-import * as t from '@nodescript/core/types';
 import { Schema } from 'airtight';
+
+import * as t from '../types/index.js';
 
 export const NodeEvalModeSchema = new Schema<t.NodeEvalMode>({
     id: 'NodeEvalMode',

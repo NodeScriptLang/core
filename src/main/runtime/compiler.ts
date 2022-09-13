@@ -382,8 +382,7 @@ class GraphCompilerContext {
         this.code.line(`${JSON.stringify(prop.key)}: ${expr},`);
     }
 
-    private singlePropExpr(prop: Prop) {
-        const targetSchema: t.DataSchemaSpec = prop.getTargetSchema();
+    private singlePropExpr(prop: Prop, targetSchema: t.DataSchemaSpec = prop.getTargetSchema()) {
         if (prop.isLambda()) {
             return this.lambdaPropExpr(prop);
         }
