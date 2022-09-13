@@ -1,5 +1,5 @@
+import { Event } from '@flexent/event';
 import { getType, Schema } from 'airtight';
-import { Event } from 'typesafe-event';
 
 import * as t from '../types/index.js';
 

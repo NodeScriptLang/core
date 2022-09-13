@@ -35,9 +35,9 @@
         "lint"
     ],
     "dependencies": {
+        "@flexent/event": "^2.0.5",
         "airtight": "^4.3.3",
-        "nanoid": "^3.3.4",
-        "typesafe-event": "^2.0.1"
+        "nanoid": "^3.3.4"
     },
     "devDependencies": {
         "@types/glob": "^7.2.0",
