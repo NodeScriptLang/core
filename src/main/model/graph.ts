@@ -52,7 +52,9 @@ export class Graph implements t.Graph {
 
     setRootNode(nodeId: string | null) {
         const node = nodeId ? this.getNodeById(nodeId) : null;
+        const resultSchema: t.DataSchemaSpec = node == null ? { type: 'any' } : node.$def.metadata.result;
         this.rootNodeId = node ? node.id : '';
+        this.metadata.result = resultSchema;
     }
 
     /**

@@ -435,4 +435,29 @@ describe('Graph', () => {
 
     });
 
+    describe('setRootNode', () => {
+
+        it('updates graph.metadata.result schema to match the result type of node', async () => {
+            const loader = new GraphLoader();
+            const graph = await loader.loadGraph({
+                nodes: [
+                    { id: 'add', ref: 'add' },
+                    { id: 'string', ref: 'string' },
+                ],
+                refs: {
+                    string: runtime.defs['string'],
+                    add: runtime.defs['math.add'],
+                }
+            });
+            assert.deepStrictEqual(graph.metadata.result, { type: 'any' });
+            graph.setRootNode('add');
+            assert.deepStrictEqual(graph.metadata.result, { type: 'number' });
+            graph.setRootNode('string');
+            assert.deepStrictEqual(graph.metadata.result, { type: 'string' });
+            graph.setRootNode(null);
+            assert.deepStrictEqual(graph.metadata.result, { type: 'any' });
+        });
+
+    });
+
 });
