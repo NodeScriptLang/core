@@ -13,5 +13,4 @@ export type ParamMetadata = {
     hideEntries?: boolean;
     hideValue?: boolean;
     renderer?: string;
-    collapsed?: boolean;
 };
