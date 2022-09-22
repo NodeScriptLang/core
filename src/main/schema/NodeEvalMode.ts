@@ -1,8 +1,8 @@
 import { Schema } from 'airtight';
 
-import * as t from '../types/index.js';
+import { NodeEvalMode } from '../types/index.js';
 
-export const NodeEvalModeSchema = new Schema<t.NodeEvalMode>({
+export const NodeEvalModeSchema = new Schema<NodeEvalMode>({
     id: 'NodeEvalMode',
     type: 'string',
     enum: ['auto', 'manual'],

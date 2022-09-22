@@ -74,7 +74,7 @@ class GraphCompilerContext {
         };
         this.order = this.computeOrder();
         this.linkMap = graph.computeLinkMap();
-        this.async = this.order.some(_ => _.$def.metadata.async);
+        this.async = this.order.some(_ => _.$module.metadata.async);
         this.asyncSym = this.async ? 'async ' : '';
         this.awaitSym = this.async ? 'await ' : '';
         this.prepareSymbols();
@@ -305,8 +305,8 @@ class GraphCompilerContext {
     }
 
     private emitNodeCompute(node: Node, resSym: string) {
-        if (node.$def.compile) {
-            return this.emitCustomCompiledNode(node, node.$def.compile, resSym);
+        if (node.$module.compile) {
+            return this.emitCustomCompiledNode(node, node.$module.compile, resSym);
         }
         const defSym = this.getDefSym(node.ref);
         this.code.block(`${resSym} = ${this.awaitSym}${defSym}.compute({`, `}, ctx.newScope());`, () => {
@@ -390,7 +390,7 @@ class GraphCompilerContext {
         let sourceSchema: t.DataSchemaSpec = { type: 'string' };
         const linkNode = prop.getLinkNode();
         if (linkNode) {
-            sourceSchema = linkNode.$def.metadata.result;
+            sourceSchema = linkNode.$module.metadata.result;
         }
         const needsTypeConversion = !isSchemaCompatible(targetSchema, sourceSchema);
         if (needsTypeConversion) {
@@ -430,7 +430,7 @@ class GraphCompilerContext {
         if (!linkNode) {
             return `() => ${this.convertTypeExpr(param.default ?? '', param.schema)}`;
         }
-        const targetSchema = linkNode.$def.metadata.result;
+        const targetSchema = linkNode.$module.metadata.result;
         const linkSym = this.getNodeSym(linkNode.id);
         const schemaCompatible = isSchemaCompatible(param.schema, targetSchema);
         return `${this.asyncSym}(p) => {
@@ -469,7 +469,7 @@ class GraphCompilerContext {
     }
 
     private isNodeCached(node: Node) {
-        const cache = node.$def.metadata.cacheMode ?? 'auto';
+        const cache = node.$module.metadata.cacheMode ?? 'auto';
         switch (cache) {
             case 'auto': {
                 const links = this.linkMap.get(node.id);

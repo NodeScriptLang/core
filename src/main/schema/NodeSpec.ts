@@ -1,20 +1,20 @@
 import { Schema } from 'airtight';
 
-import * as t from '../types/index.js';
+import { NodeSpec } from '../types/index.js';
 import { IdSchema, shortId } from '../util/id.js';
-import { PropSchema } from './prop.js';
+import { PropSpecSchema } from './PropSpec.js';
 
-export const NodeSchema = new Schema<t.Node>({
-    id: 'Node',
+export const NodeSpecSchema = new Schema<NodeSpec>({
+    id: 'NodeSpec',
     type: 'object',
     properties: {
         id: { ...IdSchema.schema, default: () => shortId() },
         ref: { type: 'string' },
         props: {
             type: 'array',
-            items: PropSchema.schema,
+            items: PropSpecSchema.schema,
         },
-        aux: {
+        metadata: {
             type: 'object',
             properties: {},
             additionalProperties: { type: 'any' },

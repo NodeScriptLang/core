@@ -1,37 +1,33 @@
-import { DeepPartial } from './deep-partial.js';
-import { NodeMetadata } from './node-metadata.js';
+import { ModuleSpec } from './module.js';
 
-export interface Graph {
-    metadata: NodeMetadata;
-    nodes: Node[];
+export interface GraphSpec {
+    module: ModuleSpec;
+    nodes: NodeSpec[];
     rootNodeId: string;
-    refs: Record<string, string>;
-    aux: Record<string, any>;
+    refs: GraphRefs;
+    metadata: GraphMetadata;
 }
 
-export type GraphSpec = DeepPartial<Graph>;
+export type GraphRefs = Record<string, string>;
+export type GraphMetadata = Record<string, string>;
 
-export interface Node {
+export interface NodeSpec {
     id: string;
     ref: string;
-    props: Prop[];
-    aux: Record<string, any>;
+    props: PropSpec[];
+    metadata: Record<string, any>;
 }
 
-export type NodeSpec = DeepPartial<Node>;
-
-export interface Prop {
+export interface PropSpec {
     id: string;
     key: string;
     value: string;
-    linkId: string;
+    linkId?: string;
     expand: boolean;
-    entries?: Prop[];
+    entries?: PropSpec[];
 }
 
-export type PropSpec = DeepPartial<Prop>;
-
-export type AddNodeSpec = {
+export interface AddNodeSpec {
     uri: string;
     node: NodeSpec;
-};
+}

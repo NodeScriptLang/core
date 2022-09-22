@@ -1,8 +1,8 @@
 import { Schema } from 'airtight';
 
-import * as t from '../types/index.js';
+import { NodeCacheMode } from '../types/index.js';
 
-export const NodeCacheModeSchema = new Schema<t.NodeCacheMode>({
+export const NodeCacheModeSchema = new Schema<NodeCacheMode>({
     id: 'NodeCacheMode',
     type: 'string',
     enum: ['auto', 'always', 'never'],

@@ -61,7 +61,7 @@ describe('GraphLoader', () => {
             }
         });
         const node = graph.getNodeById('node1');
-        const def = node!.$def;
+        const def = node!.$module;
         assert.strictEqual(def.metadata.label, 'Math.Add');
         assert.strictEqual(typeof def.compute, 'function');
     });
