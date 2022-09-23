@@ -25,18 +25,18 @@ export const DataSchemaSpecSchema = new Schema<DataSchemaSpec>({
             properties: {},
             additionalProperties: {
                 type: 'ref',
-                schemaId: 'DataSchema',
+                schemaId: 'DataSchemaSpec',
             },
         },
         additionalProperties: {
             type: 'ref',
             optional: true,
-            schemaId: 'DataSchema',
+            schemaId: 'DataSchemaSpec',
         },
         items: {
             type: 'ref',
             optional: true,
-            schemaId: 'DataSchema',
+            schemaId: 'DataSchemaSpec',
         }
     }
 });
