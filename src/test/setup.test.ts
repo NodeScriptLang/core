@@ -4,7 +4,7 @@ import { createConnection } from 'net';
 import { runtime } from './runtime.js';
 
 /**
- * Local HTTP server is used as a test CDN for loading node definitions over network.
+ * Local HTTP server is used as a test CDN for loading module definitions over network.
  */
 let httpServer: ChildProcess;
 

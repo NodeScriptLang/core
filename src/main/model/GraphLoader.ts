@@ -1,3 +1,6 @@
+import { DeepPartial } from 'airtight';
+
+import { ModuleSpecSchema } from '../schema/ModuleSpec.js';
 import * as systemNodes from '../system/index.js';
 import * as t from '../types/index.js';
 import { GraphSpec, ModuleDefinition, ModuleSpec } from '../types/index.js';
@@ -23,7 +26,7 @@ export class StandardGraphLoader implements GraphLoader {
     }
 
     async loadGraph(
-        spec: Partial<GraphSpec> = {},
+        spec: DeepPartial<GraphSpec> = {},
         options: GraphLoaderOptions = {},
     ): Promise<Graph> {
         const { ignoreFailedDefs = false } = options;
@@ -56,8 +59,9 @@ export class StandardGraphLoader implements GraphLoader {
             // Do not import core:
             return existing ?? this.createUnresolved(url);
         }
-        const def = this.getModule(url);
-        return def ?? this.createUnresolved(url);
+        const module = await this.fetchModule(url);
+        this.modules.set(url, module);
+        return module;
     }
 
     resolveModule(url: string): t.ModuleSpec {
@@ -84,6 +88,15 @@ export class StandardGraphLoader implements GraphLoader {
         return spec;
     }
 
+    protected async fetchModule(url: string): Promise<ModuleSpec> {
+        const res = await fetch(url);
+        if (!res.ok) {
+            throw new ModuleLoadFailedError(`Failed to load module ${url}: HTTP ${res.status}`, res.status);
+        }
+        const json = await res.json();
+        return ModuleSpecSchema.decode(json);
+    }
+
     protected createUnresolved(url: string): ModuleSpec {
         return {
             label: 'Unresolved',
@@ -106,4 +119,12 @@ export class StandardGraphLoader implements GraphLoader {
 export class UnresolvedNodeError extends Error {
     name = this.constructor.name;
     status = 500;
+}
+
+export class ModuleLoadFailedError extends Error {
+    name = this.constructor.name;
+
+    constructor(readonly message: string, readonly status = 500) {
+        super(message);
+    }
 }

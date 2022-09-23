@@ -25,18 +25,23 @@ export const ModuleParamSpecSchema = new Schema<ModuleParamSpec>({
         },
         default: {
             type: 'string',
+            optional: true,
         },
         addItemLabel: {
             type: 'string',
+            optional: true,
         },
         removeItemLabel: {
             type: 'string',
+            optional: true,
         },
         keyPlaceholder: {
             type: 'string',
+            optional: true,
         },
         valuePlaceholder: {
             type: 'string',
+            optional: true,
         },
         hideEntries: {
             type: 'boolean',

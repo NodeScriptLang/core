@@ -1,14 +1,14 @@
 import assert from 'assert';
 
-import { GraphLoader } from '../../main/runtime/loader.js';
 import { runtime } from '../runtime.js';
+import { TestGraphLoader } from '../test-loader.js';
 
 describe('Node', () => {
 
     describe('canLinkTo', () => {
 
         it('specifies whether a property is linkable or not', async () => {
-            const loader = new GraphLoader();
+            const loader = new TestGraphLoader();
             const graph = await loader.loadGraph({
                 nodes: [
                     {
@@ -41,7 +41,7 @@ describe('Node', () => {
     describe('addPropEntry', () => {
 
         it('adds an entry to supported properties', async () => {
-            const loader = new GraphLoader();
+            const loader = new TestGraphLoader();
             const graph = await loader.loadGraph({
                 nodes: [
                     {
@@ -88,7 +88,7 @@ describe('Node', () => {
     describe('removePropEntry', () => {
 
         it('removes a property entry', async () => {
-            const loader = new GraphLoader();
+            const loader = new TestGraphLoader();
             const graph = await loader.loadGraph({
                 nodes: [
                     {

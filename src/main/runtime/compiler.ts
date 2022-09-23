@@ -14,15 +14,14 @@ export interface GraphCompilerOptions {
 }
 
 /**
- * Compiles a graph into an EcmaScript Module (ESM).
+ * Compiles a graph into a ESM module containing `compute` function.
  *
- * The result is a standard node definition module with `export node = { ... }`.
  * A compiled graph can be computed as follows:
  *
  * ```
- * const { node } = await import(code);
+ * const { compute } = await import(code);
  * const ctx = new GraphEvalContext(...);
- * await node.compute(params, ctx);
+ * await compute(params, ctx);
  * ```
  */
 export class GraphCompiler {
@@ -398,7 +397,7 @@ class GraphCompilerContext {
         const param = prop.$param;
         const linkNode = prop.getLinkNode();
         if (!linkNode) {
-            return `() => ${this.convertTypeExpr(param.default ?? '', param.schema)}`;
+            return `() => ${this.convertTypeExpr(prop.value, param.schema)}`;
         }
         const targetSchema = linkNode.$module.result.schema;
         const linkSym = this.getNodeSym(linkNode.id);

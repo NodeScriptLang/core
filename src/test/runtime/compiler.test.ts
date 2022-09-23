@@ -122,14 +122,16 @@ describe('GraphCompiler', () => {
         it('can compile graph and use it as a node', async () => {
             const loader = await runtime.createLoader();
             const graph1 = await loader.loadGraph({
-                metadata: {
+                module: {
                     params: {
                         val: {
                             schema: { type: 'number' },
                         }
                     },
                     result: {
-                        type: 'number',
+                        schema: {
+                            type: 'number',
+                        }
                     },
                 },
                 rootNodeId: 'res',
@@ -157,7 +159,7 @@ describe('GraphCompiler', () => {
             });
             const code1 = new GraphCompiler().compileEsm(graph1);
             const url1 = codeToUrl(code1);
-            await loader.loadNodeDef(url1);
+            await loader.loadModule(url1);
             const graph = await loader.loadGraph({
                 rootNodeId: 'res',
                 nodes: [

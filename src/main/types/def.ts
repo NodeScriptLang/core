@@ -25,7 +25,6 @@ export type ParamDef<T = unknown> =
 
 export type SimpleParamDef<T = unknown> = Omit<Partial<ModuleParamSpec>, 'schema' | 'default'> & {
     schema: DataSchema<T>;
-    default?: T;
 };
 
 export type LambdaParamDef<P = unknown, R = unknown> = Partial<ModuleParamSpec> & {
@@ -34,7 +33,6 @@ export type LambdaParamDef<P = unknown, R = unknown> = Partial<ModuleParamSpec> 
     scope: {
         [K in keyof P]: DataSchema<P[K]>;
     };
-    default?: R;
 };
 
 export type ModuleCompute<P, R> = (this: void, params: P, ctx: GraphEvalContext) => R;

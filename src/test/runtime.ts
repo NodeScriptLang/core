@@ -1,5 +1,8 @@
-import { Graph } from '../main/model/Graph.js';
-import * as t from '../main/types/index.js';
+import { DeepPartial } from 'airtight';
+
+import { Graph } from '../main/model/index.js';
+import { GraphSpec } from '../main/types/index.js';
+import { TestGraphLoader } from './test-loader.js';
 
 /**
  * Test runtime utilities.
@@ -28,14 +31,14 @@ export class TestRuntime {
     }
 
     async createLoader() {
-        const loader = new GraphLoader();
+        const loader = new TestGraphLoader();
         for (const url of Object.values(this.defs)) {
-            await loader.loadNodeDef(url);
+            await loader.loadModule(url);
         }
         return loader;
     }
 
-    async loadGraph(spec: t.GraphSpec): Promise<Graph> {
+    async loadGraph(spec: DeepPartial<GraphSpec>): Promise<Graph> {
         const loader = await this.createLoader();
         const graph = await loader.loadGraph(spec);
         return graph;

@@ -1,3 +1,5 @@
+import { DeepPartial } from 'airtight';
+
 import { ModuleSpec } from './module.js';
 
 export interface GraphSpec {
@@ -28,6 +30,6 @@ export interface PropSpec {
 }
 
 export interface AddNodeSpec {
-    moduleUrl: string;
-    node: NodeSpec;
+    url: string;
+    node: DeepPartial<NodeSpec>;
 }

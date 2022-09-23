@@ -16,8 +16,8 @@ export class Graph implements GraphSpec {
 
     protected $nodeMap = new Map<string, Node>();
 
-    constructor(readonly $loader: GraphLoader, json: DeepPartial<GraphSpec> = {}) {
-        const spec = GraphSpecSchema.decode(json);
+    constructor(readonly $loader: GraphLoader, data: DeepPartial<GraphSpec> = {}) {
+        const spec = GraphSpecSchema.decode(data);
         Object.assign(this, spec);
         this.nodes = [];
         for (const n of spec.nodes) {
@@ -59,8 +59,8 @@ export class Graph implements GraphSpec {
     }
 
     async createNode(spec: AddNodeSpec) {
-        const module = await this.$loader.loadModule(spec.moduleUrl);
-        const ref = this.getRefForUrl(spec.moduleUrl);
+        const module = await this.$loader.loadModule(spec.url);
+        const ref = this.getRefForUrl(spec.url);
         const evalMode = module.evalMode;
         const node = new Node(this, {
             ...spec.node,

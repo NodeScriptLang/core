@@ -1,3 +1,5 @@
+import { DeepPartial } from 'airtight';
+
 import { NodeSpecSchema } from '../schema/index.js';
 import { NodeSpec, PropSpec } from '../types/index.js';
 import { serialize } from '../util/serialize.js';
@@ -21,7 +23,7 @@ export class Node implements NodeSpec {
 
     props: Prop[] = [];
 
-    constructor(readonly $graph: Graph, data: Partial<NodeSpec> = {}) {
+    constructor(readonly $graph: Graph, data: DeepPartial<NodeSpec> = {}) {
         const spec = NodeSpecSchema.decode(data);
         Object.assign(this, spec);
         this.props = this.initProps(spec.props);
