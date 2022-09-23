@@ -1,9 +1,10 @@
+import { GraphEvalContext } from './ctx.js';
 import { DataSchema } from './data-schema.js';
 import { ModuleParamSpec, ModuleResultSpec, ModuleSpec } from './module.js';
 
 export type Lambda<Params, Result> = (params: Params) => Promise<Result>;
 
-export type ModuleDefinition<P, R> = Partial<ModuleSpec> & {
+export type ModuleDefinition<P = unknown, R = unknown> = Omit<Partial<ModuleSpec>, 'params' | 'result'> & {
     label: string;
     params: ParamsDefinition<P>;
     result: ResultDefinition<R>;
@@ -14,15 +15,15 @@ export type ParamsDefinition<P> = {
 };
 
 export type ResultDefinition<R> = Partial<ModuleResultSpec> & {
-    schema: DataSchema<R>;
-};
+    schema: R extends Promise<infer T> ? DataSchema<T> : DataSchema<R>;
+} & (R extends Promise<any> ? { async: true } : {});
 
 export type ParamDef<T = unknown> =
     T extends Lambda<infer P, infer R> ?
     LambdaParamDef<P, R> :
     SimpleParamDef<T>;
 
-export type SimpleParamDef<T = unknown> = Partial<ModuleParamSpec> & {
+export type SimpleParamDef<T = unknown> = Omit<Partial<ModuleParamSpec>, 'schema' | 'default'> & {
     schema: DataSchema<T>;
     default?: T;
 };
@@ -35,3 +36,5 @@ export type LambdaParamDef<P = unknown, R = unknown> = Partial<ModuleParamSpec> 
     };
     default?: R;
 };
+
+export type ModuleCompute<P, R> = (this: void, params: P, ctx: GraphEvalContext) => R;

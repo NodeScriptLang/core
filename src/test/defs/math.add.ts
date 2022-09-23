@@ -1,30 +1,35 @@
-import { Operator } from '../../main/types/index.js';
+import { ModuleCompute, ModuleDefinition } from '../../main/types/index.js';
 
-export const node: Operator<{
+type P = {
     a: number;
     b: number;
-}, number> = {
-    metadata: {
-        label: 'Math.Add',
-        description: 'Computes a sum of two numbers.',
-        keywords: ['math', 'add', 'plus', 'sum'],
-        params: {
-            a: {
-                schema: {
-                    type: 'number'
-                }
-            },
-            b: {
-                schema: {
-                    type: 'number'
-                }
+};
+
+type R = number;
+
+export const module: ModuleDefinition<P, R> = {
+    label: 'Math.Add',
+    description: 'Computes a sum of two numbers.',
+    keywords: ['math', 'add', 'plus', 'sum'],
+    params: {
+        a: {
+            schema: {
+                type: 'number'
             }
         },
-        result: {
+        b: {
+            schema: {
+                type: 'number'
+            }
+        }
+    },
+    result: {
+        schema: {
             type: 'number',
         },
     },
-    compute(params) {
-        return params.a + params.b;
-    }
+};
+
+export const compute: ModuleCompute<P, R> = params => {
+    return params.a + params.b;
 };

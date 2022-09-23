@@ -28,6 +28,6 @@ export interface PropSpec {
 }
 
 export interface AddNodeSpec {
-    uri: string;
+    moduleUrl: string;
     node: NodeSpec;
 }

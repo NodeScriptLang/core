@@ -1,5 +1,4 @@
-import { Graph } from '../main/model/graph.js';
-import { GraphLoader } from '../main/runtime/loader.js';
+import { Graph } from '../main/model/Graph.js';
 import * as t from '../main/types/index.js';
 
 /**
@@ -30,8 +29,8 @@ export class TestRuntime {
 
     async createLoader() {
         const loader = new GraphLoader();
-        for (const uri of Object.values(this.defs)) {
-            await loader.loadNodeDef(uri);
+        for (const url of Object.values(this.defs)) {
+            await loader.loadNodeDef(url);
         }
         return loader;
     }

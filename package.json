@@ -9,7 +9,7 @@
         "./schema": "./out/main/schema/index.js",
         "./model": "./out/main/model/index.js",
         "./runtime": "./out/main/runtime/index.js",
-        "./nodes": "./out/main/nodes/index.js"
+        "./system": "./out/main/system/index.js"
     },
     "files": [
         "out/main/**/*"

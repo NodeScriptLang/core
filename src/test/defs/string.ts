@@ -1,23 +1,28 @@
-import { Operator } from '../../main/types/index.js';
+import { ModuleCompute, ModuleDefinition } from '../../main/types/index.js';
 
-export const node: Operator<{
+type P = {
     value: unknown;
-}, string> = {
-    metadata: {
-        label: 'String',
-        description: 'Converts the value into a string.',
-        params: {
-            value: {
-                schema: {
-                    type: 'any'
-                }
-            },
-        },
-        result: {
-            type: 'string',
+};
+
+type R = string;
+
+export const module: ModuleDefinition<P, R> = {
+    label: 'String',
+    description: 'Converts the value into a string.',
+    params: {
+        value: {
+            schema: {
+                type: 'any'
+            }
         },
     },
-    compute(params) {
-        return String(params.value);
-    }
+    result: {
+        schema: {
+            type: 'string',
+        }
+    },
+};
+
+export const compute: ModuleCompute<P, R> = params => {
+    return String(params.value);
 };

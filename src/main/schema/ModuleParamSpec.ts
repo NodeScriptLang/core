@@ -40,12 +40,15 @@ export const ModuleParamSpecSchema = new Schema<ModuleParamSpec>({
         },
         hideEntries: {
             type: 'boolean',
+            optional: true,
         },
         hideValue: {
             type: 'boolean',
+            optional: true,
         },
         hideSocket: {
             type: 'boolean',
+            optional: true,
         },
         renderer: {
             type: 'string',

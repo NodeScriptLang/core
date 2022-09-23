@@ -1,6 +1,6 @@
 import { Graph, Node, NodeLink, Prop } from '../model/index.js';
 import * as t from '../types/index.js';
-import { NodeCompile, NodeEvalMode } from '../types/index.js';
+import { NodeEvalMode } from '../types/index.js';
 import { isSchemaCompatible, MultiMap } from '../util/index.js';
 import { CodeBuilder } from './code.js';
 
@@ -74,7 +74,7 @@ class GraphCompilerContext {
         };
         this.order = this.computeOrder();
         this.linkMap = graph.computeLinkMap();
-        this.async = this.order.some(_ => _.$module.metadata.async);
+        this.async = this.order.some(_ => _.$module.result.async);
         this.asyncSym = this.async ? 'async ' : '';
         this.awaitSym = this.async ? 'await ' : '';
         this.prepareSymbols();
@@ -83,7 +83,7 @@ class GraphCompilerContext {
     compileEsm() {
         this.emitImports();
         this.emitNodeFunctions();
-        this.emitExportNode();
+        this.emitExportCompute();
         if (this.options.emitNodeMap) {
             this.emitNodeMap();
         }
@@ -108,16 +108,15 @@ class GraphCompilerContext {
         this.emitComment('Imports');
         const refs = new Set(this.order.map(_ => _.ref));
         for (const ref of refs) {
-            const uri = this.graph.refs[ref];
-            if (!uri) {
-                throw new CompilerError(`Cannot resolve ref ${ref}`);
-            }
-            if (uri.startsWith('core:')) {
+            const moduleUrl = this.graph.refs[ref];
+            const module = this.graph.$loader.resolveModule(moduleUrl);
+            const computeUrl = module.computeUrl;
+            if (!computeUrl) {
                 continue;
             }
             const sym = this.nextSym('n');
             this.symtable.set(`def:${ref}`, sym);
-            this.code.line(`import { node as ${sym} } from '${uri}'`);
+            this.code.line(`import { compute as ${sym} } from '${computeUrl}'`);
         }
     }
 
@@ -136,18 +135,11 @@ class GraphCompilerContext {
         }
     }
 
-    private emitExportNode() {
-        this.emitComment('Node Definition');
-        this.code.block('export const node = {', '};', () => {
-            this.emitGraphMetadata();
-            this.code.block(`${this.asyncSym}compute(params, ctx) {`, '}', () => {
-                this.emitResult();
-            });
+    private emitExportCompute() {
+        this.emitComment('Compute');
+        this.code.block(`export ${this.asyncSym}compute(params, ctx) {`, '}', () => {
+            this.emitResult();
         });
-    }
-
-    private emitGraphMetadata() {
-        this.code.line(`metadata: ${JSON.stringify(this.graph.metadata)},`);
     }
 
     private emitResult() {
@@ -224,12 +216,14 @@ class GraphCompilerContext {
     }
 
     private emitNodeBodyRaw(node: Node, resSym: string) {
-        switch (node.$uri) {
+        switch (node.$moduleUrl) {
             case 'core:Param': return this.emitParamNode(node, resSym);
             case 'core:Local': return this.emitLocalNode(node, resSym);
-            case 'core:Comment': return;
-            case 'core:Frame': return;
             default:
+                if (!node.$module.computeUrl) {
+                    // TODO emit undefined
+                    return;
+                }
                 if (node.isExpanded()) {
                     this.emitExpandedNode(node, resSym);
                 } else {
@@ -305,33 +299,9 @@ class GraphCompilerContext {
     }
 
     private emitNodeCompute(node: Node, resSym: string) {
-        if (node.$module.compile) {
-            return this.emitCustomCompiledNode(node, node.$module.compile, resSym);
-        }
         const defSym = this.getDefSym(node.ref);
-        this.code.block(`${resSym} = ${this.awaitSym}${defSym}.compute({`, `}, ctx.newScope());`, () => {
+        this.code.block(`${resSym} = ${this.awaitSym}${defSym}({`, `}, ctx.newScope());`, () => {
             this.emitNodeProps(node);
-        });
-    }
-
-    private emitCustomCompiledNode(node: Node, compileFn: NodeCompile, resSym: string) {
-        compileFn(node, {
-            sym: {
-                result: resSym,
-                ctx: 'ctx',
-            },
-            emitLine: str => {
-                this.code.line(str);
-            },
-            emitBlock: (start, end, fn) => {
-                this.code.block(start, end, fn);
-            },
-            emitProp: key => {
-                const prop = node.getBasePropByKey(key);
-                if (prop) {
-                    this.emitNodeProp(node, prop);
-                }
-            }
         });
     }
 
@@ -390,7 +360,7 @@ class GraphCompilerContext {
         let sourceSchema: t.DataSchemaSpec = { type: 'string' };
         const linkNode = prop.getLinkNode();
         if (linkNode) {
-            sourceSchema = linkNode.$module.metadata.result;
+            sourceSchema = linkNode.$module.result.schema;
         }
         const needsTypeConversion = !isSchemaCompatible(targetSchema, sourceSchema);
         if (needsTypeConversion) {
@@ -430,7 +400,7 @@ class GraphCompilerContext {
         if (!linkNode) {
             return `() => ${this.convertTypeExpr(param.default ?? '', param.schema)}`;
         }
-        const targetSchema = linkNode.$module.metadata.result;
+        const targetSchema = linkNode.$module.result.schema;
         const linkSym = this.getNodeSym(linkNode.id);
         const schemaCompatible = isSchemaCompatible(param.schema, targetSchema);
         return `${this.asyncSym}(p) => {
@@ -469,7 +439,7 @@ class GraphCompilerContext {
     }
 
     private isNodeCached(node: Node) {
-        const cache = node.$module.metadata.cacheMode ?? 'auto';
+        const cache = node.$module.cacheMode ?? 'auto';
         switch (cache) {
             case 'auto': {
                 const links = this.linkMap.get(node.id);
@@ -491,7 +461,6 @@ class GraphCompilerContext {
             this.symtable.set(`node:${node.id}`, sym);
         }
     }
-
 }
 
 export class CompilerError extends Error {

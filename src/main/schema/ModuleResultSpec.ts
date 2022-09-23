@@ -8,8 +8,13 @@ export const ModuleResultSpecSchema = new Schema<ModuleResultSpec>({
     type: 'object',
     properties: {
         schema: DataSchemaSpecSchema.schema,
+        async: {
+            type: 'boolean',
+            optional: true,
+        },
         hideSocket: {
             type: 'boolean',
-        }
+            optional: true,
+        },
     }
 });

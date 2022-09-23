@@ -1,9 +1,10 @@
 import { DeepPartial } from 'airtight';
 
 import { GraphSpecSchema } from '../schema/index.js';
-import { AddNodeSpec, GraphLoader, GraphMetadata, GraphRefs, GraphSpec, ModuleResultSpec, ModuleSpec } from '../types/index.js';
+import { AddNodeSpec, DataSchemaSpec, GraphMetadata, GraphRefs, GraphSpec, ModuleSpec } from '../types/index.js';
 import { MultiMap, serialize, shortId } from '../util/index.js';
-import { Node, NodeLink } from './node.js';
+import { GraphLoader } from './GraphLoader.js';
+import { Node, NodeLink } from './Node.js';
 
 export class Graph implements GraphSpec {
 
@@ -32,14 +33,14 @@ export class Graph implements GraphSpec {
         });
     }
 
-    resolveUri(ref: string): string {
-        const uri = this.refs[ref] ?? '';
-        return uri;
+    resolveRefUrl(ref: string): string {
+        const url = this.refs[ref] ?? '';
+        return url;
     }
 
     resolveModule(ref: string): ModuleSpec {
-        const uri = this.resolveUri(ref);
-        return this.$loader.resolveModule(uri);
+        const url = this.resolveRefUrl(ref);
+        return this.$loader.resolveModule(url);
     }
 
     getNodeById(id: string): Node | null {
@@ -52,21 +53,14 @@ export class Graph implements GraphSpec {
 
     setRootNode(nodeId: string | null) {
         const node = nodeId ? this.getNodeById(nodeId) : null;
-        const resultSpec: ModuleResultSpec = node == null ? {
-            schema: { type: 'any' },
-            hideSocket: false,
-        } : node.$module.result;
+        const resultSchema: DataSchemaSpec = node == null ? { type: 'any' } : node.$module.result.schema;
         this.rootNodeId = node ? node.id : '';
-        this.module.result = resultSpec;
+        this.module.result.schema = resultSchema;
     }
 
-    /**
-     * Uses uri to load node definition & add graph ref if none exists.
-     * Returns the created node.
-     */
     async createNode(spec: AddNodeSpec) {
-        const module = await this.$loader.loadModule(spec.uri);
-        const ref = this.getRefForUri(spec.uri);
+        const module = await this.$loader.loadModule(spec.moduleUrl);
+        const ref = this.getRefForUrl(spec.moduleUrl);
         const evalMode = module.evalMode;
         const node = new Node(this, {
             ...spec.node,
@@ -198,15 +192,15 @@ export class Graph implements GraphSpec {
         }
     }
 
-    protected getRefForUri(uri: string): string {
+    protected getRefForUrl(url: string): string {
         for (const [k, v] of Object.entries(this.refs)) {
-            if (v === uri) {
+            if (v === url) {
                 return k;
             }
         }
         // Generate a new one
         const ref = shortId();
-        this.refs[ref] = uri;
+        this.refs[ref] = url;
         return ref;
     }
 
@@ -214,7 +208,7 @@ export class Graph implements GraphSpec {
         for (const node of this.nodes) {
             node.applyInvariants();
         }
-        this.module.async = this.nodes.some(_ => _.$module.async);
+        this.module.result.async = this.nodes.some(_ => _.$module.result.async);
     }
 
 }

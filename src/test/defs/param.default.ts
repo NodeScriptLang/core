@@ -1,24 +1,29 @@
-import { Operator } from '../../main/types/index.js';
+import { ModuleCompute, ModuleDefinition } from '../../main/types/index.js';
 
-export const node: Operator<{
+type P = {
     value: string;
-}, string> = {
-    metadata: {
-        label: 'Default Param',
-        description: 'A node that has a parameter with default value',
-        params: {
-            value: {
-                schema: {
-                    type: 'string',
-                    default: 'Hello',
-                }
-            },
-        },
-        result: {
-            type: 'string',
+};
+
+type R = string;
+
+export const module: ModuleDefinition<P, R> = {
+    label: 'Default Param',
+    description: 'A node that has a parameter with default value',
+    params: {
+        value: {
+            schema: {
+                type: 'string',
+                default: 'Hello',
+            }
         },
     },
-    compute(params) {
-        return String(params.value);
-    }
+    result: {
+        schema: {
+            type: 'string',
+        }
+    },
+};
+
+export const compute: ModuleCompute<P, R> = params => {
+    return String(params.value);
 };

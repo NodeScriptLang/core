@@ -1,8 +1,8 @@
 import { NodeSpecSchema } from '../schema/index.js';
 import { NodeSpec, PropSpec } from '../types/index.js';
 import { serialize } from '../util/serialize.js';
-import { Graph } from './graph.js';
-import { Prop } from './prop.js';
+import { Graph } from './Graph.js';
+import { Prop } from './Prop.js';
 
 export type NodeLink = {
     node: Node;
@@ -31,8 +31,8 @@ export class Node implements NodeSpec {
         return serialize(this, {});
     }
 
-    get $uri() {
-        return this.$graph.resolveUri(this.ref);
+    get $moduleUrl() {
+        return this.$graph.resolveRefUrl(this.ref);
     }
 
     get $module() {

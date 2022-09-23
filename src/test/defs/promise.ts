@@ -1,24 +1,29 @@
-import { Operator } from '../../main/types/index.js';
+import { ModuleCompute, ModuleDefinition } from '../../main/types/index.js';
 
-export const node: Operator<{
+type P = {
     value: any;
-}, Promise<any>> = {
-    metadata: {
-        label: 'Promise',
-        description: 'Returns the value asynchronously.',
-        async: true,
-        params: {
-            value: {
-                schema: {
-                    type: 'any'
-                }
-            },
-        },
-        result: {
-            type: 'any',
+};
+
+type R = Promise<any>;
+
+export const module: ModuleDefinition<P, R> = {
+    label: 'Promise',
+    description: 'Returns the value asynchronously.',
+    params: {
+        value: {
+            schema: {
+                type: 'any'
+            }
         },
     },
-    async compute(params) {
-        return params.value;
-    }
+    result: {
+        schema: {
+            type: 'any',
+        },
+        async: true,
+    },
+};
+
+export const compute: ModuleCompute<P, R> = (params: P) => {
+    return params.value;
 };

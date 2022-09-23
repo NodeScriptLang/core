@@ -21,13 +21,15 @@ export const ModuleSpecSchema = new Schema<ModuleSpec>({
             type: 'string',
         },
         keywords: {
-            type: 'string',
-        },
-        async: {
-            type: 'boolean',
+            type: 'array',
+            items: { type: 'string' },
         },
         deprecated: {
             type: 'string',
+            optional: true,
+        },
+        hidden: {
+            type: 'boolean',
             optional: true,
         },
         params: {

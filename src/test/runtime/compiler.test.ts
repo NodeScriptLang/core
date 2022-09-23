@@ -156,8 +156,8 @@ describe('GraphCompiler', () => {
                 }
             });
             const code1 = new GraphCompiler().compileEsm(graph1);
-            const uri1 = codeToUrl(code1);
-            await loader.loadNodeDef(uri1);
+            const url1 = codeToUrl(code1);
+            await loader.loadNodeDef(url1);
             const graph = await loader.loadGraph({
                 rootNodeId: 'res',
                 nodes: [
@@ -170,7 +170,7 @@ describe('GraphCompiler', () => {
                     }
                 ],
                 refs: {
-                    'a': uri1,
+                    'a': url1,
                 }
             });
             const code2 = new GraphCompiler().compileEsm(graph);

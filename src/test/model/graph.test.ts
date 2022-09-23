@@ -12,7 +12,7 @@ describe('Graph', () => {
             const graph = await loader.loadGraph();
             assert.strictEqual(graph.nodes.length, 0);
             const node = await graph.createNode({
-                uri: runtime.defs['any'],
+                url: runtime.defs['any'],
                 node: {},
             });
             assert.ok(node);
@@ -20,49 +20,49 @@ describe('Graph', () => {
             assert.strictEqual(graph.nodes[0], node);
         });
 
-        it('adds a URI to refs', async () => {
+        it('adds a url to refs', async () => {
             const loader = new GraphLoader();
             const graph = await loader.loadGraph();
             assert.strictEqual(Object.keys(graph.refs).length, 0);
-            const uri = runtime.defs['math.add'];
+            const url = runtime.defs['math.add'];
             const node = await graph.createNode({
-                uri,
+                url,
                 node: {},
             });
             assert.strictEqual(Object.keys(graph.refs).length, 1);
-            assert.strictEqual(graph.refs[node.ref], uri);
+            assert.strictEqual(graph.refs[node.ref], url);
         });
 
-        it('does not add the same URI twice', async () => {
+        it('does not add the same url twice', async () => {
             const loader = new GraphLoader();
             const graph = await loader.loadGraph();
             assert.strictEqual(Object.keys(graph.refs).length, 0);
-            const uri = runtime.defs['math.add'];
+            const url = runtime.defs['math.add'];
             const node1 = await graph.createNode({
-                uri,
+                url,
                 node: {},
             });
             const node2 = await graph.createNode({
-                uri,
+                url,
                 node: {},
             });
             assert.strictEqual(Object.keys(graph.refs).length, 1);
-            assert.strictEqual(graph.refs[node1.ref], uri);
+            assert.strictEqual(graph.refs[node1.ref], url);
             assert.strictEqual(graph.refs[node1.ref], graph.refs[node2.ref]);
         });
 
-        it('different URIs will save to different refs', async () => {
+        it('different urls will save to different refs', async () => {
             const loader = new GraphLoader();
             const graph = await loader.loadGraph();
             assert.strictEqual(Object.keys(graph.refs).length, 0);
-            const uri1 = runtime.defs['math.add'];
-            const uri2 = runtime.defs['any'];
+            const url1 = runtime.defs['math.add'];
+            const url2 = runtime.defs['any'];
             const node1 = await graph.createNode({
-                uri: uri1,
+                url: url1,
                 node: {},
             });
             const node2 = await graph.createNode({
-                uri: uri2,
+                url: url2,
                 node: {},
             });
             assert.strictEqual(Object.keys(graph.refs).length, 2);
@@ -73,7 +73,7 @@ describe('Graph', () => {
             const loader = new GraphLoader();
             const graph = await loader.loadGraph();
             const node = await graph.createNode({
-                uri: runtime.defs['param.default'],
+                url: runtime.defs['param.default'],
                 node: {},
             });
             assert.strictEqual(node.props[0].key, 'value');
@@ -84,7 +84,7 @@ describe('Graph', () => {
             const loader = new GraphLoader();
             const graph = await loader.loadGraph();
             const node = await graph.createNode({
-                uri: runtime.defs['param.default'],
+                url: runtime.defs['param.default'],
                 node: {
                     props: [
                         { key: 'value', value: 'Bye' }

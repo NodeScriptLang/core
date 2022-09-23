@@ -4,9 +4,9 @@ export interface ModuleSpec {
     label: string;
     labelParam: string;
     description: string;
-    keywords: string;
-    async: boolean;
+    keywords: string[];
     deprecated?: string;
+    hidden?: boolean;
     params: Record<string, ModuleParamSpec>;
     result: ModuleResultSpec;
     cacheMode: NodeCacheMode;
@@ -28,15 +28,16 @@ export interface ModuleParamSpec {
     removeItemLabel: string;
     keyPlaceholder: string;
     valuePlaceholder: string;
-    hideSocket: boolean;
-    hideEntries: boolean;
-    hideValue: boolean;
+    hideSocket?: boolean;
+    hideEntries?: boolean;
+    hideValue?: boolean;
     renderer?: string;
 }
 
 export interface ModuleResultSpec {
     schema: DataSchemaSpec;
-    hideSocket: boolean;
+    async?: boolean;
+    hideSocket?: boolean;
 }
 
 export type NodeEvalMode = 'auto' | 'manual';

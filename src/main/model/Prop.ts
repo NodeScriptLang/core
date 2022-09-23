@@ -2,7 +2,7 @@ import { PropSpecSchema } from '../schema/index.js';
 import { DataSchemaSpec, ModuleParamSpec, PropSpec } from '../types/index.js';
 import { serialize } from '../util/serialize.js';
 import { humanize } from '../util/string.js';
-import { Node, NodeLink } from './node.js';
+import { Node, NodeLink } from './Node.js';
 
 export type PropParent = Node | Prop;
 
