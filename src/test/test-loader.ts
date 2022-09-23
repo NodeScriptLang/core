@@ -12,7 +12,9 @@ export class TestGraphLoader extends StandardGraphLoader {
 
     protected async fetchModule(url: string): Promise<ModuleSpec> {
         const { module } = await import(url);
-        return ModuleSpecSchema.decode(module);
+        const result = ModuleSpecSchema.decode(module);
+        result.computeUrl = url;
+        return result;
     }
 
 }

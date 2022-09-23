@@ -72,7 +72,7 @@ export class StandardGraphLoader implements GraphLoader {
         return this.modules.get(url) ?? null;
     }
 
-    defineModule(url: string, def: ModuleDefinition): ModuleSpec {
+    defineModule(url: string, def: ModuleDefinition | ModuleSpec): ModuleSpec {
         const spec: ModuleSpec = {
             labelParam: '',
             description: '',

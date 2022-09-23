@@ -23,6 +23,7 @@ describe('GraphLoader', () => {
             cacheMode: 'auto',
             evalMode: 'auto',
             resizeMode: 'horizontal',
+            computeUrl: runtime.makeUrl('/out/test/defs/math.add.js'),
         });
     });
 

@@ -26,9 +26,9 @@ export interface GraphCompilerOptions {
  */
 export class GraphCompiler {
 
-    compileEsm(graph: Graph, options: Partial<GraphCompilerOptions> = {}) {
+    compileComputeEsm(graph: Graph, options: Partial<GraphCompilerOptions> = {}) {
         const gcc = new GraphCompilerContext(graph, options);
-        return gcc.compileEsm();
+        return gcc.emitComputeEsm();
     }
 
 }
@@ -79,7 +79,7 @@ class GraphCompilerContext {
         this.prepareSymbols();
     }
 
-    compileEsm() {
+    emitComputeEsm() {
         this.emitImports();
         this.emitNodeFunctions();
         this.emitExportCompute();
@@ -136,7 +136,7 @@ class GraphCompilerContext {
 
     private emitExportCompute() {
         this.emitComment('Compute');
-        this.code.block(`export ${this.asyncSym}compute(params, ctx) {`, '}', () => {
+        this.code.block(`export ${this.asyncSym}function compute(params, ctx) {`, '}', () => {
             this.emitResult();
         });
     }
