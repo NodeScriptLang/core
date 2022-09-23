@@ -401,7 +401,7 @@ describe('Graph', () => {
             assert.strictEqual(node2?.props[0].linkId, 'res');
         });
 
-        it('sets metadata.async = false when all nodes are sync', async () => {
+        it('sets module.result.async = false when all nodes are sync', async () => {
             const loader = new TestGraphLoader();
             const graph = await loader.loadGraph({
                 nodes: [
@@ -413,10 +413,10 @@ describe('Graph', () => {
                     add: runtime.defs['math.add'],
                 }
             });
-            assert.strictEqual(graph.metadata.async, false);
+            assert.strictEqual(graph.module.result.async, false);
         });
 
-        it('sets metadata.async = true if at least one node is async', async () => {
+        it('sets module.result.async = true if at least one node is async', async () => {
             const loader = new TestGraphLoader();
             const graph = await loader.loadGraph({
                 nodes: [
@@ -430,7 +430,7 @@ describe('Graph', () => {
                     promise: runtime.defs['promise'],
                 }
             });
-            assert.strictEqual(graph.metadata.async, true);
+            assert.strictEqual(graph.module.result.async, true);
         });
 
     });
@@ -449,13 +449,13 @@ describe('Graph', () => {
                     add: runtime.defs['math.add'],
                 }
             });
-            assert.deepStrictEqual(graph.metadata.result, { type: 'any' });
+            assert.deepStrictEqual(graph.module.result.schema, { type: 'any' });
             graph.setRootNode('add');
-            assert.deepStrictEqual(graph.metadata.result, { type: 'number' });
+            assert.deepStrictEqual(graph.module.result.schema, { type: 'number' });
             graph.setRootNode('string');
-            assert.deepStrictEqual(graph.metadata.result, { type: 'string' });
+            assert.deepStrictEqual(graph.module.result.schema, { type: 'string' });
             graph.setRootNode(null);
-            assert.deepStrictEqual(graph.metadata.result, { type: 'any' });
+            assert.deepStrictEqual(graph.module.result.schema, { type: 'any' });
         });
 
     });

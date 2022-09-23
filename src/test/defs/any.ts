@@ -3,7 +3,7 @@ import { ModuleCompute, ModuleDefinition } from '../../main/types/index.js';
 type P = { value: unknown };
 type R = unknown;
 
-export const node: ModuleDefinition<P, R> = {
+export const module: ModuleDefinition<P, R> = {
     label: 'Any',
     description: 'Just returns the value as is, without type conversion.',
     params: {

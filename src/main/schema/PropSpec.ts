@@ -20,7 +20,7 @@ export const PropSpecSchema = new Schema<PropSpec>({
             optional: true,
             items: {
                 type: 'ref',
-                schemaId: 'Prop',
+                schemaId: 'PropSpec',
             },
         }
     },
