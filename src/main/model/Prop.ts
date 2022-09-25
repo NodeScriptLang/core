@@ -1,8 +1,10 @@
-import { PropSchema } from '../schema/prop.js';
-import * as t from '../types/index.js';
+import { DeepPartial } from 'airtight';
+
+import { PropSpecSchema } from '../schema/index.js';
+import { DataSchemaSpec, ModuleParamSpec, PropSpec } from '../types/index.js';
 import { serialize } from '../util/serialize.js';
 import { humanize } from '../util/string.js';
-import { Node, NodeLink } from './node.js';
+import { Node, NodeLink } from './Node.js';
 
 export type PropParent = Node | Prop;
 
@@ -12,9 +14,7 @@ export type PropParent = Node | Prop;
  * Objects and arrays support "entries", which are also represented by this class.
  * Entries don't support other entries, so they are not stacked infinitely.
  */
-export class Prop implements t.Prop {
-
-    static schema = PropSchema;
+export class Prop implements PropSpec {
 
     id!: string;
     key!: string;
@@ -23,10 +23,10 @@ export class Prop implements t.Prop {
     expand!: boolean;
     entries: Prop[];
 
-    constructor(readonly $parent: PropParent, spec: t.PropSpec = {}) {
-        const prop = Prop.schema.decode(spec);
-        Object.assign(this, prop);
-        this.entries = (prop.entries ?? []).map(spec => new Prop(this, spec));
+    constructor(readonly $parent: PropParent, data: DeepPartial<PropSpec> = {}) {
+        const spec = PropSpecSchema.decode(data);
+        Object.assign(this, spec);
+        this.entries = (spec.entries ?? []).map(spec => new Prop(this, spec));
     }
 
     toJSON() {
@@ -46,8 +46,8 @@ export class Prop implements t.Prop {
         return this.$node.$graph;
     }
 
-    get $param(): t.ParamMetadata {
-        return this.$node.$def.metadata.params[this.$paramKey] ?? {
+    get $param(): ModuleParamSpec {
+        return this.$node.$module.params[this.$paramKey] ?? {
             schema: { type: 'any' },
         };
     }
@@ -124,7 +124,7 @@ export class Prop implements t.Prop {
      * If the prop is an entry, returns the subschema (i.e. `items` if the base prop
      * is an array or `additionalProperties` if the base prop is an object)
      */
-    getTargetSchema(): t.DataSchemaSpec {
+    getTargetSchema(): DataSchemaSpec {
         const baseSchema = this.$param.schema;
         if (this.isEntry()) {
             if (baseSchema.type === 'array') {

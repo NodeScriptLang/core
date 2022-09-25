@@ -1,8 +1,9 @@
 import { Schema } from 'airtight';
 
-import * as t from '../types/index.js';
+import { NodeResult } from '../types/node-result.js';
 
-export const NodeResultSchema = new Schema<t.NodeResult>({
+export const NodeResultSchema = new Schema<NodeResult>({
+    id: 'NodeResult',
     type: 'object',
     properties: {
         nodeId: { type: 'string' },

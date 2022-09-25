@@ -1,10 +1,10 @@
 import { Schema } from 'airtight';
 
-import * as t from '../types/index.js';
-import { DataSchemaSchema } from './data-schema.js';
+import { ModuleParamSpec } from '../types/index.js';
+import { DataSchemaSpecSchema } from './DataSchemaSpec.js';
 
-export const ParamMetadataSchema = new Schema<t.ParamMetadata>({
-    id: 'ParamDef',
+export const ModuleParamSpecSchema = new Schema<ModuleParamSpec>({
+    id: 'ModuleParamSpec',
     type: 'object',
     properties: {
         kind: {
@@ -16,11 +16,11 @@ export const ParamMetadataSchema = new Schema<t.ParamMetadata>({
             type: 'string',
             optional: true,
         },
-        schema: DataSchemaSchema.schema as any,
+        schema: DataSchemaSpecSchema.schema as any,
         scope: {
             type: 'object',
             properties: {},
-            additionalProperties: DataSchemaSchema.schema,
+            additionalProperties: DataSchemaSpecSchema.schema,
             optional: true,
         },
         default: {
@@ -48,6 +48,10 @@ export const ParamMetadataSchema = new Schema<t.ParamMetadata>({
             optional: true,
         },
         hideValue: {
+            type: 'boolean',
+            optional: true,
+        },
+        hideSocket: {
             type: 'boolean',
             optional: true,
         },

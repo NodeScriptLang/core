@@ -1,27 +1,32 @@
-import { Operator } from '../../main/types/index.js';
+import { ModuleCompute, ModuleDefinition } from '../../main/types/index.js';
 
-export const node: Operator<{
+type P = {
     items: any[];
-}, any[]> = {
-    metadata: {
-        label: 'Array',
-        description: 'Creates an array.',
-        params: {
-            items: {
-                schema: {
-                    type: 'array',
-                    items: {
-                        type: 'any',
-                    },
-                }
-            },
+};
+
+type R = any[];
+
+export const module: ModuleDefinition<P, R> = {
+    label: 'Array',
+    description: 'Creates an array.',
+    params: {
+        items: {
+            schema: {
+                type: 'array',
+                items: {
+                    type: 'any',
+                },
+            }
         },
-        result: {
+    },
+    result: {
+        schema: {
             type: 'array',
             items: { type: 'any' },
         },
     },
-    compute(params) {
-        return params.items;
-    }
+};
+
+export const compute: ModuleCompute<P, R> = params => {
+    return params.items;
 };

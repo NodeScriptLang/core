@@ -1,26 +1,27 @@
-import { GraphSchema } from '../schema/index.js';
-import * as t from '../types/index.js';
+import { DeepPartial } from 'airtight';
+
+import { GraphSpecSchema } from '../schema/index.js';
+import { AddNodeSpec, DataSchemaSpec, GraphMetadata, GraphRefs, GraphSpec, ModuleSpec } from '../types/index.js';
 import { MultiMap, serialize, shortId } from '../util/index.js';
-import { Node, NodeLink } from './node.js';
+import { GraphLoader } from './GraphLoader.js';
+import { Node, NodeLink } from './Node.js';
 
-export class Graph implements t.Graph {
+export class Graph implements GraphSpec {
 
-    static schema = GraphSchema;
-
-    metadata!: t.NodeMetadata;
+    module!: ModuleSpec;
     rootNodeId!: string;
-    nodes: Node[];
-    refs: Record<string, string> = {};
-    aux: Record<string, any> = {};
+    nodes: Node[] = [];
+    refs: GraphRefs = {};
+    metadata: GraphMetadata = {};
 
     protected $nodeMap = new Map<string, Node>();
 
-    constructor(readonly $loader: t.GraphLoader, spec: t.GraphSpec = {}) {
-        const graph = Graph.schema.decode(spec);
-        Object.assign(this, graph);
+    constructor(readonly $loader: GraphLoader, data: DeepPartial<GraphSpec> = {}) {
+        const spec = GraphSpecSchema.decode(data);
+        Object.assign(this, spec);
         this.nodes = [];
-        for (const spec of graph.nodes) {
-            const node = new Node(this, spec);
+        for (const n of spec.nodes) {
+            const node = new Node(this, n);
             this.addNodeRaw(node);
         }
         this.applyInvariants();
@@ -32,14 +33,14 @@ export class Graph implements t.Graph {
         });
     }
 
-    resolveUri(ref: string): string {
-        const uri = this.refs[ref] ?? '';
-        return uri;
+    resolveRefUrl(ref: string): string {
+        const url = this.refs[ref] ?? '';
+        return url;
     }
 
-    resolveNode(ref: string): t.NodeDef {
-        const uri = this.resolveUri(ref);
-        return this.$loader.resolveNodeDef(uri);
+    resolveModule(ref: string): ModuleSpec {
+        const url = this.resolveRefUrl(ref);
+        return this.$loader.resolveModule(url);
     }
 
     getNodeById(id: string): Node | null {
@@ -52,25 +53,21 @@ export class Graph implements t.Graph {
 
     setRootNode(nodeId: string | null) {
         const node = nodeId ? this.getNodeById(nodeId) : null;
-        const resultSchema: t.DataSchemaSpec = node == null ? { type: 'any' } : node.$def.metadata.result;
+        const resultSchema: DataSchemaSpec = node == null ? { type: 'any' } : node.$module.result.schema;
         this.rootNodeId = node ? node.id : '';
-        this.metadata.result = resultSchema;
+        this.module.result.schema = resultSchema;
     }
 
-    /**
-     * Uses uri to load node definition & add graph ref if none exists.
-     * Returns the created node.
-     */
-    async createNode(spec: t.AddNodeSpec) {
-        const def = await this.$loader.loadNodeDef(spec.uri);
-        const ref = this.getRefForUri(spec.uri);
-        const evalMode = def.metadata.evalMode;
+    async createNode(spec: AddNodeSpec) {
+        const module = await this.$loader.loadModule(spec.url);
+        const ref = this.getRefForUrl(spec.url);
+        const evalMode = module.evalMode;
         const node = new Node(this, {
             ...spec.node,
             ref,
-            aux: {
+            metadata: {
                 evalMode,
-                ...spec.node?.aux,
+                ...spec.node?.metadata,
             }
         });
         this.addNodeRaw(node);
@@ -195,15 +192,15 @@ export class Graph implements t.Graph {
         }
     }
 
-    protected getRefForUri(uri: string): string {
+    protected getRefForUrl(url: string): string {
         for (const [k, v] of Object.entries(this.refs)) {
-            if (v === uri) {
+            if (v === url) {
                 return k;
             }
         }
         // Generate a new one
         const ref = shortId();
-        this.refs[ref] = uri;
+        this.refs[ref] = url;
         return ref;
     }
 
@@ -211,7 +208,7 @@ export class Graph implements t.Graph {
         for (const node of this.nodes) {
             node.applyInvariants();
         }
-        this.metadata.async = this.nodes.some(_ => _.$def.metadata.async);
+        this.module.result.async = this.nodes.some(_ => _.$module.result.async);
     }
 
 }

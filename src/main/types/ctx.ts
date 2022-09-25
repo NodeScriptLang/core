@@ -1,4 +1,4 @@
-import { DataSchema, DataType } from './data.js';
+import { DataSchema, DataType } from './data-schema.js';
 
 export interface GraphEvalContext {
     cache: Map<string, any>;

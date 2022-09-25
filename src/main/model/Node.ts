@@ -1,8 +1,10 @@
-import { NodeSchema } from '../schema/node.js';
-import * as t from '../types/index.js';
+import { DeepPartial } from 'airtight';
+
+import { NodeSpecSchema } from '../schema/index.js';
+import { NodeSpec, PropSpec } from '../types/index.js';
 import { serialize } from '../util/serialize.js';
-import { Graph } from './graph.js';
-import { Prop } from './prop.js';
+import { Graph } from './Graph.js';
+import { Prop } from './Prop.js';
 
 export type NodeLink = {
     node: Node;
@@ -13,32 +15,30 @@ export type NodeLink = {
 /**
  * Represents a single node instance in a graph.
  */
-export class Node implements t.Node {
-
-    static schema = NodeSchema;
+export class Node implements NodeSpec {
 
     id!: string;
     ref!: string;
-    aux: Record<string, any> = {};
+    metadata: Record<string, any> = {};
 
     props: Prop[] = [];
 
-    constructor(readonly $graph: Graph, spec: t.NodeSpec = {}) {
-        const node = Node.schema.decode(spec);
-        Object.assign(this, node);
-        this.props = this.initProps(node.props);
+    constructor(readonly $graph: Graph, data: DeepPartial<NodeSpec> = {}) {
+        const spec = NodeSpecSchema.decode(data);
+        Object.assign(this, spec);
+        this.props = this.initProps(spec.props);
     }
 
     toJSON() {
         return serialize(this, {});
     }
 
-    get $uri() {
-        return this.$graph.resolveUri(this.ref);
+    get $moduleUrl() {
+        return this.$graph.resolveRefUrl(this.ref);
     }
 
-    get $def() {
-        return this.$graph.resolveNode(this.ref);
+    get $module() {
+        return this.$graph.resolveModule(this.ref);
     }
 
     /**
@@ -204,9 +204,9 @@ export class Node implements t.Node {
         return firstProp ?? null;
     }
 
-    protected initProps(specs: t.Prop[]) {
+    protected initProps(specs: PropSpec[]) {
         const props: Prop[] = [];
-        for (const [key, param] of Object.entries(this.$def.metadata.params)) {
+        for (const [key, param] of Object.entries(this.$module.params)) {
             const spec = specs.find(_ => _.key === key) ?? {
                 key,
                 value: param.schema.default ?? '',

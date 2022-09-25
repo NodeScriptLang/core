@@ -1,6 +1,8 @@
-import { Graph } from '../main/model/graph.js';
-import { GraphLoader } from '../main/runtime/loader.js';
-import * as t from '../main/types/index.js';
+import { DeepPartial } from 'airtight';
+
+import { Graph } from '../main/model/index.js';
+import { GraphSpec } from '../main/types/index.js';
+import { TestGraphLoader } from './test-loader.js';
 
 /**
  * Test runtime utilities.
@@ -18,7 +20,6 @@ export class TestRuntime {
         'array': this.makeUrl('/out/test/defs/array.js'),
         'any': this.makeUrl('/out/test/defs/any.js'),
         'promise': this.makeUrl('/out/test/defs/promise.js'),
-        'eval': this.makeUrl('/out/test/defs/eval.js'),
         'math.add': this.makeUrl('/out/test/defs/math.add.js'),
         'lambda.map': this.makeUrl('/out/test/defs/lambda.map.js'),
         'param.default': this.makeUrl('/out/test/defs/param.default.js'),
@@ -29,14 +30,14 @@ export class TestRuntime {
     }
 
     async createLoader() {
-        const loader = new GraphLoader();
-        for (const uri of Object.values(this.defs)) {
-            await loader.loadNodeDef(uri);
+        const loader = new TestGraphLoader();
+        for (const url of Object.values(this.defs)) {
+            await loader.loadModule(url);
         }
         return loader;
     }
 
-    async loadGraph(spec: t.GraphSpec): Promise<Graph> {
+    async loadGraph(spec: DeepPartial<GraphSpec>): Promise<Graph> {
         const loader = await this.createLoader();
         const graph = await loader.loadGraph(spec);
         return graph;

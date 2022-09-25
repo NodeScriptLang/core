@@ -1,4 +1,4 @@
-import { DataSchemaSpec, DataType } from '../types/data.js';
+import { DataSchemaSpec, DataType } from '../types/data-schema.js';
 
 export function parseAny(str: string) {
     const s = String(str ?? '').trim();

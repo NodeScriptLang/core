@@ -1,9 +1,9 @@
 import { Schema } from 'airtight';
 
-import * as t from '../types/index.js';
+import { DataSchemaSpec } from '../types/data-schema.js';
 
-export const DataSchemaSchema = new Schema<t.DataSchemaSpec>({
-    id: 'DataSchema',
+export const DataSchemaSpecSchema = new Schema<DataSchemaSpec>({
+    id: 'DataSchemaSpec',
     type: 'object',
     properties: {
         type: {
@@ -25,18 +25,18 @@ export const DataSchemaSchema = new Schema<t.DataSchemaSpec>({
             properties: {},
             additionalProperties: {
                 type: 'ref',
-                schemaId: 'DataSchema',
+                schemaId: 'DataSchemaSpec',
             },
         },
         additionalProperties: {
             type: 'ref',
             optional: true,
-            schemaId: 'DataSchema',
+            schemaId: 'DataSchemaSpec',
         },
         items: {
             type: 'ref',
             optional: true,
-            schemaId: 'DataSchema',
+            schemaId: 'DataSchemaSpec',
         }
     }
 });

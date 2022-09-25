@@ -1,18 +1,18 @@
 import assert from 'assert';
 
-import { GraphLoader } from '../../main/runtime/loader.js';
 import { runtime } from '../runtime.js';
+import { TestGraphLoader } from '../test-loader.js';
 
 describe('Graph', () => {
 
     describe('createNode', () => {
 
         it('adds the node to the graph', async () => {
-            const loader = new GraphLoader();
+            const loader = new TestGraphLoader();
             const graph = await loader.loadGraph();
             assert.strictEqual(graph.nodes.length, 0);
             const node = await graph.createNode({
-                uri: runtime.defs['any'],
+                url: runtime.defs['any'],
                 node: {},
             });
             assert.ok(node);
@@ -20,49 +20,49 @@ describe('Graph', () => {
             assert.strictEqual(graph.nodes[0], node);
         });
 
-        it('adds a URI to refs', async () => {
-            const loader = new GraphLoader();
+        it('adds a url to refs', async () => {
+            const loader = new TestGraphLoader();
             const graph = await loader.loadGraph();
             assert.strictEqual(Object.keys(graph.refs).length, 0);
-            const uri = runtime.defs['math.add'];
+            const url = runtime.defs['math.add'];
             const node = await graph.createNode({
-                uri,
+                url,
                 node: {},
             });
             assert.strictEqual(Object.keys(graph.refs).length, 1);
-            assert.strictEqual(graph.refs[node.ref], uri);
+            assert.strictEqual(graph.refs[node.ref], url);
         });
 
-        it('does not add the same URI twice', async () => {
-            const loader = new GraphLoader();
+        it('does not add the same url twice', async () => {
+            const loader = new TestGraphLoader();
             const graph = await loader.loadGraph();
             assert.strictEqual(Object.keys(graph.refs).length, 0);
-            const uri = runtime.defs['math.add'];
+            const url = runtime.defs['math.add'];
             const node1 = await graph.createNode({
-                uri,
+                url,
                 node: {},
             });
             const node2 = await graph.createNode({
-                uri,
+                url,
                 node: {},
             });
             assert.strictEqual(Object.keys(graph.refs).length, 1);
-            assert.strictEqual(graph.refs[node1.ref], uri);
+            assert.strictEqual(graph.refs[node1.ref], url);
             assert.strictEqual(graph.refs[node1.ref], graph.refs[node2.ref]);
         });
 
-        it('different URIs will save to different refs', async () => {
-            const loader = new GraphLoader();
+        it('different urls will save to different refs', async () => {
+            const loader = new TestGraphLoader();
             const graph = await loader.loadGraph();
             assert.strictEqual(Object.keys(graph.refs).length, 0);
-            const uri1 = runtime.defs['math.add'];
-            const uri2 = runtime.defs['any'];
+            const url1 = runtime.defs['math.add'];
+            const url2 = runtime.defs['any'];
             const node1 = await graph.createNode({
-                uri: uri1,
+                url: url1,
                 node: {},
             });
             const node2 = await graph.createNode({
-                uri: uri2,
+                url: url2,
                 node: {},
             });
             assert.strictEqual(Object.keys(graph.refs).length, 2);
@@ -70,10 +70,10 @@ describe('Graph', () => {
         });
 
         it('sets the default param value if not explicitly specified', async () => {
-            const loader = new GraphLoader();
+            const loader = new TestGraphLoader();
             const graph = await loader.loadGraph();
             const node = await graph.createNode({
-                uri: runtime.defs['param.default'],
+                url: runtime.defs['param.default'],
                 node: {},
             });
             assert.strictEqual(node.props[0].key, 'value');
@@ -81,10 +81,10 @@ describe('Graph', () => {
         });
 
         it('sets the actual param value when explicitly specified', async () => {
-            const loader = new GraphLoader();
+            const loader = new TestGraphLoader();
             const graph = await loader.loadGraph();
             const node = await graph.createNode({
-                uri: runtime.defs['param.default'],
+                url: runtime.defs['param.default'],
                 node: {
                     props: [
                         { key: 'value', value: 'Bye' }
@@ -100,7 +100,7 @@ describe('Graph', () => {
     describe('deleteNode', () => {
 
         it('removes the correct node', async () => {
-            const loader = new GraphLoader();
+            const loader = new TestGraphLoader();
             const graph = await loader.loadGraph({
                 nodes: [
                     {
@@ -131,7 +131,7 @@ describe('Graph', () => {
         });
 
         it('only removes unused refs', async () => {
-            const loader = new GraphLoader();
+            const loader = new TestGraphLoader();
             const graph = await loader.loadGraph({
                 nodes: [
                     {
@@ -168,7 +168,7 @@ describe('Graph', () => {
     describe('detachNode', () => {
 
         it('recreates the links attached to the first property', async () => {
-            const loader = new GraphLoader();
+            const loader = new TestGraphLoader();
             const graph = await loader.loadGraph({
                 nodes: [
                     {
@@ -231,7 +231,7 @@ describe('Graph', () => {
         });
 
         it('recreates the links through the first connected entry', async () => {
-            const loader = new GraphLoader();
+            const loader = new TestGraphLoader();
             const graph = await loader.loadGraph({
                 nodes: [
                     {
@@ -286,7 +286,7 @@ describe('Graph', () => {
     describe('invariants', () => {
 
         it('removes extra properties not supported by node definition', async () => {
-            const loader = new GraphLoader();
+            const loader = new TestGraphLoader();
             const graph = await loader.loadGraph({
                 nodes: [
                     {
@@ -310,7 +310,7 @@ describe('Graph', () => {
         });
 
         it('keeps firstmost properties when extra properties are present', async () => {
-            const loader = new GraphLoader();
+            const loader = new TestGraphLoader();
             const graph = await loader.loadGraph({
                 nodes: [
                     {
@@ -332,7 +332,7 @@ describe('Graph', () => {
         });
 
         it('ensures the correct order of properties', async () => {
-            const loader = new GraphLoader();
+            const loader = new TestGraphLoader();
             const graph = await loader.loadGraph({
                 nodes: [
                     {
@@ -354,7 +354,7 @@ describe('Graph', () => {
         });
 
         it('initializes all node properties with default values', async () => {
-            const loader = new GraphLoader();
+            const loader = new TestGraphLoader();
             const graph = await loader.loadGraph({
                 nodes: [
                     {
@@ -373,7 +373,7 @@ describe('Graph', () => {
         });
 
         it('removes the first link of two looped nodes', async () => {
-            const loader = new GraphLoader();
+            const loader = new TestGraphLoader();
             const graph = await loader.loadGraph({
                 nodes: [
                     {
@@ -401,8 +401,8 @@ describe('Graph', () => {
             assert.strictEqual(node2?.props[0].linkId, 'res');
         });
 
-        it('sets metadata.async = false when all nodes are sync', async () => {
-            const loader = new GraphLoader();
+        it('sets module.result.async = false when all nodes are sync', async () => {
+            const loader = new TestGraphLoader();
             const graph = await loader.loadGraph({
                 nodes: [
                     { ref: 'add' },
@@ -413,11 +413,11 @@ describe('Graph', () => {
                     add: runtime.defs['math.add'],
                 }
             });
-            assert.strictEqual(graph.metadata.async, false);
+            assert.strictEqual(graph.module.result.async, false);
         });
 
-        it('sets metadata.async = true if at least one node is async', async () => {
-            const loader = new GraphLoader();
+        it('sets module.result.async = true if at least one node is async', async () => {
+            const loader = new TestGraphLoader();
             const graph = await loader.loadGraph({
                 nodes: [
                     { ref: 'add' },
@@ -430,7 +430,7 @@ describe('Graph', () => {
                     promise: runtime.defs['promise'],
                 }
             });
-            assert.strictEqual(graph.metadata.async, true);
+            assert.strictEqual(graph.module.result.async, true);
         });
 
     });
@@ -438,7 +438,7 @@ describe('Graph', () => {
     describe('setRootNode', () => {
 
         it('updates graph.metadata.result schema to match the result type of node', async () => {
-            const loader = new GraphLoader();
+            const loader = new TestGraphLoader();
             const graph = await loader.loadGraph({
                 nodes: [
                     { id: 'add', ref: 'add' },
@@ -449,13 +449,13 @@ describe('Graph', () => {
                     add: runtime.defs['math.add'],
                 }
             });
-            assert.deepStrictEqual(graph.metadata.result, { type: 'any' });
+            assert.deepStrictEqual(graph.module.result.schema, { type: 'any' });
             graph.setRootNode('add');
-            assert.deepStrictEqual(graph.metadata.result, { type: 'number' });
+            assert.deepStrictEqual(graph.module.result.schema, { type: 'number' });
             graph.setRootNode('string');
-            assert.deepStrictEqual(graph.metadata.result, { type: 'string' });
+            assert.deepStrictEqual(graph.module.result.schema, { type: 'string' });
             graph.setRootNode(null);
-            assert.deepStrictEqual(graph.metadata.result, { type: 'any' });
+            assert.deepStrictEqual(graph.module.result.schema, { type: 'any' });
         });
 
     });

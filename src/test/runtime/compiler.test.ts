@@ -26,10 +26,10 @@ describe('GraphCompiler', () => {
                     add: runtime.defs['math.add'],
                 }
             });
-            const code = new GraphCompiler().compileEsm(graph);
-            const { node } = await evalEsmModule(code);
+            const code = new GraphCompiler().compileComputeEsm(graph);
+            const { compute } = await evalEsmModule(code);
             const ctx = new GraphEvalContext();
-            const res = await node.compute({}, ctx);
+            const res = compute({}, ctx);
             assert.strictEqual(res, 33);
         });
 
@@ -58,14 +58,14 @@ describe('GraphCompiler', () => {
                     param: 'core:Param',
                 }
             });
-            const code = new GraphCompiler().compileEsm(graph, {
+            const code = new GraphCompiler().compileComputeEsm(graph, {
                 introspect: true,
             });
-            const { node } = await evalEsmModule(code);
+            const { compute } = await evalEsmModule(code);
             const ctx = new GraphEvalContext();
             const nodeResults: t.NodeResult[] = [];
             ctx.nodeEvaluated.on(_ => nodeResults.push(_));
-            const res = await node.compute({
+            const res = await compute({
                 value: 12
             }, ctx);
             assert.strictEqual(res, 33);
@@ -106,10 +106,10 @@ describe('GraphCompiler', () => {
                     add: runtime.defs['math.add'],
                 }
             });
-            const code = new GraphCompiler().compileEsm(graph);
-            const { node } = await evalEsmModule(code);
+            const code = new GraphCompiler().compileComputeEsm(graph);
+            const { compute } = await evalEsmModule(code);
             const ctx = new GraphEvalContext();
-            const res = await node.compute({
+            const res = await compute({
                 value: 42
             }, ctx);
             assert.strictEqual(res, 43);
@@ -122,14 +122,16 @@ describe('GraphCompiler', () => {
         it('can compile graph and use it as a node', async () => {
             const loader = await runtime.createLoader();
             const graph1 = await loader.loadGraph({
-                metadata: {
+                module: {
                     params: {
                         val: {
                             schema: { type: 'number' },
                         }
                     },
                     result: {
-                        type: 'number',
+                        schema: {
+                            type: 'number',
+                        }
                     },
                 },
                 rootNodeId: 'res',
@@ -155,9 +157,9 @@ describe('GraphCompiler', () => {
                     add: runtime.defs['math.add'],
                 }
             });
-            const code1 = new GraphCompiler().compileEsm(graph1);
-            const uri1 = codeToUrl(code1);
-            await loader.loadNodeDef(uri1);
+            const code1 = new GraphCompiler().compileComputeEsm(graph1);
+            graph1.module.computeUrl = codeToUrl(code1);
+            loader.defineModule('graph1', graph1.module);
             const graph = await loader.loadGraph({
                 rootNodeId: 'res',
                 nodes: [
@@ -170,13 +172,13 @@ describe('GraphCompiler', () => {
                     }
                 ],
                 refs: {
-                    'a': uri1,
+                    'a': 'graph1',
                 }
             });
-            const code2 = new GraphCompiler().compileEsm(graph);
-            const { node } = await evalEsmModule(code2);
+            const code2 = new GraphCompiler().compileComputeEsm(graph);
+            const { compute } = await evalEsmModule(code2);
             const ctx = new GraphEvalContext();
-            const res = await node.compute({}, ctx);
+            const res = await compute({}, ctx);
             assert.strictEqual(res, 124);
         });
     });
@@ -207,10 +209,10 @@ describe('GraphCompiler', () => {
                     number: runtime.defs['number'],
                 }
             });
-            const code = new GraphCompiler().compileEsm(graph);
-            const { node } = await evalEsmModule(code);
+            const code = new GraphCompiler().compileComputeEsm(graph);
+            const { compute } = await evalEsmModule(code);
             const ctx = new GraphEvalContext();
-            const res = await node.compute({}, ctx);
+            const res = await compute({}, ctx);
             assert.strictEqual(res, 42);
         });
 
@@ -238,14 +240,14 @@ describe('GraphCompiler', () => {
                     any: runtime.defs['any'],
                 }
             });
-            const code = new GraphCompiler().compileEsm(graph);
-            const { node } = await evalEsmModule(code);
+            const code = new GraphCompiler().compileComputeEsm(graph);
+            const { compute } = await evalEsmModule(code);
             const ctx = new GraphEvalContext();
-            const res1 = await node.compute({ value: true }, ctx);
+            const res1 = await compute({ value: true }, ctx);
             assert.strictEqual(res1, true);
-            const res2 = await node.compute({ value: 42 }, ctx);
+            const res2 = await compute({ value: 42 }, ctx);
             assert.strictEqual(res2, 42);
-            const res3 = await node.compute({ value: { foo: 123 } }, ctx);
+            const res3 = await compute({ value: { foo: 123 } }, ctx);
             assert.deepStrictEqual(res3, { foo: 123 });
         });
 
@@ -283,10 +285,10 @@ describe('GraphCompiler', () => {
                     object: runtime.defs['object'],
                 }
             });
-            const code = new GraphCompiler().compileEsm(graph);
-            const { node } = await evalEsmModule(code);
+            const code = new GraphCompiler().compileComputeEsm(graph);
+            const { compute } = await evalEsmModule(code);
             const ctx = new GraphEvalContext();
-            const res = await node.compute({}, ctx);
+            const res = await compute({}, ctx);
             assert.deepStrictEqual(res, {
                 foo: '42',
                 bar: 42,
@@ -323,10 +325,10 @@ describe('GraphCompiler', () => {
                     array: runtime.defs['array'],
                 }
             });
-            const code = new GraphCompiler().compileEsm(graph);
-            const { node } = await evalEsmModule(code);
+            const code = new GraphCompiler().compileComputeEsm(graph);
+            const { compute } = await evalEsmModule(code);
             const ctx = new GraphEvalContext();
-            const res = await node.compute({}, ctx);
+            const res = await compute({}, ctx);
             assert.deepStrictEqual(res, ['42', 42]);
         });
 
@@ -361,10 +363,10 @@ describe('GraphCompiler', () => {
                     array: runtime.defs['array'],
                 }
             });
-            const code = new GraphCompiler().compileEsm(graph);
-            const { node } = await evalEsmModule(code);
+            const code = new GraphCompiler().compileComputeEsm(graph);
+            const { compute } = await evalEsmModule(code);
             const ctx = new GraphEvalContext();
-            const res = await node.compute({
+            const res = await compute({
                 value: ['foo', 'bar']
             }, ctx);
             assert.deepStrictEqual(res, ['foo', 'bar']);
@@ -406,10 +408,10 @@ describe('GraphCompiler', () => {
                     add: runtime.defs['math.add'],
                 }
             });
-            const code = new GraphCompiler().compileEsm(graph);
-            const { node } = await evalEsmModule(code);
+            const code = new GraphCompiler().compileComputeEsm(graph);
+            const { compute } = await evalEsmModule(code);
             const ctx = new GraphEvalContext();
-            const res = await node.compute({}, ctx);
+            const res = await compute({}, ctx);
             assert.deepStrictEqual(res, [2, 3, 43]);
         });
 
@@ -445,10 +447,10 @@ describe('GraphCompiler', () => {
                     add: runtime.defs['math.add'],
                 }
             });
-            const code = new GraphCompiler().compileEsm(graph);
-            const { node } = await evalEsmModule(code);
+            const code = new GraphCompiler().compileComputeEsm(graph);
+            const { compute } = await evalEsmModule(code);
             const ctx = new GraphEvalContext();
-            const res = await node.compute({}, ctx);
+            const res = await compute({}, ctx);
             assert.deepStrictEqual(res, [2, 4, 84]);
         });
 
@@ -497,10 +499,10 @@ describe('GraphCompiler', () => {
                     add: runtime.defs['math.add'],
                 }
             });
-            const code = new GraphCompiler().compileEsm(graph);
-            const { node } = await evalEsmModule(code);
+            const code = new GraphCompiler().compileComputeEsm(graph);
+            const { compute } = await evalEsmModule(code);
             const ctx = new GraphEvalContext();
-            const res = await node.compute({}, ctx);
+            const res = await compute({}, ctx);
             assert.deepStrictEqual(res, [3, 5]);
         });
 
@@ -555,10 +557,10 @@ describe('GraphCompiler', () => {
                     array: runtime.defs['array'],
                 }
             });
-            const code = new GraphCompiler().compileEsm(graph);
-            const { node } = await evalEsmModule(code);
+            const code = new GraphCompiler().compileComputeEsm(graph);
+            const { compute } = await evalEsmModule(code);
             const ctx = new GraphEvalContext();
-            const res = await node.compute({}, ctx);
+            const res = await compute({}, ctx);
             assert.deepStrictEqual(res, [
                 { foo: 'one', bar: ['1', '2'], baz: '42' },
                 { foo: 'two', bar: ['1', '2'], baz: '42' },
@@ -591,10 +593,10 @@ describe('GraphCompiler', () => {
                     string: runtime.defs['string'],
                 }
             });
-            const code = new GraphCompiler().compileEsm(graph);
-            const { node } = await evalEsmModule(code);
+            const code = new GraphCompiler().compileComputeEsm(graph);
+            const { compute } = await evalEsmModule(code);
             const ctx = new GraphEvalContext();
-            const res = await node.compute({}, ctx);
+            const res = await compute({}, ctx);
             assert.deepStrictEqual(res, [44]);
         });
 
@@ -629,12 +631,12 @@ describe('GraphCompiler', () => {
                     any: runtime.defs['any'],
                 }
             });
-            const code = new GraphCompiler().compileEsm(graph, { introspect: true });
-            const { node } = await evalEsmModule(code);
+            const code = new GraphCompiler().compileComputeEsm(graph, { introspect: true });
+            const { compute } = await evalEsmModule(code);
             const ctx = new GraphEvalContext();
             const results: t.NodeResult[] = [];
             ctx.nodeEvaluated.on(_ => results.push(_));
-            const res = await node.compute({}, ctx);
+            const res = await compute({}, ctx);
             assert.deepStrictEqual(res, ['1', '2', '42']);
             assert.deepStrictEqual(results, [
                 { nodeId: 'res', progress: 0 },
@@ -676,12 +678,12 @@ describe('GraphCompiler', () => {
                     string: runtime.defs['string'],
                 }
             });
-            const code = new GraphCompiler().compileEsm(graph, { introspect: true });
-            const { node } = await evalEsmModule(code);
+            const code = new GraphCompiler().compileComputeEsm(graph, { introspect: true });
+            const { compute } = await evalEsmModule(code);
             const ctx = new GraphEvalContext();
             const results: t.NodeResult[] = [];
             ctx.nodeEvaluated.on(_ => results.push(_));
-            const res = await node.compute({}, ctx);
+            const res = await compute({}, ctx);
             assert.deepStrictEqual(res, 84);
             assert.deepStrictEqual(results, [
                 { nodeId: 'res', progress: 0 },
@@ -718,12 +720,12 @@ describe('GraphCompiler', () => {
                     string: runtime.defs['string'],
                 }
             });
-            const code = new GraphCompiler().compileEsm(graph, { introspect: true });
-            const { node } = await evalEsmModule(code);
+            const code = new GraphCompiler().compileComputeEsm(graph, { introspect: true });
+            const { compute } = await evalEsmModule(code);
             const ctx = new GraphEvalContext();
             const results: t.NodeResult[] = [];
             ctx.nodeEvaluated.on(_ => results.push(_));
-            const res = await node.compute({}, ctx);
+            const res = await compute({}, ctx);
             assert.deepStrictEqual(res, 54);
             assert.deepStrictEqual(results, [
                 { nodeId: 'res', progress: 0 },
@@ -798,10 +800,10 @@ describe('GraphCompiler', () => {
                     local: 'core:Local',
                 }
             });
-            const code = new GraphCompiler().compileEsm(graph);
-            const { node } = await evalEsmModule(code);
+            const code = new GraphCompiler().compileComputeEsm(graph);
+            const { compute } = await evalEsmModule(code);
             const ctx = new GraphEvalContext();
-            const res = await node.compute({}, ctx);
+            const res = await compute({}, ctx);
             assert.deepStrictEqual(res, [
                 [0, 'one'],
                 [1, 'two'],
@@ -845,10 +847,10 @@ describe('GraphCompiler', () => {
                     promise: runtime.defs['promise'],
                 }
             });
-            const code = new GraphCompiler().compileEsm(graph, { rootNodeId: 'res' });
-            const { node } = await evalEsmModule(code);
+            const code = new GraphCompiler().compileComputeEsm(graph, { rootNodeId: 'res' });
+            const { compute } = await evalEsmModule(code);
             const ctx = new GraphEvalContext();
-            const res = await node.compute({}, ctx);
+            const res = await compute({}, ctx);
             assert.strictEqual(res, 43);
             assert.strictEqual(/async\s+/.test(code), false);
             assert.strictEqual(/await\s+/.test(code), false);
@@ -887,10 +889,10 @@ describe('GraphCompiler', () => {
                     promise: runtime.defs['promise'],
                 }
             });
-            const code = new GraphCompiler().compileEsm(graph, { rootNodeId: 'promise' });
-            const { node } = await evalEsmModule(code);
+            const code = new GraphCompiler().compileComputeEsm(graph, { rootNodeId: 'promise' });
+            const { compute } = await evalEsmModule(code);
             const ctx = new GraphEvalContext();
-            const res = await node.compute({}, ctx);
+            const res = await compute({}, ctx);
             assert.strictEqual(res, 43);
             assert.strictEqual(/async\s+/.test(code), true);
             assert.strictEqual(/await\s+/.test(code), true);
@@ -940,7 +942,7 @@ describe('GraphCompiler', () => {
                     param: 'core:Param',
                 }
             });
-            const code = new GraphCompiler().compileEsm(graph, {
+            const code = new GraphCompiler().compileComputeEsm(graph, {
                 rootNodeId: 'plus1',
                 emitAll: true,
                 emitNodeMap: true,
@@ -955,52 +957,6 @@ describe('GraphCompiler', () => {
             assert.strictEqual(plus2, 44);
             const mul2 = await nodeMap.get('mul2')({ value: 80 }, ctx);
             assert.strictEqual(mul2, 160);
-        });
-
-    });
-
-    describe('custom compiling', () => {
-
-        it('compiles nodes with custom compile()', async () => {
-            const graph = await runtime.loadGraph({
-                nodes: [
-                    {
-                        id: 'res',
-                        ref: 'eval',
-                        props: [
-                            {
-                                key: 'args',
-                                entries: [
-                                    { key: 'a', linkId: 'h' },
-                                    { key: 'b', value: 'World' },
-                                ]
-                            },
-                            {
-                                key: 'code',
-                                value: 'return a + b;',
-                            }
-                        ]
-                    },
-                    {
-                        id: 'h',
-                        ref: 'string',
-                        props: [
-                            { key: 'value', value: 'Hello' }
-                        ]
-                    },
-                ],
-                refs: {
-                    string: runtime.defs['string'],
-                    eval: runtime.defs['eval'],
-                }
-            });
-            const code = new GraphCompiler().compileEsm(graph, {
-                rootNodeId: 'res',
-            });
-            const { node } = await evalEsmModule(code);
-            const ctx = new GraphEvalContext();
-            const result = node.compute({}, ctx);
-            assert.strictEqual(result, 'HelloWorld');
         });
 
     });

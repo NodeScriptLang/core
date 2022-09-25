@@ -1,8 +1,8 @@
 import { Schema } from 'airtight';
 
-import * as t from '../types/index.js';
+import { NodeResizeMode } from '../types/module.js';
 
-export const NodeResizeModeSchema = new Schema<t.NodeResizeMode>({
+export const NodeResizeModeSchema = new Schema<NodeResizeMode>({
     id: 'NodeResizeMode',
     type: 'string',
     enum: ['horizontal', 'all', 'none'],
