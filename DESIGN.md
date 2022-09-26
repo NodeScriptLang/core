@@ -49,7 +49,7 @@ Each graph can be compiled into a Module. Module has two parts:
 - **ModuleSpec** — declarative JSON which describes how to render the node, as well as providing various hints to compiler (e.g. whether or not the emitted function should be asynchronous, whether the type conversion is required, etc.)
 - **compute** ESM module exporting a function that will be invoked at runtime. Compiler will emit ESM import to this module and wire all computations together. From there a bundler like [ESBuild](https://esbuild.github.io/) can take over and bundle it into a single import-less module.
 
-Each module should be compiled into `module.json` and `compute.ejs`.
+Each module should be compiled into `module.json` and `compute.mjs`.
 
 ### ESM Modules
 
