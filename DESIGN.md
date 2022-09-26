@@ -9,7 +9,13 @@ The following principles are essential to the user experience of visual programm
 - **Instant feedback** — nodes are immediately evaluated and the intermediate results are displayed; this allows for "creative scripting" flow where you don't necessarily know what you want to achieve and how, but can figure something out on the go with data guiding the thought process.
 - **Composability** — being able to combine multiple nodes together define the language capability.
 - **Atomicity** — a key prerequisite to composability, each node should aim to "do one thing and do it good".
-- **Reusability** — any part of graph can be extracted into a standalone "function graph" and can subsequently be used in other graphs. This allows users to define their own toolkits and libraries and further scale the language in the direction of user choice.
+- **Reusability** — any part of graph can be extracted into a standalone "function graph" (module) and can subsequently be used in other graphs. This allows users to define their own toolkits and libraries and further scale the language in the direction of user choice.
+
+## Terminology
+
+- **Module** defines node's functionality in terms of rendering (JSON spec with label, properties, data types, etc) and computation (a JavaScript function).
+- **Graph** — a set of nodes with links; each graph can be compiled into a Module
+- **Node** — an instance of Module with specific values and links set for properties
 
 ## Model
 
@@ -36,43 +42,67 @@ graph
 
 Note: each node result can be linked to multiple nodes, or to the multiple properties of the same node; however, each property can only have one link (multiple results cannot be plugged into the same property)
 
-## Node Definitions
+## Modules
 
-Graphs are compiled into *definitions* — ESM modules with `export const node: NodeDef<Param, Returns> = { ... }`.
+Each graph can be compiled into a Module. Module has two parts:
+
+- **ModuleSpec** — declarative JSON which describes how to render the node, as well as providing various hints to compiler (e.g. whether or not the emitted function should be asynchronous, whether the type conversion is required, etc.)
+- **compute** ESM module exporting a function that will be invoked at runtime. Compiler will emit ESM import to this module and wire all computations together. From there a bundler like [ESBuild](https://esbuild.github.io/) can take over and bundle it into a single import-less module.
+
+Each module should be compiled into `module.json` and `compute.ejs`.
+
+### ESM Modules
 
 A definition module can also be written in TypeScript or JavaScript, for example:
 
 ```ts
-import { Operator } from '../../main/types/index.js';
+import { ModuleSpec, ModuleCompute } from '@nodescript/core';
 
-export const node: Operator<{
+// Parameter and result types
+
+type P = {
     a: number;
     b: number;
-}, number> = {
-    metadata: {
-        label: 'Math.Add',
-        description: 'Computes a sum of two numbers.',
-        params: {
-            a: {
-                schema: {
-                    type: 'number'
-                }
-            },
-            b: {
-                schema: {
-                    type: 'number'
-                }
+};
+
+type R = number;
+
+// Declarative part
+
+export const module: ModuleSpec<P, R> = {
+    label: 'Math.Add',
+    description: 'Computes a sum of two numbers.',
+    params: {
+        a: {
+            schema: {
+                type: 'number'
             }
         },
-        result: {
+        b: {
+            schema: {
+                type: 'number'
+            }
+        }
+    },
+    result: {
+        schema: {
             type: 'number',
         },
     },
-    compute(params) {
-        return params.a + params.b;
-    }
+};
+
+// Computation part
+
+export const compute: ModuleCompute<P, R> = params => {
+    return params.a + params.b;
 };
 ```
+
+ESM compiler needs to decompose this definition into two parts.
+
+> How? Possibly split those — but no TypeScript support to wire `params` and `result` together.
+
+### Graph compiler
 
 Graph Compiler would take a Graph and compile it into a definition module that can be imported as a dependency in other graphs. Therefore, the composability is achieved by being able to extract common functions as separate graphs that can be used elsewhere.
 
