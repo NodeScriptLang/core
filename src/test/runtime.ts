@@ -1,4 +1,4 @@
-import { DeepPartial } from 'airtight';
+import { DeepPartial } from '@flexent/schema';
 
 import { Graph } from '../main/model/index.js';
 import { GraphSpec } from '../main/types/index.js';

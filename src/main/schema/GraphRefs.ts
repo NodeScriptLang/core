@@ -1,4 +1,4 @@
-import { Schema } from 'airtight';
+import { Schema } from '@flexent/schema';
 
 import { GraphRefs } from '../types/index.js';
 

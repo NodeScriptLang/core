@@ -1,4 +1,4 @@
-import { DeepPartial } from 'airtight';
+import { DeepPartial } from '@flexent/schema';
 
 import { ModuleSpec } from './module.js';
 

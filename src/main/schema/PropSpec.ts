@@ -1,4 +1,4 @@
-import { Schema } from 'airtight';
+import { Schema } from '@flexent/schema';
 
 import { PropSpec } from '../types/index.js';
 import { IdSchema, shortId } from '../util/id.js';

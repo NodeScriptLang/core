@@ -1,4 +1,4 @@
-import { Schema } from 'airtight';
+import { Schema } from '@flexent/schema';
 import { customAlphabet, nanoid } from 'nanoid';
 
 const safeAlphabet = 'abcdefghijklmnopqrstuvwxyz0123456789';

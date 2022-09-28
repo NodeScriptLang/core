@@ -1,4 +1,4 @@
-import { Schema } from 'airtight';
+import { Schema } from '@flexent/schema';
 
 import { ModuleSpec } from '../types/index.js';
 import { ModuleParamSpecSchema } from './ModuleParamSpec.js';

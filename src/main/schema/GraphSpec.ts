@@ -1,4 +1,4 @@
-import { Schema } from 'airtight';
+import { Schema } from '@flexent/schema';
 
 import { GraphSpec } from '../types/model.js';
 import { GraphMetadataSchema } from './GraphMetadata.js';

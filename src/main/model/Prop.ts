@@ -1,4 +1,4 @@
-import { DeepPartial } from 'airtight';
+import { DeepPartial } from '@flexent/schema';
 
 import { PropSpecSchema } from '../schema/index.js';
 import { DataSchemaSpec, ModuleParamSpec, PropSpec } from '../types/index.js';

@@ -1,4 +1,4 @@
-import { Schema } from 'airtight';
+import { Schema } from '@flexent/schema';
 
 import { DataSchemaSpec } from '../types/data-schema.js';
 
