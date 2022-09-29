@@ -57,5 +57,11 @@ export const ModuleSpecSchema = new Schema<ModuleSpec>({
             type: 'string',
             optional: true,
         },
+        attributes: {
+            type: 'object',
+            properties: {},
+            additionalProperties: { type: 'any' },
+            optional: true,
+        }
     }
 });

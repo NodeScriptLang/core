@@ -16,6 +16,7 @@ export interface ModuleSpec {
     bundleUrl?: string;
     sourceUrl?: string;
     exampleUrl?: string;
+    attributes?: Record<string, any>;
 }
 
 export interface ModuleParamSpec {
