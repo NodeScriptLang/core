@@ -413,7 +413,7 @@ describe('Graph', () => {
                     add: runtime.defs['math.add'],
                 }
             });
-            assert.strictEqual(graph.module.result.async, false);
+            assert.strictEqual(graph.moduleSpec.result.async, false);
         });
 
         it('sets module.result.async = true if at least one node is async', async () => {
@@ -430,7 +430,7 @@ describe('Graph', () => {
                     promise: runtime.defs['promise'],
                 }
             });
-            assert.strictEqual(graph.module.result.async, true);
+            assert.strictEqual(graph.moduleSpec.result.async, true);
         });
 
     });
@@ -449,13 +449,13 @@ describe('Graph', () => {
                     add: runtime.defs['math.add'],
                 }
             });
-            assert.deepStrictEqual(graph.module.result.schema, { type: 'any' });
+            assert.deepStrictEqual(graph.moduleSpec.result.schema, { type: 'any' });
             graph.setRootNode('add');
-            assert.deepStrictEqual(graph.module.result.schema, { type: 'number' });
+            assert.deepStrictEqual(graph.moduleSpec.result.schema, { type: 'number' });
             graph.setRootNode('string');
-            assert.deepStrictEqual(graph.module.result.schema, { type: 'string' });
+            assert.deepStrictEqual(graph.moduleSpec.result.schema, { type: 'string' });
             graph.setRootNode(null);
-            assert.deepStrictEqual(graph.module.result.schema, { type: 'any' });
+            assert.deepStrictEqual(graph.moduleSpec.result.schema, { type: 'any' });
         });
 
     });

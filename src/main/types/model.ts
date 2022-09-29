@@ -5,7 +5,7 @@ import { ModuleSpec } from './module.js';
 export type GraphRefs = Record<string, string>;
 
 export interface GraphSpec {
-    module: ModuleSpec;
+    moduleSpec: ModuleSpec;
     nodes: NodeSpec[];
     rootNodeId: string;
     refs: GraphRefs;

@@ -9,7 +9,7 @@ export const GraphSpecSchema = new Schema<GraphSpec>({
     id: 'GraphSpec',
     type: 'object',
     properties: {
-        module: ModuleSpecSchema.schema,
+        moduleSpec: ModuleSpecSchema.schema,
         rootNodeId: { type: 'string' },
         nodes: {
             type: 'array',

@@ -8,7 +8,7 @@ import { Node, NodeLink } from './Node.js';
 
 export class Graph implements GraphSpec {
 
-    module!: ModuleSpec;
+    moduleSpec!: ModuleSpec;
     rootNodeId!: string;
     nodes: Node[] = [];
     refs: GraphRefs = {};
@@ -55,7 +55,7 @@ export class Graph implements GraphSpec {
         const node = nodeId ? this.getNodeById(nodeId) : null;
         const resultSchema: DataSchemaSpec = node == null ? { type: 'any' } : node.$module.result.schema;
         this.rootNodeId = node ? node.id : '';
-        this.module.result.schema = resultSchema;
+        this.moduleSpec.result.schema = resultSchema;
     }
 
     async createNode(spec: AddNodeSpec) {
@@ -208,7 +208,7 @@ export class Graph implements GraphSpec {
         for (const node of this.nodes) {
             node.applyInvariants();
         }
-        this.module.result.async = this.nodes.some(_ => _.$module.result.async);
+        this.moduleSpec.result.async = this.nodes.some(_ => _.$module.result.async);
     }
 
 }
