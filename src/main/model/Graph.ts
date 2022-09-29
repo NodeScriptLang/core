@@ -1,7 +1,7 @@
 import { DeepPartial } from '@flexent/schema';
 
 import { GraphSpecSchema } from '../schema/index.js';
-import { AddNodeSpec, DataSchemaSpec, GraphMetadata, GraphRefs, GraphSpec, ModuleSpec } from '../types/index.js';
+import { AddNodeSpec, DataSchemaSpec, GraphRefs, GraphSpec, ModuleSpec } from '../types/index.js';
 import { MultiMap, serialize, shortId } from '../util/index.js';
 import { GraphLoader } from './GraphLoader.js';
 import { Node, NodeLink } from './Node.js';
@@ -12,7 +12,7 @@ export class Graph implements GraphSpec {
     rootNodeId!: string;
     nodes: Node[] = [];
     refs: GraphRefs = {};
-    metadata: GraphMetadata = {};
+    metadata: Record<string, any> = {};
 
     protected $nodeMap = new Map<string, Node>();
 

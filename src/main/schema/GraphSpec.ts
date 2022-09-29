@@ -1,7 +1,6 @@
 import { Schema } from '@flexent/schema';
 
 import { GraphSpec } from '../types/model.js';
-import { GraphMetadataSchema } from './GraphMetadata.js';
 import { GraphRefsSchema } from './GraphRefs.js';
 import { ModuleSpecSchema } from './ModuleSpec.js';
 import { NodeSpecSchema } from './NodeSpec.js';
@@ -17,6 +16,10 @@ export const GraphSpecSchema = new Schema<GraphSpec>({
             items: NodeSpecSchema.schema,
         },
         refs: GraphRefsSchema.schema,
-        metadata: GraphMetadataSchema.schema,
+        metadata: {
+            type: 'object',
+            properties: {},
+            additionalProperties: { type: 'any' },
+        },
     }
 });
