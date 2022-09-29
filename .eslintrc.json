@@ -1,7 +1,5 @@
 {
     "extends": [
-        "@ubio/eslint-config"
-    ],
-    "rules": {
-    }
+        "@flexent/eslint-config"
+    ]
 }
