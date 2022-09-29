@@ -11,7 +11,7 @@ export const safeId = customAlphabet(safeAlphabet, 24);
 export const IdSchema = new Schema<string>({
     id: 'Id',
     type: 'string',
-    regex: '^[a-zA-Z0-9_-]{1,64}$',
+    regex: '^[a-zA-Z0-9._-]{1,64}$',
     default: () => safeId(),
 });
 
