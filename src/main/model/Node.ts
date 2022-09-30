@@ -196,11 +196,11 @@ export class Node implements NodeSpec {
      * Returns the property that will be used to reroute the links
      * when the node is muted or detached.
      *
-     * Unless specified explicitly in NodeMetadata, the first property is used.
+     * Unless specified explicitly in ModuleSpec, the first property is used.
      */
     getDefaultProp(): Prop | null {
         const firstProp = this.props[0];
-        // TODO add support to customize via NodeMetadata
+        // TODO add support to customize via ModuleSpec
         return firstProp ?? null;
     }
 

@@ -172,7 +172,7 @@ class GraphCompilerContext {
         });
     }
 
-    private emitNodePreamble(node: Node) {
+    private emitNodePreamble(_node: Node) {
         this.code.line(`const {` +
             `convertType:${this.sym.convertType},` +
             `toArray:${this.sym.toArray},` +
@@ -218,6 +218,9 @@ class GraphCompilerContext {
         switch (node.$moduleUrl) {
             case 'core:Param': return this.emitParamNode(node, resSym);
             case 'core:Local': return this.emitLocalNode(node, resSym);
+            case 'core:EvalSync': return this.emitEvalSync(node, resSym);
+            case 'core:EvalAsync': return this.emitEvalAsync(node, resSym);
+            case 'core:EvalJson': return this.emitEvalJson(node, resSym);
             default:
                 if (!node.$module.computeUrl) {
                     // TODO emit undefined
@@ -244,6 +247,49 @@ class GraphCompilerContext {
     private emitLocalNode(node: Node, resSym: string) {
         const prop = node.getBasePropByKey('key')!;
         this.code.line(`${resSym} = ctx.getLocal(${JSON.stringify(prop.value)});`);
+    }
+
+    private emitEvalSync(node: Node, resSym: string) {
+        const code = node.props.find(_ => _.key === 'code')?.value ?? '';
+        this.code.block(`const $p = {`, `}`, () => {
+            const prop = node.getBasePropByKey('args');
+            if (prop) {
+                this.emitNodeProp(node, prop);
+            }
+        });
+        const args = node.props.find(_ => _.key === 'args')?.entries ?? [];
+        const argList = args.map(_ => _.key).join(',');
+        const argVals = args.map(_ => `$p.args[${JSON.stringify(_.key)}]`).join(',');
+        this.code.block(`${resSym} = ((${argList}) => {`, `})(${argVals})`, () => {
+            this.code.line(code);
+        });
+    }
+
+    private emitEvalAsync(node: Node, resSym: string) {
+        const code = node.props.find(_ => _.key === 'code')?.value ?? '';
+        this.code.block(`const $p = {`, `}`, () => {
+            const prop = node.getBasePropByKey('args');
+            if (prop) {
+                this.emitNodeProp(node, prop);
+            }
+        });
+        const args = node.props.find(_ => _.key === 'args')?.entries ?? [];
+        const argList = args.map(_ => _.key).join(',');
+        const argVals = args.map(_ => `$p.args[${JSON.stringify(_.key)}]`).join(',');
+        this.code.block(`${resSym} = await (async (${argList}) => {`, `})(${argVals})`, () => {
+            this.code.line(code);
+        });
+    }
+
+    private emitEvalJson(node: Node, resSym: string) {
+        const code = node.props.find(_ => _.key === 'code')?.value ?? '';
+        try {
+            // Make sure it's actually a JSON
+            JSON.parse(code);
+            this.code.line(`${resSym} = ${code};`);
+        } catch (error: any) {
+            this.code.line(`throw new Error(${JSON.stringify(error.message)})`);
+        }
     }
 
     private emitRegularNode(node: Node, resSym: string) {

@@ -2,7 +2,6 @@ import { DeepPartial } from '@flexent/schema';
 
 import { ModuleSpecSchema } from '../schema/ModuleSpec.js';
 import * as systemNodes from '../system/index.js';
-import * as t from '../types/index.js';
 import { GraphSpec, ModuleDefinition, ModuleSpec } from '../types/index.js';
 import { Graph } from './Graph.js';
 
@@ -23,6 +22,9 @@ export class StandardGraphLoader implements GraphLoader {
         this.defineModule('core:Frame', systemNodes.Frame);
         this.defineModule('core:Local', systemNodes.Local);
         this.defineModule('core:Param', systemNodes.Param);
+        this.defineModule('core:EvalSync', systemNodes.EvalSync);
+        this.defineModule('core:EvalAsync', systemNodes.EvalAsync);
+        this.defineModule('core:EvalJson', systemNodes.EvalJson);
     }
 
     async loadGraph(
@@ -64,7 +66,7 @@ export class StandardGraphLoader implements GraphLoader {
         return module;
     }
 
-    resolveModule(url: string): t.ModuleSpec {
+    resolveModule(url: string): ModuleSpec {
         return this.getModule(url) ?? this.createUnresolved(url);
     }
 
