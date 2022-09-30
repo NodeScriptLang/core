@@ -25,4 +25,7 @@ export const EvalJson: ModuleDefinition<P, R> = {
             type: 'any',
         }
     },
+    attributes: {
+        edgeUxRole: 'Json',
+    }
 };
