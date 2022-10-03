@@ -55,7 +55,7 @@ export class StandardGraphLoader implements GraphLoader {
     }
 
     resolveComputeUrl(moduleName: string): string {
-        return new URL(moduleName + '.json', this.registryUrl).toString();
+        return new URL(moduleName + '.mjs', this.registryUrl).toString();
     }
 
     resolveModule(moduleName: string): ModuleSpec {
