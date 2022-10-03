@@ -25,8 +25,5 @@ export const EvalJson: ModuleDefinition<P, R> = {
         schema: {
             type: 'any',
         }
-    },
-    attributes: {
-        edgeUxRole: 'Json',
     }
 };
