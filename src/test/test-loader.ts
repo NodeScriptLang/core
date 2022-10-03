@@ -11,10 +11,6 @@ import { runtime } from './runtime.js';
  */
 export class TestGraphLoader extends StandardGraphLoader {
 
-    constructor() {
-        super('');
-    }
-
     override resolveModuleUrl(moduleName: string): string {
         return runtime.makeUrl(`/out/test/modules/${moduleName}.js`);
     }

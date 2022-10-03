@@ -15,8 +15,9 @@ export interface GraphLoader {
 
 export class StandardGraphLoader implements GraphLoader {
     modules = new Map<string, ModuleSpec>();
+    registryUrl = 'https://registry.nodescript.dev';
 
-    constructor(readonly registryUrl: string) {
+    constructor() {
         this.defineModule('@system/Comment', systemNodes.Comment);
         this.defineModule('@system/Frame', systemNodes.Frame);
         this.defineModule('@system/Local', systemNodes.Local);
