@@ -11,8 +11,7 @@ describe('Graph', () => {
             const graph = await loader.loadGraph({});
             assert.strictEqual(graph.nodes.length, 0);
             const node = await graph.createNode({
-                moduleName: 'Any',
-                node: {},
+                ref: 'Any',
             });
             assert.ok(node);
             assert.strictEqual(graph.nodes.length, 1);
@@ -23,8 +22,7 @@ describe('Graph', () => {
             const loader = new TestGraphLoader();
             const graph = await loader.loadGraph({});
             const node = await graph.createNode({
-                moduleName: 'Param.Default',
-                node: {},
+                ref: 'Param.Default',
             });
             assert.strictEqual(node.props[0].key, 'value');
             assert.strictEqual(node.props[0].value, 'Hello');
@@ -34,12 +32,10 @@ describe('Graph', () => {
             const loader = new TestGraphLoader();
             const graph = await loader.loadGraph({});
             const node = await graph.createNode({
-                moduleName: 'Param.Default',
-                node: {
-                    props: [
-                        { key: 'value', value: 'Bye' }
-                    ]
-                },
+                ref: 'Param.Default',
+                props: [
+                    { key: 'value', value: 'Bye' }
+                ]
             });
             assert.strictEqual(node.props[0].key, 'value');
             assert.strictEqual(node.props[0].value, 'Bye');

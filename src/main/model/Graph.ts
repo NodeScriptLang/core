@@ -1,10 +1,12 @@
 import { DeepPartial } from '@flexent/schema';
 
 import { GraphSpecSchema } from '../schema/index.js';
-import { AddNodeSpec, DataSchemaSpec, GraphSpec, ModuleSpec } from '../types/index.js';
+import { DataSchemaSpec, GraphSpec, ModuleSpec, NodeSpec } from '../types/index.js';
 import { MultiMap, serialize } from '../util/index.js';
 import { GraphLoader } from './GraphLoader.js';
 import { Node, NodeLink } from './Node.js';
+
+export type CreateNodeSpec = { ref: string } & Omit<DeepPartial<NodeSpec>, 'ref'>;
 
 export class Graph implements GraphSpec {
 
@@ -51,16 +53,16 @@ export class Graph implements GraphSpec {
         this.moduleSpec.result.schema = resultSchema;
     }
 
-    async createNode(spec: AddNodeSpec) {
-        const { moduleName } = spec;
-        const module = await this.$loader.loadModule(moduleName);
+    async createNode(spec: CreateNodeSpec) {
+        const { ref } = spec;
+        const module = await this.$loader.loadModule(ref);
         const evalMode = module.evalMode;
         const node = new Node(this, {
-            ...spec.node,
-            ref: moduleName,
+            ...spec,
+            ref,
             metadata: {
                 evalMode,
-                ...spec.node?.metadata,
+                ...spec.metadata,
             }
         });
         this.addNodeRaw(node);

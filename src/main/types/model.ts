@@ -24,8 +24,3 @@ export interface PropSpec {
     expand: boolean;
     entries?: PropSpec[];
 }
-
-export interface AddNodeSpec {
-    moduleName: string;
-    node: DeepPartial<NodeSpec>;
-}
