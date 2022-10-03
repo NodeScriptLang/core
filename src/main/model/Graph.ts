@@ -1,8 +1,8 @@
 import { DeepPartial } from '@flexent/schema';
 
 import { GraphSpecSchema } from '../schema/index.js';
-import { AddNodeSpec, DataSchemaSpec, GraphRefs, GraphSpec, ModuleSpec } from '../types/index.js';
-import { MultiMap, serialize, shortId } from '../util/index.js';
+import { AddNodeSpec, DataSchemaSpec, GraphSpec, ModuleSpec } from '../types/index.js';
+import { MultiMap, serialize } from '../util/index.js';
 import { GraphLoader } from './GraphLoader.js';
 import { Node, NodeLink } from './Node.js';
 
@@ -11,20 +11,27 @@ export class Graph implements GraphSpec {
     moduleSpec!: ModuleSpec;
     rootNodeId!: string;
     nodes: Node[] = [];
-    refs: GraphRefs = {};
     metadata: Record<string, any> = {};
 
     protected $nodeMap = new Map<string, Node>();
 
-    constructor(readonly $loader: GraphLoader, data: DeepPartial<GraphSpec> = {}) {
-        const spec = GraphSpecSchema.decode(data);
-        Object.assign(this, spec);
+    private constructor(readonly $loader: GraphLoader, graphSpec: GraphSpec) {
+        Object.assign(this, graphSpec);
         this.nodes = [];
-        for (const n of spec.nodes) {
+        for (const n of graphSpec.nodes) {
             const node = new Node(this, n);
             this.addNodeRaw(node);
         }
         this.applyInvariants();
+    }
+
+    static async load($loader: GraphLoader, data: DeepPartial<GraphSpec> = {}) {
+        const spec = GraphSpecSchema.decode(data);
+        const refs = new Set(spec.nodes.map(_ => _.ref));
+        for (const moduleName of refs) {
+            await $loader.loadModule(moduleName);
+        }
+        return new Graph($loader, spec);
     }
 
     toJSON() {
@@ -33,14 +40,8 @@ export class Graph implements GraphSpec {
         });
     }
 
-    resolveRefUrl(ref: string): string {
-        const url = this.refs[ref] ?? '';
-        return url;
-    }
-
-    resolveModule(ref: string): ModuleSpec {
-        const url = this.resolveRefUrl(ref);
-        return this.$loader.resolveModule(url);
+    resolveModule(moduleName: string): ModuleSpec {
+        return this.$loader.resolveModule(moduleName);
     }
 
     getNodeById(id: string): Node | null {
@@ -59,12 +60,12 @@ export class Graph implements GraphSpec {
     }
 
     async createNode(spec: AddNodeSpec) {
-        const module = await this.$loader.loadModule(spec.url);
-        const ref = this.getRefForUrl(spec.url);
+        const { moduleName } = spec;
+        const module = await this.$loader.loadModule(moduleName);
         const evalMode = module.evalMode;
         const node = new Node(this, {
             ...spec.node,
-            ref,
+            ref: moduleName,
             metadata: {
                 evalMode,
                 ...spec.node?.metadata,
@@ -82,9 +83,6 @@ export class Graph implements GraphSpec {
 
     /**
      * Deletes the node.
-     *
-     * If its corresponding `ref` is no longer used, ref is also removed,
-     * thus guaranteeing that there are no extraneous refs left in graph.
      */
     deleteNode(nodeId: string) {
         this.$nodeMap.delete(nodeId);
@@ -95,12 +93,6 @@ export class Graph implements GraphSpec {
         this.nodes.splice(i, 1);
         if (this.rootNodeId === nodeId) {
             this.rootNodeId = '';
-        }
-        for (const key of Object.keys(this.refs)) {
-            const res = this.nodes.find(node => node.ref === key);
-            if (!res) {
-                delete this.refs[key];
-            }
         }
         this.applyInvariants();
         return true;
@@ -190,18 +182,6 @@ export class Graph implements GraphSpec {
                 this._computeOrder(order, linkNode);
             }
         }
-    }
-
-    protected getRefForUrl(url: string): string {
-        for (const [k, v] of Object.entries(this.refs)) {
-            if (v === url) {
-                return k;
-            }
-        }
-        // Generate a new one
-        const ref = shortId();
-        this.refs[ref] = url;
-        return ref;
     }
 
     applyInvariants() {

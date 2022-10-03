@@ -8,6 +8,7 @@ type P = {
 type R = Promise<unknown[]>;
 
 export const module: ModuleDefinition<P, R> = {
+    moduleName: 'Lambda.Map',
     label: 'Lambda.Map',
     description: 'Executes a function for each array element and returns an array of results.',
     params: {

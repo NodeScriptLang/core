@@ -86,6 +86,6 @@ export class ScopeEvalContext extends BaseContext {
 }
 
 export class NodePendingError extends Error {
-    name = this.constructor.name;
+    override name = this.constructor.name;
     code = 'EPENDING';
 }

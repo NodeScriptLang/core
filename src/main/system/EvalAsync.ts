@@ -8,6 +8,7 @@ type P = {
 type R = Promise<unknown>;
 
 export const EvalAsync: ModuleDefinition<P, R> = {
+    moduleName: '@system/EvalAsync',
     label: 'Eval Async',
     description: 'Evaluates asynchronous JavaScript code with provided arguments.',
     keywords: ['eval', 'compute', 'js', 'javascript', 'function', 'execute', 'expression', 'async'],

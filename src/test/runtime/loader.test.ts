@@ -1,14 +1,15 @@
 import assert from 'assert';
 
-import { runtime } from '../runtime.js';
+import { Graph } from '../../main/model/Graph.js';
 import { TestGraphLoader } from '../test-loader.js';
 
 describe('GraphLoader', () => {
 
-    it('loads modules from URL', async () => {
+    it('loads modules by moduleName', async () => {
         const loader = new TestGraphLoader();
-        const def = await loader.loadModule(runtime.defs['math.add']);
+        const def = await loader.loadModule('Math.Add');
         assert.deepStrictEqual(def, {
+            moduleName: 'Math.Add',
             label: 'Math.Add',
             labelParam: '',
             description: 'Computes a sum of two numbers.',
@@ -23,40 +24,34 @@ describe('GraphLoader', () => {
             cacheMode: 'auto',
             evalMode: 'auto',
             resizeMode: 'horizontal',
-            computeUrl: runtime.makeUrl('/out/test/defs/math.add.js'),
         });
     });
 
     it('loads all graph dependencies', async () => {
         const loader = new TestGraphLoader();
-        await loader.loadGraph({
+        await Graph.load(loader, {
             nodes: [
-                { ref: 'n1' }
+                { ref: 'Math.Add' },
+                { ref: 'String' },
             ],
-            refs: {
-                'n1': runtime.defs['math.add'],
-            }
         });
-        const def = loader.resolveModule(runtime.defs['math.add']);
-        assert.strictEqual(def.label, 'Math.Add');
+        assert.strictEqual(loader.resolveModule('Math.Add').label, 'Math.Add');
+        assert.strictEqual(loader.resolveModule('String').label, 'String');
     });
 
     it('allows graph node to resolve module definitions synchronously', async () => {
         const loader = new TestGraphLoader();
-        const graph = await loader.loadGraph({
+        const graph = await Graph.load(loader, {
             nodes: [
                 {
                     id: 'node1',
-                    ref: 'n1',
+                    ref: 'Math.Add',
                     props: [
                         { key: 'a', value: '12' },
                         { key: 'b', value: '21' },
                     ]
                 }
             ],
-            refs: {
-                'n1': runtime.defs['math.add'],
-            }
         });
         const node = graph.getNodeById('node1');
         const def = node!.$module;

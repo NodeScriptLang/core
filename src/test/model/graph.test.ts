@@ -1,6 +1,6 @@
 import assert from 'assert';
 
-import { runtime } from '../runtime.js';
+import { Graph } from '../../main/model/Graph.js';
 import { TestGraphLoader } from '../test-loader.js';
 
 describe('Graph', () => {
@@ -9,10 +9,10 @@ describe('Graph', () => {
 
         it('adds the node to the graph', async () => {
             const loader = new TestGraphLoader();
-            const graph = await loader.loadGraph();
+            const graph = await Graph.load(loader);
             assert.strictEqual(graph.nodes.length, 0);
             const node = await graph.createNode({
-                url: runtime.defs['any'],
+                moduleName: 'Any',
                 node: {},
             });
             assert.ok(node);
@@ -20,60 +20,11 @@ describe('Graph', () => {
             assert.strictEqual(graph.nodes[0], node);
         });
 
-        it('adds a url to refs', async () => {
-            const loader = new TestGraphLoader();
-            const graph = await loader.loadGraph();
-            assert.strictEqual(Object.keys(graph.refs).length, 0);
-            const url = runtime.defs['math.add'];
-            const node = await graph.createNode({
-                url,
-                node: {},
-            });
-            assert.strictEqual(Object.keys(graph.refs).length, 1);
-            assert.strictEqual(graph.refs[node.ref], url);
-        });
-
-        it('does not add the same url twice', async () => {
-            const loader = new TestGraphLoader();
-            const graph = await loader.loadGraph();
-            assert.strictEqual(Object.keys(graph.refs).length, 0);
-            const url = runtime.defs['math.add'];
-            const node1 = await graph.createNode({
-                url,
-                node: {},
-            });
-            const node2 = await graph.createNode({
-                url,
-                node: {},
-            });
-            assert.strictEqual(Object.keys(graph.refs).length, 1);
-            assert.strictEqual(graph.refs[node1.ref], url);
-            assert.strictEqual(graph.refs[node1.ref], graph.refs[node2.ref]);
-        });
-
-        it('different urls will save to different refs', async () => {
-            const loader = new TestGraphLoader();
-            const graph = await loader.loadGraph();
-            assert.strictEqual(Object.keys(graph.refs).length, 0);
-            const url1 = runtime.defs['math.add'];
-            const url2 = runtime.defs['any'];
-            const node1 = await graph.createNode({
-                url: url1,
-                node: {},
-            });
-            const node2 = await graph.createNode({
-                url: url2,
-                node: {},
-            });
-            assert.strictEqual(Object.keys(graph.refs).length, 2);
-            assert.notEqual(graph.refs[node1.ref], graph.refs[node2.ref]);
-        });
-
         it('sets the default param value if not explicitly specified', async () => {
             const loader = new TestGraphLoader();
-            const graph = await loader.loadGraph();
+            const graph = await Graph.load(loader);
             const node = await graph.createNode({
-                url: runtime.defs['param.default'],
+                moduleName: 'Param.Default',
                 node: {},
             });
             assert.strictEqual(node.props[0].key, 'value');
@@ -82,9 +33,9 @@ describe('Graph', () => {
 
         it('sets the actual param value when explicitly specified', async () => {
             const loader = new TestGraphLoader();
-            const graph = await loader.loadGraph();
+            const graph = await Graph.load(loader);
             const node = await graph.createNode({
-                url: runtime.defs['param.default'],
+                moduleName: 'Param.Default',
                 node: {
                     props: [
                         { key: 'value', value: 'Bye' }
@@ -99,13 +50,13 @@ describe('Graph', () => {
 
     describe('deleteNode', () => {
 
-        it('removes the correct node', async () => {
+        it('removes the node', async () => {
             const loader = new TestGraphLoader();
-            const graph = await loader.loadGraph({
+            const graph = await Graph.load(loader, {
                 nodes: [
                     {
                         id: 'res',
-                        ref: 'add',
+                        ref: 'Math.Add',
                         props: [
                             { key: 'a', linkId: 'p' },
                             { key: 'b', linkId: 'p' },
@@ -113,54 +64,17 @@ describe('Graph', () => {
                     },
                     {
                         id: 'p',
-                        ref: 'string',
+                        ref: 'String',
                         props: [
                             { key: 'value', value: '42' },
                         ]
                     }
-                ],
-                refs: {
-                    add: runtime.defs['math.add'],
-                    string: runtime.defs['string'],
-                }
+                ]
             });
             assert.strictEqual(Object.keys(graph.nodes).length, 2);
             graph.deleteNode('res');
             assert.strictEqual(Object.keys(graph.nodes).length, 1);
             assert.strictEqual(graph.nodes[0]['id'], 'p');
-        });
-
-        it('only removes unused refs', async () => {
-            const loader = new TestGraphLoader();
-            const graph = await loader.loadGraph({
-                nodes: [
-                    {
-                        id: 'res',
-                        ref: 'add',
-                        props: [
-                            { key: 'a', linkId: 'p' },
-                            { key: 'b', linkId: 'p' },
-                        ]
-                    },
-                    {
-                        id: 'p',
-                        ref: 'string',
-                        props: [
-                            { key: 'value', value: '42' },
-                        ]
-                    }
-                ],
-                refs: {
-                    add: runtime.defs['math.add'],
-                    string: runtime.defs['string'],
-                }
-            });
-            assert.strictEqual(Object.keys(graph.nodes).length, 2);
-            assert.strictEqual(Object.keys(graph.refs).length, 2);
-            graph.deleteNode('res');
-            assert.strictEqual(Object.keys(graph.nodes).length, 1);
-            assert.strictEqual(Object.keys(graph.refs).length, 1);
-            assert.strictEqual(Object.keys(graph.refs)[0], 'string');
         });
 
     });
@@ -169,18 +83,18 @@ describe('Graph', () => {
 
         it('recreates the links attached to the first property', async () => {
             const loader = new TestGraphLoader();
-            const graph = await loader.loadGraph({
+            const graph = await Graph.load(loader, {
                 nodes: [
                     {
                         id: 'res',
-                        ref: 'any',
+                        ref: 'Any',
                         props: [
                             { key: 'value', linkId: 'add' },
                         ]
                     },
                     {
                         id: 'obj',
-                        ref: 'obj',
+                        ref: 'Object',
                         props: [
                             {
                                 key: 'properties',
@@ -193,7 +107,7 @@ describe('Graph', () => {
                     },
                     {
                         id: 'add',
-                        ref: 'add',
+                        ref: 'Math.Add',
                         props: [
                             { key: 'a', linkId: 'a' },
                             { key: 'b', linkId: 'b' },
@@ -201,25 +115,19 @@ describe('Graph', () => {
                     },
                     {
                         id: 'a',
-                        ref: 'number',
+                        ref: 'Number',
                         props: [
                             { key: 'value', value: '42' },
                         ]
                     },
                     {
                         id: 'b',
-                        ref: 'number',
+                        ref: 'Number',
                         props: [
                             { key: 'value', value: '37' },
                         ]
                     }
                 ],
-                refs: {
-                    add: runtime.defs['math.add'],
-                    number: runtime.defs['number'],
-                    obj: runtime.defs['object'],
-                    any: runtime.defs['any'],
-                }
             });
             const resNode = graph.getNodeById('res')!;
             assert.strictEqual(resNode.props[0].linkId, 'add');
@@ -232,18 +140,18 @@ describe('Graph', () => {
 
         it('recreates the links through the first connected entry', async () => {
             const loader = new TestGraphLoader();
-            const graph = await loader.loadGraph({
+            const graph = await Graph.load(loader, {
                 nodes: [
                     {
                         id: 'res',
-                        ref: 'any',
+                        ref: 'Any',
                         props: [
                             { key: 'value', linkId: 'obj' },
                         ]
                     },
                     {
                         id: 'obj',
-                        ref: 'obj',
+                        ref: 'Object',
                         props: [
                             {
                                 key: 'properties',
@@ -256,24 +164,19 @@ describe('Graph', () => {
                     },
                     {
                         id: 'a',
-                        ref: 'number',
+                        ref: 'Number',
                         props: [
                             { key: 'value', value: '42' },
                         ]
                     },
                     {
                         id: 'b',
-                        ref: 'number',
+                        ref: 'Number',
                         props: [
                             { key: 'value', value: '37' },
                         ]
                     }
                 ],
-                refs: {
-                    number: runtime.defs['number'],
-                    obj: runtime.defs['object'],
-                    any: runtime.defs['any'],
-                }
             });
             const resNode = graph.getNodeById('res')!;
             assert.strictEqual(resNode.props[0].linkId, 'obj');
@@ -287,21 +190,18 @@ describe('Graph', () => {
 
         it('removes extra properties not supported by node definition', async () => {
             const loader = new TestGraphLoader();
-            const graph = await loader.loadGraph({
+            const graph = await Graph.load(loader, {
                 nodes: [
                     {
                         id: 'res',
-                        ref: 'add',
+                        ref: 'Math.Add',
                         props: [
                             { key: 'c', value: '10' },
                             { key: 'a', value: '12' },
                             { key: 'b', value: '21' },
                         ]
                     }
-                ],
-                refs: {
-                    add: runtime.defs['math.add'],
-                }
+                ]
             });
             const node = graph.getNodeById('res');
             assert.strictEqual(node?.props.length, 2);
@@ -311,20 +211,17 @@ describe('Graph', () => {
 
         it('keeps firstmost properties when extra properties are present', async () => {
             const loader = new TestGraphLoader();
-            const graph = await loader.loadGraph({
+            const graph = await Graph.load(loader, {
                 nodes: [
                     {
                         id: 'p',
-                        ref: 'string',
+                        ref: 'String',
                         props: [
                             { key: 'value', value: '42' },
                             { key: 'value', value: '68' },
                         ]
                     }
-                ],
-                refs: {
-                    string: runtime.defs['string'],
-                }
+                ]
             });
             const node = graph.getNodeById('p');
             assert.strictEqual(node?.props.length, 1);
@@ -333,20 +230,17 @@ describe('Graph', () => {
 
         it('ensures the correct order of properties', async () => {
             const loader = new TestGraphLoader();
-            const graph = await loader.loadGraph({
+            const graph = await Graph.load(loader, {
                 nodes: [
                     {
                         id: 'res',
-                        ref: 'add',
+                        ref: 'Math.Add',
                         props: [
                             { key: 'b', value: '21' },
                             { key: 'a', value: '12' },
                         ]
                     }
-                ],
-                refs: {
-                    add: runtime.defs['math.add'],
-                }
+                ]
             });
             const node = graph.getNodeById('res');
             assert.strictEqual(node?.props[0].key, 'a');
@@ -355,16 +249,13 @@ describe('Graph', () => {
 
         it('initializes all node properties with default values', async () => {
             const loader = new TestGraphLoader();
-            const graph = await loader.loadGraph({
+            const graph = await Graph.load(loader, {
                 nodes: [
                     {
                         id: 'res',
-                        ref: 'add',
+                        ref: 'Math.Add',
                     }
-                ],
-                refs: {
-                    add: runtime.defs['math.add'],
-                }
+                ]
             });
             const node = graph.getNodeById('res');
             assert.strictEqual(node?.props.length, 2);
@@ -374,26 +265,23 @@ describe('Graph', () => {
 
         it('removes the first link of two looped nodes', async () => {
             const loader = new TestGraphLoader();
-            const graph = await loader.loadGraph({
+            const graph = await Graph.load(loader, {
                 nodes: [
                     {
                         id: 'res',
-                        ref: 'string',
+                        ref: 'String',
                         props: [
                             { key: 'value', value: '42', linkId: 'p' },
                         ]
                     },
                     {
                         id: 'p',
-                        ref: 'string',
+                        ref: 'String',
                         props: [
                             { key: 'value', value: '42', linkId: 'res' },
                         ]
                     }
                 ],
-                refs: {
-                    string: runtime.defs['string']
-                }
             });
             const node1 = graph.getNodeById('res');
             const node2 = graph.getNodeById('p');
@@ -403,32 +291,23 @@ describe('Graph', () => {
 
         it('sets module.result.async = false when all nodes are sync', async () => {
             const loader = new TestGraphLoader();
-            const graph = await loader.loadGraph({
+            const graph = await Graph.load(loader, {
                 nodes: [
-                    { ref: 'add' },
-                    { ref: 'string' },
+                    { ref: 'Math.Add' },
+                    { ref: 'String' },
                 ],
-                refs: {
-                    string: runtime.defs['string'],
-                    add: runtime.defs['math.add'],
-                }
             });
             assert.strictEqual(graph.moduleSpec.result.async, false);
         });
 
         it('sets module.result.async = true if at least one node is async', async () => {
             const loader = new TestGraphLoader();
-            const graph = await loader.loadGraph({
+            const graph = await Graph.load(loader, {
                 nodes: [
-                    { ref: 'add' },
-                    { ref: 'string' },
-                    { ref: 'promise' },
+                    { ref: 'Math.Add' },
+                    { ref: 'String' },
+                    { ref: 'Promise' },
                 ],
-                refs: {
-                    string: runtime.defs['string'],
-                    add: runtime.defs['math.add'],
-                    promise: runtime.defs['promise'],
-                }
             });
             assert.strictEqual(graph.moduleSpec.result.async, true);
         });
@@ -439,15 +318,11 @@ describe('Graph', () => {
 
         it('updates graph.metadata.result schema to match the result type of node', async () => {
             const loader = new TestGraphLoader();
-            const graph = await loader.loadGraph({
+            const graph = await Graph.load(loader, {
                 nodes: [
-                    { id: 'add', ref: 'add' },
-                    { id: 'string', ref: 'string' },
+                    { id: 'add', ref: 'Math.Add' },
+                    { id: 'string', ref: 'String' },
                 ],
-                refs: {
-                    string: runtime.defs['string'],
-                    add: runtime.defs['math.add'],
-                }
             });
             assert.deepStrictEqual(graph.moduleSpec.result.schema, { type: 'any' });
             graph.setRootNode('add');

@@ -1,25 +1,30 @@
 import { ModuleCompute, ModuleDefinition } from '../../main/types/index.js';
 
-type P = { value: unknown };
-type R = number;
+type P = {
+    value: string;
+};
+
+type R = string;
 
 export const module: ModuleDefinition<P, R> = {
-    label: 'Number',
-    description: 'Converts the value into a number.',
+    moduleName: 'Param.Default',
+    label: 'Default Param',
+    description: 'A node that has a parameter with default value',
     params: {
         value: {
             schema: {
-                type: 'any'
+                type: 'string',
+                default: 'Hello',
             }
         },
     },
     result: {
         schema: {
-            type: 'number',
+            type: 'string',
         }
-    }
+    },
 };
 
 export const compute: ModuleCompute<P, R> = params => {
-    return Number(params.value);
+    return String(params.value);
 };

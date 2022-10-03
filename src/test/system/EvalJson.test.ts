@@ -13,7 +13,7 @@ describe('EvalJson', () => {
             nodes: [
                 {
                     id: 'res',
-                    ref: 'evalJson',
+                    ref: '@system/EvalJson',
                     props: [
                         {
                             key: 'code',
@@ -22,9 +22,6 @@ describe('EvalJson', () => {
                     ]
                 }
             ],
-            refs: {
-                evalJson: 'core:EvalJson',
-            }
         });
         const code = new GraphCompiler().compileComputeEsm(graph);
         const { compute } = await evalEsmModule(code);

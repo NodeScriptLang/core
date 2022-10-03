@@ -1,73 +1,53 @@
-import { DeepPartial } from '@flexent/schema';
-
 import { ModuleSpecSchema } from '../schema/ModuleSpec.js';
 import * as systemNodes from '../system/index.js';
-import { GraphSpec, ModuleDefinition, ModuleSpec } from '../types/index.js';
-import { Graph } from './Graph.js';
+import { ModuleDefinition, ModuleSpec } from '../types/index.js';
 
 export interface GraphLoaderOptions {
     ignoreFailedDefs?: boolean;
 }
 
 export interface GraphLoader {
-    resolveModule(url: string): ModuleSpec;
-    loadModule(url: string): Promise<ModuleSpec>;
+    resolveModuleUrl(moduleName: string): string;
+    resolveComputeUrl(moduleName: string): string;
+    resolveModule(moduleName: string): ModuleSpec;
+    loadModule(moduleName: string): Promise<ModuleSpec>;
 }
 
 export class StandardGraphLoader implements GraphLoader {
     modules = new Map<string, ModuleSpec>();
 
-    constructor() {
-        this.defineModule('core:Comment', systemNodes.Comment);
-        this.defineModule('core:Frame', systemNodes.Frame);
-        this.defineModule('core:Local', systemNodes.Local);
-        this.defineModule('core:Param', systemNodes.Param);
-        this.defineModule('core:EvalSync', systemNodes.EvalSync);
-        this.defineModule('core:EvalAsync', systemNodes.EvalAsync);
-        this.defineModule('core:EvalJson', systemNodes.EvalJson);
+    constructor(readonly registryUrl: string) {
+        this.defineModule('@system/Comment', systemNodes.Comment);
+        this.defineModule('@system/Frame', systemNodes.Frame);
+        this.defineModule('@system/Local', systemNodes.Local);
+        this.defineModule('@system/Param', systemNodes.Param);
+        this.defineModule('@system/EvalSync', systemNodes.EvalSync);
+        this.defineModule('@system/EvalAsync', systemNodes.EvalAsync);
+        this.defineModule('@system/EvalJson', systemNodes.EvalJson);
     }
 
-    async loadGraph(
-        spec: DeepPartial<GraphSpec> = {},
-        options: GraphLoaderOptions = {},
-    ): Promise<Graph> {
-        const { ignoreFailedDefs = false } = options;
-        const { refs = {} } = spec;
-        const promises = [];
-        for (const url of Object.values(refs)) {
-            if (!url) {
-                continue;
-            }
-            const promise = this.loadModule(url)
-                .catch(error => {
-                    if (ignoreFailedDefs) {
-                        return;
-                    }
-                    throw error;
-                });
-            promises.push(promise);
-        }
-        await Promise.all(promises);
-        return new Graph(this, spec);
+    resolveModuleUrl(moduleName: string) {
+        return new URL(moduleName + '.json', this.registryUrl).toString();
     }
 
-    async loadModule(url: string): Promise<ModuleSpec> {
-        const existing = this.getModule(url);
+    resolveComputeUrl(moduleName: string): string {
+        return new URL(moduleName + '.json', this.registryUrl).toString();
+    }
+
+    resolveModule(moduleName: string): ModuleSpec {
+        return this.getModule(moduleName) ?? this.createUnresolved(moduleName);
+    }
+
+    async loadModule(moduleName: string): Promise<ModuleSpec> {
+        const existing = this.getModule(moduleName);
         if (existing) {
             // Do not import twice
             return existing;
         }
-        if (url.startsWith('core:')) {
-            // Do not import core:
-            return existing ?? this.createUnresolved(url);
-        }
-        const module = await this.fetchModule(url);
-        this.modules.set(url, module);
+        const moduleUrl = this.resolveModuleUrl(moduleName);
+        const module = await this.fetchModule(moduleUrl);
+        this.modules.set(moduleName, module);
         return module;
-    }
-
-    resolveModule(url: string): ModuleSpec {
-        return this.getModule(url) ?? this.createUnresolved(url);
     }
 
     getModule(url: string) {
@@ -99,12 +79,13 @@ export class StandardGraphLoader implements GraphLoader {
         return ModuleSpecSchema.decode(json);
     }
 
-    protected createUnresolved(url: string): ModuleSpec {
+    protected createUnresolved(moduleName: string): ModuleSpec {
         return {
+            moduleName: 'System.Unresolved',
             label: 'Unresolved',
             labelParam: '',
             keywords: [],
-            description: `Module ${url} not found`,
+            description: `Module ${moduleName} not found`,
             deprecated: '',
             hidden: true,
             params: {},
@@ -119,14 +100,14 @@ export class StandardGraphLoader implements GraphLoader {
 }
 
 export class UnresolvedNodeError extends Error {
-    name = this.constructor.name;
+    override name = this.constructor.name;
     status = 500;
 }
 
 export class ModuleLoadFailedError extends Error {
-    name = this.constructor.name;
+    override name = this.constructor.name;
 
-    constructor(readonly message: string, readonly status = 500) {
+    constructor(override readonly message: string, readonly status = 500) {
         super(message);
     }
 }

@@ -11,6 +11,9 @@ export const ModuleSpecSchema = new Schema<ModuleSpec>({
     id: 'ModuleSpec',
     type: 'object',
     properties: {
+        moduleName: {
+            type: 'string',
+        },
         label: {
             type: 'string',
         },
@@ -41,22 +44,6 @@ export const ModuleSpecSchema = new Schema<ModuleSpec>({
         cacheMode: NodeCacheModeSchema.schema,
         evalMode: NodeEvalModeSchema.schema,
         resizeMode: NodeResizeModeSchema.schema,
-        computeUrl: {
-            type: 'string',
-            optional: true,
-        },
-        bundleUrl: {
-            type: 'string',
-            optional: true,
-        },
-        sourceUrl: {
-            type: 'string',
-            optional: true,
-        },
-        exampleUrl: {
-            type: 'string',
-            optional: true,
-        },
         attributes: {
             type: 'object',
             properties: {},

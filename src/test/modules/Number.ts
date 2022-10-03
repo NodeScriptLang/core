@@ -1,14 +1,12 @@
 import { ModuleCompute, ModuleDefinition } from '../../main/types/index.js';
 
-type P = {
-    value: unknown;
-};
-
-type R = string;
+type P = { value: unknown };
+type R = number;
 
 export const module: ModuleDefinition<P, R> = {
-    label: 'String',
-    description: 'Converts the value into a string.',
+    moduleName: 'Number',
+    label: 'Number',
+    description: 'Converts the value into a number.',
     params: {
         value: {
             schema: {
@@ -18,11 +16,11 @@ export const module: ModuleDefinition<P, R> = {
     },
     result: {
         schema: {
-            type: 'string',
+            type: 'number',
         }
-    },
+    }
 };
 
 export const compute: ModuleCompute<P, R> = params => {
-    return String(params.value);
+    return Number(params.value);
 };

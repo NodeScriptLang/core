@@ -1,9 +1,11 @@
 import assert from 'assert';
 
+import { Graph } from '../../main/model/Graph.js';
 import { GraphCompiler, GraphEvalContext } from '../../main/runtime/index.js';
 import * as t from '../../main/types/index.js';
 import { codeToUrl, evalEsmModule } from '../../main/util/index.js';
 import { runtime } from '../runtime.js';
+import { TestGraphLoader } from '../test-loader.js';
 
 describe('GraphCompiler', () => {
 
@@ -15,16 +17,13 @@ describe('GraphCompiler', () => {
                 nodes: [
                     {
                         id: 'res',
-                        ref: 'add',
+                        ref: 'Math.Add',
                         props: [
                             { key: 'a', value: '12' },
                             { key: 'b', value: '21' },
                         ]
                     }
                 ],
-                refs: {
-                    add: runtime.defs['math.add'],
-                }
             });
             const code = new GraphCompiler().compileComputeEsm(graph);
             const { compute } = await evalEsmModule(code);
@@ -39,24 +38,20 @@ describe('GraphCompiler', () => {
                 nodes: [
                     {
                         id: 'p1',
-                        ref: 'param',
+                        ref: '@system/Param',
                         props: [
                             { key: 'key', value: 'value' },
                         ]
                     },
                     {
                         id: 'res',
-                        ref: 'add',
+                        ref: 'Math.Add',
                         props: [
                             { key: 'a', linkId: 'p1' },
                             { key: 'b', value: '21' },
                         ]
                     }
-                ],
-                refs: {
-                    add: runtime.defs['math.add'],
-                    param: 'core:Param',
-                }
+                ]
             });
             const code = new GraphCompiler().compileComputeEsm(graph, {
                 introspect: true,
@@ -87,24 +82,20 @@ describe('GraphCompiler', () => {
                 nodes: [
                     {
                         id: 'p1',
-                        ref: 'param',
+                        ref: '@system/Param',
                         props: [
                             { key: 'key', value: 'value' },
                         ]
                     },
                     {
                         id: 'res',
-                        ref: 'add',
+                        ref: 'Math.Add',
                         props: [
                             { key: 'a', linkId: 'p1' },
                             { key: 'b', value: '1' },
                         ]
                     }
                 ],
-                refs: {
-                    param: 'core:Param',
-                    add: runtime.defs['math.add'],
-                }
             });
             const code = new GraphCompiler().compileComputeEsm(graph);
             const { compute } = await evalEsmModule(code);
@@ -120,8 +111,8 @@ describe('GraphCompiler', () => {
     describe('custom graphs', () => {
 
         it('can compile graph and use it as a node', async () => {
-            const loader = await runtime.createLoader();
-            const graph1 = await loader.loadGraph({
+            const loader = new TestGraphLoader();
+            const graph1 = await Graph.load(loader, {
                 moduleSpec: {
                     params: {
                         val: {
@@ -138,42 +129,37 @@ describe('GraphCompiler', () => {
                 nodes: [
                     {
                         id: 'p1',
-                        ref: 'param',
+                        ref: '@system/Param',
                         props: [
                             { key: 'key', value: 'val' },
                         ]
                     },
                     {
                         id: 'res',
-                        ref: 'add',
+                        ref: 'Math.Add',
                         props: [
                             { key: 'a', linkId: 'p1' },
                             { key: 'b', value: '1' },
                         ]
                     }
                 ],
-                refs: {
-                    param: 'core:Param',
-                    add: runtime.defs['math.add'],
-                }
             });
             const code1 = new GraphCompiler().compileComputeEsm(graph1);
-            graph1.moduleSpec.computeUrl = codeToUrl(code1);
+            graph1.moduleSpec.attributes = {
+                customImportUrl: codeToUrl(code1),
+            };
             loader.defineModule('graph1', graph1.moduleSpec);
-            const graph = await loader.loadGraph({
+            const graph = await Graph.load(loader, {
                 rootNodeId: 'res',
                 nodes: [
                     {
                         id: 'res',
-                        ref: 'a',
+                        ref: 'graph1',
                         props: [
                             { key: 'val', value: '123' },
                         ]
                     }
                 ],
-                refs: {
-                    'a': 'graph1',
-                }
             });
             const code2 = new GraphCompiler().compileComputeEsm(graph);
             const { compute } = await evalEsmModule(code2);
@@ -191,23 +177,19 @@ describe('GraphCompiler', () => {
                 nodes: [
                     {
                         id: 'res',
-                        ref: 'number',
+                        ref: 'Number',
                         props: [
                             { key: 'value', linkId: 'p' },
                         ]
                     },
                     {
                         id: 'p',
-                        ref: 'string',
+                        ref: 'String',
                         props: [
                             { key: 'value', value: '42' },
                         ]
                     }
                 ],
-                refs: {
-                    string: runtime.defs['string'],
-                    number: runtime.defs['number'],
-                }
             });
             const code = new GraphCompiler().compileComputeEsm(graph);
             const { compute } = await evalEsmModule(code);
@@ -222,23 +204,19 @@ describe('GraphCompiler', () => {
                 nodes: [
                     {
                         id: 'res',
-                        ref: 'any',
+                        ref: 'Any',
                         props: [
                             { key: 'value', linkId: 'p' },
                         ]
                     },
                     {
                         id: 'p',
-                        ref: 'param',
+                        ref: '@system/Param',
                         props: [
                             { key: 'key', value: 'value' },
                         ]
                     }
                 ],
-                refs: {
-                    param: 'core:Param',
-                    any: runtime.defs['any'],
-                }
             });
             const code = new GraphCompiler().compileComputeEsm(graph);
             const { compute } = await evalEsmModule(code);
@@ -261,7 +239,7 @@ describe('GraphCompiler', () => {
                 nodes: [
                     {
                         id: 'res',
-                        ref: 'object',
+                        ref: 'Object',
                         props: [
                             {
                                 key: 'properties',
@@ -274,16 +252,12 @@ describe('GraphCompiler', () => {
                     },
                     {
                         id: 'num',
-                        ref: 'number',
+                        ref: 'Number',
                         props: [
                             { key: 'value', value: '42' }
                         ]
                     }
                 ],
-                refs: {
-                    number: runtime.defs['number'],
-                    object: runtime.defs['object'],
-                }
             });
             const code = new GraphCompiler().compileComputeEsm(graph);
             const { compute } = await evalEsmModule(code);
@@ -301,7 +275,7 @@ describe('GraphCompiler', () => {
                 nodes: [
                     {
                         id: 'res',
-                        ref: 'array',
+                        ref: 'Array',
                         props: [
                             {
                                 key: 'items',
@@ -314,16 +288,12 @@ describe('GraphCompiler', () => {
                     },
                     {
                         id: 'num',
-                        ref: 'number',
+                        ref: 'Number',
                         props: [
                             { key: 'value', value: '42' }
                         ]
                     }
                 ],
-                refs: {
-                    number: runtime.defs['number'],
-                    array: runtime.defs['array'],
-                }
             });
             const code = new GraphCompiler().compileComputeEsm(graph);
             const { compute } = await evalEsmModule(code);
@@ -338,7 +308,7 @@ describe('GraphCompiler', () => {
                 nodes: [
                     {
                         id: 'res',
-                        ref: 'array',
+                        ref: 'Array',
                         props: [
                             {
                                 key: 'items',
@@ -352,16 +322,12 @@ describe('GraphCompiler', () => {
                     },
                     {
                         id: 'p',
-                        ref: 'param',
+                        ref: '@system/Param',
                         props: [
                             { key: 'key', value: 'value' }
                         ]
                     }
                 ],
-                refs: {
-                    param: 'core:Param',
-                    array: runtime.defs['array'],
-                }
             });
             const code = new GraphCompiler().compileComputeEsm(graph);
             const { compute } = await evalEsmModule(code);
@@ -382,7 +348,7 @@ describe('GraphCompiler', () => {
                 nodes: [
                     {
                         id: 'res',
-                        ref: 'add',
+                        ref: 'Math.Add',
                         props: [
                             { key: 'a', linkId: 'arr', expand: true },
                             { key: 'b', value: '1' },
@@ -390,7 +356,7 @@ describe('GraphCompiler', () => {
                     },
                     {
                         id: 'arr',
-                        ref: 'array',
+                        ref: 'Array',
                         props: [
                             {
                                 key: 'items',
@@ -403,10 +369,6 @@ describe('GraphCompiler', () => {
                         ]
                     }
                 ],
-                refs: {
-                    array: runtime.defs['array'],
-                    add: runtime.defs['math.add'],
-                }
             });
             const code = new GraphCompiler().compileComputeEsm(graph);
             const { compute } = await evalEsmModule(code);
@@ -421,7 +383,7 @@ describe('GraphCompiler', () => {
                 nodes: [
                     {
                         id: 'res',
-                        ref: 'add',
+                        ref: 'Math.Add',
                         props: [
                             { key: 'a', linkId: 'arr', expand: true },
                             { key: 'b', linkId: 'arr', expand: true },
@@ -429,7 +391,7 @@ describe('GraphCompiler', () => {
                     },
                     {
                         id: 'arr',
-                        ref: 'array',
+                        ref: 'Array',
                         props: [
                             {
                                 key: 'items',
@@ -442,10 +404,6 @@ describe('GraphCompiler', () => {
                         ]
                     }
                 ],
-                refs: {
-                    array: runtime.defs['array'],
-                    add: runtime.defs['math.add'],
-                }
             });
             const code = new GraphCompiler().compileComputeEsm(graph);
             const { compute } = await evalEsmModule(code);
@@ -460,7 +418,7 @@ describe('GraphCompiler', () => {
                 nodes: [
                     {
                         id: 'res',
-                        ref: 'add',
+                        ref: 'Math.Add',
                         props: [
                             { key: 'a', linkId: 'arr1', expand: true },
                             { key: 'b', linkId: 'arr2', expand: true },
@@ -468,7 +426,7 @@ describe('GraphCompiler', () => {
                     },
                     {
                         id: 'arr1',
-                        ref: 'array',
+                        ref: 'Array',
                         props: [
                             {
                                 key: 'items',
@@ -482,7 +440,7 @@ describe('GraphCompiler', () => {
                     },
                     {
                         id: 'arr2',
-                        ref: 'array',
+                        ref: 'Array',
                         props: [
                             {
                                 key: 'items',
@@ -494,10 +452,6 @@ describe('GraphCompiler', () => {
                         ]
                     }
                 ],
-                refs: {
-                    array: runtime.defs['array'],
-                    add: runtime.defs['math.add'],
-                }
             });
             const code = new GraphCompiler().compileComputeEsm(graph);
             const { compute } = await evalEsmModule(code);
@@ -512,7 +466,7 @@ describe('GraphCompiler', () => {
                 nodes: [
                     {
                         id: 'res',
-                        ref: 'object',
+                        ref: 'Object',
                         props: [
                             {
                                 key: 'properties',
@@ -526,7 +480,7 @@ describe('GraphCompiler', () => {
                     },
                     {
                         id: 'arr1',
-                        ref: 'array',
+                        ref: 'Array',
                         props: [
                             {
                                 key: 'items',
@@ -540,7 +494,7 @@ describe('GraphCompiler', () => {
                     },
                     {
                         id: 'arr2',
-                        ref: 'array',
+                        ref: 'Array',
                         props: [
                             {
                                 key: 'items',
@@ -552,10 +506,6 @@ describe('GraphCompiler', () => {
                         ]
                     }
                 ],
-                refs: {
-                    object: runtime.defs['object'],
-                    array: runtime.defs['array'],
-                }
             });
             const code = new GraphCompiler().compileComputeEsm(graph);
             const { compute } = await evalEsmModule(code);
@@ -574,7 +524,7 @@ describe('GraphCompiler', () => {
                 nodes: [
                     {
                         id: 'res',
-                        ref: 'add',
+                        ref: 'Math.Add',
                         props: [
                             { key: 'a', value: '2', expand: true },
                             { key: 'b', linkId: 'p', expand: true },
@@ -582,16 +532,12 @@ describe('GraphCompiler', () => {
                     },
                     {
                         id: 'p',
-                        ref: 'string',
+                        ref: 'String',
                         props: [
                             { key: 'value', value: '42' },
                         ]
                     }
                 ],
-                refs: {
-                    add: runtime.defs['math.add'],
-                    string: runtime.defs['string'],
-                }
             });
             const code = new GraphCompiler().compileComputeEsm(graph);
             const { compute } = await evalEsmModule(code);
@@ -606,14 +552,14 @@ describe('GraphCompiler', () => {
                 nodes: [
                     {
                         id: 'res',
-                        ref: 'any',
+                        ref: 'Any',
                         props: [
                             { key: 'value', linkId: 'arr', expand: true },
                         ]
                     },
                     {
                         id: 'arr',
-                        ref: 'array',
+                        ref: 'Array',
                         props: [
                             {
                                 key: 'items',
@@ -626,10 +572,6 @@ describe('GraphCompiler', () => {
                         ]
                     }
                 ],
-                refs: {
-                    array: runtime.defs['array'],
-                    any: runtime.defs['any'],
-                }
             });
             const code = new GraphCompiler().compileComputeEsm(graph, { introspect: true });
             const { compute } = await evalEsmModule(code);
@@ -659,7 +601,7 @@ describe('GraphCompiler', () => {
                 nodes: [
                     {
                         id: 'res',
-                        ref: 'add',
+                        ref: 'Math.Add',
                         props: [
                             { key: 'a', linkId: 'p' },
                             { key: 'b', linkId: 'p' },
@@ -667,16 +609,12 @@ describe('GraphCompiler', () => {
                     },
                     {
                         id: 'p',
-                        ref: 'string',
+                        ref: 'String',
                         props: [
                             { key: 'value', value: '42' },
                         ]
                     }
                 ],
-                refs: {
-                    add: runtime.defs['math.add'],
-                    string: runtime.defs['string'],
-                }
             });
             const code = new GraphCompiler().compileComputeEsm(graph, { introspect: true });
             const { compute } = await evalEsmModule(code);
@@ -701,7 +639,7 @@ describe('GraphCompiler', () => {
                 nodes: [
                     {
                         id: 'res',
-                        ref: 'add',
+                        ref: 'Math.Add',
                         props: [
                             { key: 'a', linkId: 'p' },
                             { key: 'b', value: '12' },
@@ -709,16 +647,12 @@ describe('GraphCompiler', () => {
                     },
                     {
                         id: 'p',
-                        ref: 'string',
+                        ref: 'String',
                         props: [
                             { key: 'value', value: '42' },
                         ]
                     }
                 ],
-                refs: {
-                    add: runtime.defs['math.add'],
-                    string: runtime.defs['string'],
-                }
             });
             const code = new GraphCompiler().compileComputeEsm(graph, { introspect: true });
             const { compute } = await evalEsmModule(code);
@@ -746,7 +680,7 @@ describe('GraphCompiler', () => {
                 nodes: [
                     {
                         id: 'res',
-                        ref: 'map',
+                        ref: 'Lambda.Map',
                         props: [
                             { key: 'array', linkId: 'arr' },
                             { key: 'fn', linkId: 'fn' },
@@ -754,7 +688,7 @@ describe('GraphCompiler', () => {
                     },
                     {
                         id: 'arr',
-                        ref: 'array',
+                        ref: 'Array',
                         props: [
                             {
                                 key: 'items',
@@ -768,7 +702,7 @@ describe('GraphCompiler', () => {
                     },
                     {
                         id: 'fn',
-                        ref: 'array',
+                        ref: 'Array',
                         props: [
                             {
                                 key: 'items',
@@ -781,24 +715,19 @@ describe('GraphCompiler', () => {
                     },
                     {
                         id: 'index',
-                        ref: 'local',
+                        ref: '@system/Local',
                         props: [
                             { key: 'key', value: 'index' },
                         ]
                     },
                     {
                         id: 'item',
-                        ref: 'local',
+                        ref: '@system/Local',
                         props: [
                             { key: 'key', value: 'item' },
                         ]
                     }
                 ],
-                refs: {
-                    map: runtime.defs['lambda.map'],
-                    array: runtime.defs['array'],
-                    local: 'core:Local',
-                }
             });
             const code = new GraphCompiler().compileComputeEsm(graph);
             const { compute } = await evalEsmModule(code);
@@ -820,14 +749,14 @@ describe('GraphCompiler', () => {
                 nodes: [
                     {
                         id: 'p1',
-                        ref: 'number',
+                        ref: 'Number',
                         props: [
                             { key: 'value', value: '42' },
                         ]
                     },
                     {
                         id: 'res',
-                        ref: 'add',
+                        ref: 'Math.Add',
                         props: [
                             { key: 'a', linkId: 'p1' },
                             { key: 'b', value: '1' },
@@ -835,17 +764,12 @@ describe('GraphCompiler', () => {
                     },
                     {
                         id: 'promise',
-                        ref: 'promise',
+                        ref: 'Promise',
                         props: [
                             { key: 'value', linkId: 'res' },
                         ]
                     }
                 ],
-                refs: {
-                    number: runtime.defs['number'],
-                    add: runtime.defs['math.add'],
-                    promise: runtime.defs['promise'],
-                }
             });
             const code = new GraphCompiler().compileComputeEsm(graph, { rootNodeId: 'res' });
             const { compute } = await evalEsmModule(code);
@@ -862,14 +786,14 @@ describe('GraphCompiler', () => {
                 nodes: [
                     {
                         id: 'p1',
-                        ref: 'number',
+                        ref: 'Number',
                         props: [
                             { key: 'value', value: '42' },
                         ]
                     },
                     {
                         id: 'res',
-                        ref: 'add',
+                        ref: 'Math.Add',
                         props: [
                             { key: 'a', linkId: 'p1' },
                             { key: 'b', value: '1' },
@@ -877,17 +801,12 @@ describe('GraphCompiler', () => {
                     },
                     {
                         id: 'promise',
-                        ref: 'promise',
+                        ref: 'Promise',
                         props: [
                             { key: 'value', linkId: 'res' },
                         ]
                     }
                 ],
-                refs: {
-                    number: runtime.defs['number'],
-                    add: runtime.defs['math.add'],
-                    promise: runtime.defs['promise'],
-                }
             });
             const code = new GraphCompiler().compileComputeEsm(graph, { rootNodeId: 'promise' });
             const { compute } = await evalEsmModule(code);
@@ -907,14 +826,14 @@ describe('GraphCompiler', () => {
                 nodes: [
                     {
                         id: 'p1',
-                        ref: 'param',
+                        ref: '@system/Param',
                         props: [
                             { key: 'key', value: 'value' },
                         ]
                     },
                     {
                         id: 'plus1',
-                        ref: 'add',
+                        ref: 'Math.Add',
                         props: [
                             { key: 'a', linkId: 'p1' },
                             { key: 'b', value: '1' },
@@ -922,7 +841,7 @@ describe('GraphCompiler', () => {
                     },
                     {
                         id: 'plus2',
-                        ref: 'add',
+                        ref: 'Math.Add',
                         props: [
                             { key: 'a', linkId: 'p1' },
                             { key: 'b', value: '2' },
@@ -930,17 +849,13 @@ describe('GraphCompiler', () => {
                     },
                     {
                         id: 'mul2',
-                        ref: 'add',
+                        ref: 'Math.Add',
                         props: [
                             { key: 'a', linkId: 'p1' },
                             { key: 'b', linkId: 'p1' },
                         ]
                     },
                 ],
-                refs: {
-                    add: runtime.defs['math.add'],
-                    param: 'core:Param',
-                }
             });
             const code = new GraphCompiler().compileComputeEsm(graph, {
                 rootNodeId: 'plus1',
