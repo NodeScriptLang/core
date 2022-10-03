@@ -15,10 +15,11 @@ export class Graph implements GraphSpec {
 
     protected $nodeMap = new Map<string, Node>();
 
-    private constructor(readonly $loader: GraphLoader, graphSpec: GraphSpec) {
-        Object.assign(this, graphSpec);
+    constructor(readonly $loader: GraphLoader, data: DeepPartial<GraphSpec> = {}) {
+        const spec = GraphSpecSchema.decode(data);
+        Object.assign(this, spec);
         this.nodes = [];
-        for (const n of graphSpec.nodes) {
+        for (const n of spec.nodes) {
             const node = new Node(this, n);
             this.addNodeRaw(node);
         }
