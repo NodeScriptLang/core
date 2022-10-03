@@ -1,6 +1,5 @@
 import assert from 'assert';
 
-import { Graph } from '../../main/model/Graph.js';
 import { TestGraphLoader } from '../test-loader.js';
 
 describe('Node', () => {
@@ -9,7 +8,7 @@ describe('Node', () => {
 
         it('specifies whether a property is linkable or not', async () => {
             const loader = new TestGraphLoader();
-            const graph = await Graph.load(loader, {
+            const graph = await loader.loadGraph({
                 nodes: [
                     {
                         id: 'res',
@@ -39,7 +38,7 @@ describe('Node', () => {
 
         it('adds an entry to supported properties', async () => {
             const loader = new TestGraphLoader();
-            const graph = await Graph.load(loader, {
+            const graph = await loader.loadGraph({
                 nodes: [
                     {
                         id: 'obj',
@@ -81,7 +80,7 @@ describe('Node', () => {
 
         it('removes a property entry', async () => {
             const loader = new TestGraphLoader();
-            const graph = await Graph.load(loader, {
+            const graph = await loader.loadGraph({
                 nodes: [
                     {
                         id: 'obj',

@@ -26,15 +26,6 @@ export class Graph implements GraphSpec {
         this.applyInvariants();
     }
 
-    static async load($loader: GraphLoader, data: DeepPartial<GraphSpec> = {}) {
-        const spec = GraphSpecSchema.decode(data);
-        const refs = new Set(spec.nodes.map(_ => _.ref));
-        for (const moduleName of refs) {
-            await $loader.loadModule(moduleName);
-        }
-        return new Graph($loader, spec);
-    }
-
     toJSON() {
         return serialize(this, {
             rootNodeId: '',

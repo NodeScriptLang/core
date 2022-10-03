@@ -1,6 +1,5 @@
 import assert from 'assert';
 
-import { Graph } from '../../main/model/Graph.js';
 import { GraphCompiler, GraphEvalContext } from '../../main/runtime/index.js';
 import * as t from '../../main/types/index.js';
 import { codeToUrl, evalEsmModule } from '../../main/util/index.js';
@@ -112,7 +111,7 @@ describe('GraphCompiler', () => {
 
         it('can compile graph and use it as a node', async () => {
             const loader = new TestGraphLoader();
-            const graph1 = await Graph.load(loader, {
+            const graph1 = await loader.loadGraph({
                 moduleSpec: {
                     params: {
                         val: {
@@ -149,7 +148,7 @@ describe('GraphCompiler', () => {
                 customImportUrl: codeToUrl(code1),
             };
             loader.defineModule('graph1', graph1.moduleSpec);
-            const graph = await Graph.load(loader, {
+            const graph = await loader.loadGraph({
                 rootNodeId: 'res',
                 nodes: [
                     {

@@ -24,7 +24,7 @@ export class TestRuntime {
 
     async loadGraph(spec: DeepPartial<GraphSpec>): Promise<Graph> {
         const loader = await this.createLoader();
-        const graph = await Graph.load(loader, spec);
+        const graph = await loader.loadGraph(spec);
         return graph;
     }
 }

@@ -1,12 +1,17 @@
+import { DeepPartial } from '@flexent/schema';
+
+import { GraphSpecSchema } from '../schema/GraphSpec.js';
 import { ModuleSpecSchema } from '../schema/ModuleSpec.js';
 import * as systemNodes from '../system/index.js';
-import { ModuleDefinition, ModuleSpec } from '../types/index.js';
+import { GraphSpec, ModuleDefinition, ModuleSpec } from '../types/index.js';
+import { Graph } from './Graph.js';
 
 export interface GraphLoaderOptions {
     ignoreFailedDefs?: boolean;
 }
 
 export interface GraphLoader {
+    loadGraph(spec: DeepPartial<GraphSpec>, options?: GraphLoaderOptions): Promise<Graph>;
     resolveModuleUrl(moduleName: string): string;
     resolveComputeUrl(moduleName: string): string;
     resolveModule(moduleName: string): ModuleSpec;
@@ -25,6 +30,24 @@ export class StandardGraphLoader implements GraphLoader {
         this.defineModule('@system/EvalSync', systemNodes.EvalSync);
         this.defineModule('@system/EvalAsync', systemNodes.EvalAsync);
         this.defineModule('@system/EvalJson', systemNodes.EvalJson);
+    }
+
+    async loadGraph(spec: DeepPartial<GraphSpec>, options: GraphLoaderOptions = {}): Promise<Graph> {
+        const graphSpec = GraphSpecSchema.decode(spec);
+        const refs = new Set(graphSpec.nodes.map(_ => _.ref));
+        const promises = [];
+        for (const moduleName of refs) {
+            const promise = this.loadModule(moduleName)
+                .catch(error => {
+                    if (options.ignoreFailedDefs) {
+                        return;
+                    }
+                    throw error;
+                });
+            promises.push(promise);
+        }
+        await Promise.all(promises);
+        return new Graph(this, spec);
     }
 
     resolveModuleUrl(moduleName: string) {

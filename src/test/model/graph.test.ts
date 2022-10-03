@@ -1,6 +1,5 @@
 import assert from 'assert';
 
-import { Graph } from '../../main/model/Graph.js';
 import { TestGraphLoader } from '../test-loader.js';
 
 describe('Graph', () => {
@@ -9,7 +8,7 @@ describe('Graph', () => {
 
         it('adds the node to the graph', async () => {
             const loader = new TestGraphLoader();
-            const graph = await Graph.load(loader);
+            const graph = await loader.loadGraph({});
             assert.strictEqual(graph.nodes.length, 0);
             const node = await graph.createNode({
                 moduleName: 'Any',
@@ -22,7 +21,7 @@ describe('Graph', () => {
 
         it('sets the default param value if not explicitly specified', async () => {
             const loader = new TestGraphLoader();
-            const graph = await Graph.load(loader);
+            const graph = await loader.loadGraph({});
             const node = await graph.createNode({
                 moduleName: 'Param.Default',
                 node: {},
@@ -33,7 +32,7 @@ describe('Graph', () => {
 
         it('sets the actual param value when explicitly specified', async () => {
             const loader = new TestGraphLoader();
-            const graph = await Graph.load(loader);
+            const graph = await loader.loadGraph({});
             const node = await graph.createNode({
                 moduleName: 'Param.Default',
                 node: {
@@ -52,7 +51,7 @@ describe('Graph', () => {
 
         it('removes the node', async () => {
             const loader = new TestGraphLoader();
-            const graph = await Graph.load(loader, {
+            const graph = await loader.loadGraph({
                 nodes: [
                     {
                         id: 'res',
@@ -83,7 +82,7 @@ describe('Graph', () => {
 
         it('recreates the links attached to the first property', async () => {
             const loader = new TestGraphLoader();
-            const graph = await Graph.load(loader, {
+            const graph = await loader.loadGraph({
                 nodes: [
                     {
                         id: 'res',
@@ -140,7 +139,7 @@ describe('Graph', () => {
 
         it('recreates the links through the first connected entry', async () => {
             const loader = new TestGraphLoader();
-            const graph = await Graph.load(loader, {
+            const graph = await loader.loadGraph({
                 nodes: [
                     {
                         id: 'res',
@@ -190,7 +189,7 @@ describe('Graph', () => {
 
         it('removes extra properties not supported by node definition', async () => {
             const loader = new TestGraphLoader();
-            const graph = await Graph.load(loader, {
+            const graph = await loader.loadGraph({
                 nodes: [
                     {
                         id: 'res',
@@ -211,7 +210,7 @@ describe('Graph', () => {
 
         it('keeps firstmost properties when extra properties are present', async () => {
             const loader = new TestGraphLoader();
-            const graph = await Graph.load(loader, {
+            const graph = await loader.loadGraph({
                 nodes: [
                     {
                         id: 'p',
@@ -230,7 +229,7 @@ describe('Graph', () => {
 
         it('ensures the correct order of properties', async () => {
             const loader = new TestGraphLoader();
-            const graph = await Graph.load(loader, {
+            const graph = await loader.loadGraph({
                 nodes: [
                     {
                         id: 'res',
@@ -249,7 +248,7 @@ describe('Graph', () => {
 
         it('initializes all node properties with default values', async () => {
             const loader = new TestGraphLoader();
-            const graph = await Graph.load(loader, {
+            const graph = await loader.loadGraph({
                 nodes: [
                     {
                         id: 'res',
@@ -265,7 +264,7 @@ describe('Graph', () => {
 
         it('removes the first link of two looped nodes', async () => {
             const loader = new TestGraphLoader();
-            const graph = await Graph.load(loader, {
+            const graph = await loader.loadGraph({
                 nodes: [
                     {
                         id: 'res',
@@ -291,7 +290,7 @@ describe('Graph', () => {
 
         it('sets module.result.async = false when all nodes are sync', async () => {
             const loader = new TestGraphLoader();
-            const graph = await Graph.load(loader, {
+            const graph = await loader.loadGraph({
                 nodes: [
                     { ref: 'Math.Add' },
                     { ref: 'String' },
@@ -302,7 +301,7 @@ describe('Graph', () => {
 
         it('sets module.result.async = true if at least one node is async', async () => {
             const loader = new TestGraphLoader();
-            const graph = await Graph.load(loader, {
+            const graph = await loader.loadGraph({
                 nodes: [
                     { ref: 'Math.Add' },
                     { ref: 'String' },
@@ -318,7 +317,7 @@ describe('Graph', () => {
 
         it('updates graph.metadata.result schema to match the result type of node', async () => {
             const loader = new TestGraphLoader();
-            const graph = await Graph.load(loader, {
+            const graph = await loader.loadGraph({
                 nodes: [
                     { id: 'add', ref: 'Math.Add' },
                     { id: 'string', ref: 'String' },

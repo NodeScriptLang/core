@@ -1,6 +1,5 @@
 import assert from 'assert';
 
-import { Graph } from '../../main/model/Graph.js';
 import { TestGraphLoader } from '../test-loader.js';
 
 describe('GraphLoader', () => {
@@ -29,7 +28,7 @@ describe('GraphLoader', () => {
 
     it('loads all graph dependencies', async () => {
         const loader = new TestGraphLoader();
-        await Graph.load(loader, {
+        await loader.loadGraph({
             nodes: [
                 { ref: 'Math.Add' },
                 { ref: 'String' },
@@ -41,7 +40,7 @@ describe('GraphLoader', () => {
 
     it('allows graph node to resolve module definitions synchronously', async () => {
         const loader = new TestGraphLoader();
-        const graph = await Graph.load(loader, {
+        const graph = await loader.loadGraph({
             nodes: [
                 {
                     id: 'node1',
