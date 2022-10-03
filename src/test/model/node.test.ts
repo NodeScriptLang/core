@@ -1,6 +1,6 @@
 import assert from 'assert';
 
-import { runtime } from '../runtime.js';
+import { Graph } from '../../main/model/Graph.js';
 import { TestGraphLoader } from '../test-loader.js';
 
 describe('Node', () => {
@@ -9,26 +9,23 @@ describe('Node', () => {
 
         it('specifies whether a property is linkable or not', async () => {
             const loader = new TestGraphLoader();
-            const graph = await loader.loadGraph({
+            const graph = await Graph.load(loader, {
                 nodes: [
                     {
                         id: 'res',
-                        ref: 'string',
+                        ref: 'String',
                         props: [
                             { key: 'value', value: '42' },
                         ]
                     },
                     {
                         id: 'p',
-                        ref: 'string',
+                        ref: 'String',
                         props: [
                             { key: 'value', value: '42', linkId: 'res' },
                         ]
                     }
                 ],
-                refs: {
-                    string: runtime.defs['string'],
-                }
             });
             const node1 = graph.getNodeById('res')!;
             const node2 = graph.getNodeById('p')!;
@@ -42,35 +39,30 @@ describe('Node', () => {
 
         it('adds an entry to supported properties', async () => {
             const loader = new TestGraphLoader();
-            const graph = await loader.loadGraph({
+            const graph = await Graph.load(loader, {
                 nodes: [
                     {
                         id: 'obj',
-                        ref: 'object',
+                        ref: 'Object',
                         props: [
                             { key: 'properties' },
                         ]
                     },
                     {
                         id: 'arr',
-                        ref: 'array',
+                        ref: 'Array',
                         props: [
                             { key: 'items' },
                         ]
                     },
                     {
                         id: 'str',
-                        ref: 'string',
+                        ref: 'String',
                         props: [
                             { key: 'value' },
                         ]
                     }
                 ],
-                refs: {
-                    object: runtime.defs['object'],
-                    array: runtime.defs['array'],
-                    string: runtime.defs['string'],
-                }
             });
             const node1 = graph.getNodeById('obj');
             const node2 = graph.getNodeById('arr');
@@ -89,11 +81,11 @@ describe('Node', () => {
 
         it('removes a property entry', async () => {
             const loader = new TestGraphLoader();
-            const graph = await loader.loadGraph({
+            const graph = await Graph.load(loader, {
                 nodes: [
                     {
                         id: 'obj',
-                        ref: 'object',
+                        ref: 'Object',
                         props: [
                             {
                                 key: 'properties',
@@ -103,10 +95,7 @@ describe('Node', () => {
                             }
                         ]
                     },
-                ],
-                refs: {
-                    object: runtime.defs['object'],
-                }
+                ]
             });
             const node = graph.getNodeById('obj');
             assert.strictEqual(node?.props[0].entries.length, 1);

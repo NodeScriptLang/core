@@ -105,16 +105,16 @@ class GraphCompilerContext {
 
     private emitImports() {
         this.emitComment('Imports');
-        const refs = new Set(this.order.map(_ => _.ref));
-        for (const ref of refs) {
-            const moduleUrl = this.graph.refs[ref];
-            const module = this.graph.$loader.resolveModule(moduleUrl);
-            const computeUrl = module.computeUrl;
-            if (!computeUrl) {
+        const moduleNames = new Set(this.order.map(_ => _.ref));
+        for (const moduleName of moduleNames) {
+            if (moduleName.startsWith('@system/')) {
                 continue;
             }
+            const module = this.graph.$loader.resolveModule(moduleName);
+            const computeUrl = module.attributes?.customImportUrl ??
+                this.graph.$loader.resolveComputeUrl(moduleName);
             const sym = this.nextSym('n');
-            this.symtable.set(`def:${ref}`, sym);
+            this.symtable.set(`def:${moduleName}`, sym);
             this.code.line(`import { compute as ${sym} } from '${computeUrl}'`);
         }
     }
@@ -215,17 +215,13 @@ class GraphCompilerContext {
     }
 
     private emitNodeBodyRaw(node: Node, resSym: string) {
-        switch (node.$moduleUrl) {
-            case 'core:Param': return this.emitParamNode(node, resSym);
-            case 'core:Local': return this.emitLocalNode(node, resSym);
-            case 'core:EvalSync': return this.emitEvalSync(node, resSym);
-            case 'core:EvalAsync': return this.emitEvalAsync(node, resSym);
-            case 'core:EvalJson': return this.emitEvalJson(node, resSym);
+        switch (node.ref) {
+            case '@system/Param': return this.emitParamNode(node, resSym);
+            case '@system/Local': return this.emitLocalNode(node, resSym);
+            case '@system/EvalSync': return this.emitEvalSync(node, resSym);
+            case '@system/EvalAsync': return this.emitEvalAsync(node, resSym);
+            case '@system/EvalJson': return this.emitEvalJson(node, resSym);
             default:
-                if (!node.$module.computeUrl) {
-                    // TODO emit undefined
-                    return;
-                }
                 if (node.isExpanded()) {
                     this.emitExpandedNode(node, resSym);
                 } else {
@@ -509,6 +505,6 @@ class GraphCompilerContext {
 }
 
 export class CompilerError extends Error {
-    name = this.constructor.name;
+    override name = this.constructor.name;
     status = 500;
 }

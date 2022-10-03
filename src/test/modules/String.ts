@@ -1,28 +1,29 @@
 import { ModuleCompute, ModuleDefinition } from '../../main/types/index.js';
 
 type P = {
-    properties: any;
+    value: unknown;
 };
 
-type R = any;
+type R = string;
 
 export const module: ModuleDefinition<P, R> = {
-    label: 'Object',
-    description: 'Creates an object.',
+    moduleName: 'String',
+    label: 'String',
+    description: 'Converts the value into a string.',
     params: {
-        properties: {
+        value: {
             schema: {
-                type: 'object',
+                type: 'any'
             }
         },
     },
     result: {
         schema: {
-            type: 'object',
+            type: 'string',
         }
     },
 };
 
 export const compute: ModuleCompute<P, R> = params => {
-    return params.properties;
+    return String(params.value);
 };

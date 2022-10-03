@@ -1,6 +1,5 @@
 // This file is auto-generated
 export * from './DataSchemaSpec.js';
-export * from './GraphRefs.js';
 export * from './GraphSpec.js';
 export * from './ModuleParamSpec.js';
 export * from './ModuleResultSpec.js';

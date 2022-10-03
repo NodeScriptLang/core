@@ -1,14 +1,12 @@
 import { ModuleCompute, ModuleDefinition } from '../../main/types/index.js';
 
-type P = {
-    value: any;
-};
-
-type R = Promise<any>;
+type P = { value: unknown };
+type R = unknown;
 
 export const module: ModuleDefinition<P, R> = {
-    label: 'Promise',
-    description: 'Returns the value asynchronously.',
+    moduleName: 'Any',
+    label: 'Any',
+    description: 'Just returns the value as is, without type conversion.',
     params: {
         value: {
             schema: {
@@ -19,11 +17,10 @@ export const module: ModuleDefinition<P, R> = {
     result: {
         schema: {
             type: 'any',
-        },
-        async: true,
+        }
     },
 };
 
-export const compute: ModuleCompute<P, R> = (params: P) => {
+export const compute: ModuleCompute<P, R> = params => {
     return params.value;
 };

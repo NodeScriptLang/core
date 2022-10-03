@@ -1,6 +1,7 @@
 import { StandardGraphLoader } from '../main/model/GraphLoader.js';
 import { ModuleSpecSchema } from '../main/schema/ModuleSpec.js';
 import { ModuleSpec } from '../main/types/module.js';
+import { runtime } from './runtime.js';
 
 /**
  * Custom module loader for tests.
@@ -10,11 +11,21 @@ import { ModuleSpec } from '../main/types/module.js';
  */
 export class TestGraphLoader extends StandardGraphLoader {
 
-    protected async fetchModule(url: string): Promise<ModuleSpec> {
+    constructor() {
+        super('');
+    }
+
+    override resolveModuleUrl(moduleName: string): string {
+        return runtime.makeUrl(`/out/test/modules/${moduleName}.js`);
+    }
+
+    override resolveComputeUrl(moduleName: string): string {
+        return runtime.makeUrl(`/out/test/modules/${moduleName}.js`);
+    }
+
+    protected override async fetchModule(url: string): Promise<ModuleSpec> {
         const { module } = await import(url);
-        const result = ModuleSpecSchema.decode(module);
-        result.computeUrl = url;
-        return result;
+        return ModuleSpecSchema.decode(module);
     }
 
 }

@@ -34,7 +34,7 @@ export class Node implements NodeSpec {
     }
 
     get $moduleUrl() {
-        return this.$graph.resolveRefUrl(this.ref);
+        return this.$graph.$loader.resolveModuleUrl(this.ref);
     }
 
     get $module() {

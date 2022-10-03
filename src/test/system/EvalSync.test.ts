@@ -13,7 +13,7 @@ describe('EvalSync', () => {
             nodes: [
                 {
                     id: 'res',
-                    ref: 'add',
+                    ref: 'Math.Add',
                     props: [
                         { key: 'a', linkId: 'e1' },
                         { key: 'b', linkId: 'e2' },
@@ -21,7 +21,7 @@ describe('EvalSync', () => {
                 },
                 {
                     id: 'e1',
-                    ref: 'evalSync',
+                    ref: '@system/EvalSync',
                     props: [
                         {
                             key: 'code',
@@ -31,7 +31,7 @@ describe('EvalSync', () => {
                 },
                 {
                     id: 'e2',
-                    ref: 'evalSync',
+                    ref: '@system/EvalSync',
                     props: [
                         {
                             key: 'code',
@@ -40,10 +40,6 @@ describe('EvalSync', () => {
                     ]
                 }
             ],
-            refs: {
-                add: runtime.defs['math.add'],
-                evalSync: 'core:EvalSync',
-            }
         });
         const code = new GraphCompiler().compileComputeEsm(graph);
         const { compute } = await evalEsmModule(code);
@@ -58,21 +54,21 @@ describe('EvalSync', () => {
             nodes: [
                 {
                     id: 's1',
-                    ref: 'str',
+                    ref: 'String',
                     props: [
                         { key: 'value', value: 'hello' },
                     ]
                 },
                 {
                     id: 's2',
-                    ref: 'str',
+                    ref: 'String',
                     props: [
                         { key: 'value', value: 'world' },
                     ]
                 },
                 {
                     id: 'res',
-                    ref: 'evalSync',
+                    ref: '@system/EvalSync',
                     props: [
                         {
                             key: 'code',
@@ -88,10 +84,6 @@ describe('EvalSync', () => {
                     ]
                 }
             ],
-            refs: {
-                str: runtime.defs['string'],
-                evalSync: 'core:EvalSync',
-            }
         });
         const code = new GraphCompiler().compileComputeEsm(graph);
         const { compute } = await evalEsmModule(code);

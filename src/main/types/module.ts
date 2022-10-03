@@ -1,6 +1,7 @@
 import { DataSchemaSpec } from './data-schema.js';
 
 export interface ModuleSpec {
+    moduleName: string;
     label: string;
     labelParam: string;
     description: string;
@@ -12,10 +13,6 @@ export interface ModuleSpec {
     cacheMode: NodeCacheMode;
     evalMode: NodeEvalMode;
     resizeMode: NodeResizeMode;
-    computeUrl?: string;
-    bundleUrl?: string;
-    sourceUrl?: string;
-    exampleUrl?: string;
     attributes?: Record<string, any>;
 }
 

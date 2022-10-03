@@ -2,13 +2,10 @@ import { DeepPartial } from '@flexent/schema';
 
 import { ModuleSpec } from './module.js';
 
-export type GraphRefs = Record<string, string>;
-
 export interface GraphSpec {
     moduleSpec: ModuleSpec;
     nodes: NodeSpec[];
     rootNodeId: string;
-    refs: GraphRefs;
     metadata: Record<string, any>;
 }
 
@@ -29,6 +26,6 @@ export interface PropSpec {
 }
 
 export interface AddNodeSpec {
-    url: string;
+    moduleName: string;
     node: DeepPartial<NodeSpec>;
 }

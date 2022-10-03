@@ -8,6 +8,7 @@ type P = {
 type R = unknown;
 
 export const EvalSync: ModuleDefinition<P, R> = {
+    moduleName: '@system/EvalSync',
     label: 'Eval',
     description: 'Evaluates synchronous JavaScript code with provided arguments.',
     keywords: ['eval', 'compute', 'js', 'javascript', 'function', 'execute', 'expression', 'sync'],
