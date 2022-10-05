@@ -1,5 +1,3 @@
-import { DeepPartial } from '@flexent/schema';
-
 import { ModuleSpec } from './module.js';
 
 export interface GraphSpec {
