@@ -13,6 +13,7 @@ export class NodeView {
 
     constructor(
         readonly graph: GraphView,
+        readonly nodeId: string,
         readonly nodeSpec: NodeSpec,
     ) {}
 
@@ -24,16 +25,12 @@ export class NodeView {
         return this.loader.resolveModule(this.nodeSpec.ref);
     }
 
-    get id() {
-        return this.nodeSpec.id;
-    }
-
     get ref() {
         return this.nodeSpec.ref;
     }
 
     isRoot() {
-        return this.graph.graphSpec.rootNodeId === this.id;
+        return this.graph.graphSpec.rootNodeId === this.nodeId;
     }
 
     getProps(): PropView[] {
@@ -93,14 +90,14 @@ export class NodeView {
     }
 
     getOutboundLinks(linkMap = this.graph.computeLinkMap()) {
-        return linkMap.get(this.id);
+        return linkMap.get(this.nodeId);
     }
 
     *leftNodes(visited: Set<string> = new Set()): Iterable<NodeView> {
-        if (visited.has(this.id)) {
+        if (visited.has(this.nodeId)) {
             return;
         }
-        visited.add(this.id);
+        visited.add(this.nodeId);
         yield this;
         for (const link of this.inboundLinks()) {
             yield* link.linkNode.leftNodes(visited);
@@ -109,7 +106,7 @@ export class NodeView {
 
     *rightNodes(linkMap = this.graph.computeLinkMap()): Iterable<NodeView> {
         yield this;
-        for (const link of linkMap.get(this.id)) {
+        for (const link of linkMap.get(this.nodeId)) {
             yield* link.node.rightNodes(linkMap);
         }
     }
@@ -121,7 +118,7 @@ export class NodeView {
      */
     canLinkTo(node: NodeView) {
         for (const n of this.leftNodes()) {
-            if (n.id === node.id) {
+            if (n.nodeId === node.nodeId) {
                 return false;
             }
         }

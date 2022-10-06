@@ -11,8 +11,9 @@ export const GraphSpecSchema = new Schema<GraphSpec>({
         moduleSpec: ModuleSpecSchema.schema,
         rootNodeId: { type: 'string' },
         nodes: {
-            type: 'array',
-            items: NodeSpecSchema.schema,
+            type: 'object',
+            properties: {},
+            additionalProperties: NodeSpecSchema.schema,
         },
         metadata: {
             type: 'object',

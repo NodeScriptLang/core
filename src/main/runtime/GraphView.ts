@@ -12,12 +12,12 @@ export class GraphView {
     ) {}
 
     getNodeById(id: string): NodeView | null {
-        const nodeSpec = this.graphSpec.nodes.find(_ => _.id === id);
-        return nodeSpec ? new NodeView(this, nodeSpec) : null;
+        const nodeSpec = this.graphSpec.nodes[id];
+        return nodeSpec ? new NodeView(this, id, nodeSpec) : null;
     }
 
     getNodes() {
-        return this.graphSpec.nodes.map(_ => new NodeView(this, _));
+        return Object.entries(this.graphSpec.nodes).map(_ => new NodeView(this, _[0], _[1]));
     }
 
     /**
@@ -49,7 +49,7 @@ export class GraphView {
             for (const prop of node.actualProps()) {
                 const linkNode = prop.getLinkNode();
                 if (linkNode) {
-                    map.add(linkNode.id, {
+                    map.add(linkNode.nodeId, {
                         node,
                         prop,
                         linkNode,
@@ -77,7 +77,7 @@ export class GraphView {
         for (const prop of node.actualProps()) {
             const linkNode = prop.getLinkNode();
             if (linkNode) {
-                const i = order.findIndex(_ => _.id === linkNode.id);
+                const i = order.findIndex(_ => _.nodeId === linkNode.nodeId);
                 if (i > -1) {
                     order.splice(i, 1);
                 }

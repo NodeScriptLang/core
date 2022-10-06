@@ -13,16 +13,15 @@ describe('GraphCompiler', () => {
         it('emits ESM code', async () => {
             const graph = await runtime.loadGraph({
                 rootNodeId: 'res',
-                nodes: [
-                    {
-                        id: 'res',
+                nodes: {
+                    res: {
                         ref: 'Math.Add',
                         props: [
                             { key: 'a', value: '12' },
                             { key: 'b', value: '21' },
                         ]
                     }
-                ],
+                },
             });
             const { code } = new GraphCompiler().compileComputeEsm(graph);
             const { compute } = await evalEsmModule(code);
@@ -34,23 +33,21 @@ describe('GraphCompiler', () => {
         it('supports introspection', async () => {
             const graph = await runtime.loadGraph({
                 rootNodeId: 'res',
-                nodes: [
-                    {
-                        id: 'p1',
+                nodes: {
+                    p1: {
                         ref: '@system/Param',
                         props: [
                             { key: 'key', value: 'value' },
                         ]
                     },
-                    {
-                        id: 'res',
+                    res: {
                         ref: 'Math.Add',
                         props: [
                             { key: 'a', linkId: 'p1' },
                             { key: 'b', value: '21' },
                         ]
                     }
-                ]
+                }
             });
             const { code } = new GraphCompiler().compileComputeEsm(graph, {
                 introspect: true,
@@ -78,23 +75,21 @@ describe('GraphCompiler', () => {
         it('supports param nodes', async () => {
             const graph = await runtime.loadGraph({
                 rootNodeId: 'res',
-                nodes: [
-                    {
-                        id: 'p1',
+                nodes: {
+                    p1: {
                         ref: '@system/Param',
                         props: [
                             { key: 'key', value: 'value' },
                         ]
                     },
-                    {
-                        id: 'res',
+                    res: {
                         ref: 'Math.Add',
                         props: [
                             { key: 'a', linkId: 'p1' },
                             { key: 'b', value: '1' },
                         ]
                     }
-                ],
+                },
             });
             const { code } = new GraphCompiler().compileComputeEsm(graph);
             const { compute } = await evalEsmModule(code);
@@ -125,23 +120,21 @@ describe('GraphCompiler', () => {
                     },
                 },
                 rootNodeId: 'res',
-                nodes: [
-                    {
-                        id: 'p1',
+                nodes: {
+                    p1: {
                         ref: '@system/Param',
                         props: [
                             { key: 'key', value: 'val' },
                         ]
                     },
-                    {
-                        id: 'res',
+                    res: {
                         ref: 'Math.Add',
                         props: [
                             { key: 'a', linkId: 'p1' },
                             { key: 'b', value: '1' },
                         ]
                     }
-                ],
+                },
             });
             const { code: code1 } = new GraphCompiler().compileComputeEsm(graph1);
             graph1.graphSpec.moduleSpec.attributes = {
@@ -150,15 +143,14 @@ describe('GraphCompiler', () => {
             loader.defineModule('graph1', graph1.graphSpec.moduleSpec);
             const graph = await loader.loadGraph({
                 rootNodeId: 'res',
-                nodes: [
-                    {
-                        id: 'res',
+                nodes: {
+                    res: {
                         ref: 'graph1',
                         props: [
                             { key: 'val', value: '123' },
                         ]
                     }
-                ],
+                },
             });
             const { code: code2 } = new GraphCompiler().compileComputeEsm(graph);
             const { compute } = await evalEsmModule(code2);
@@ -173,22 +165,20 @@ describe('GraphCompiler', () => {
         it('converts types when schemas do not match', async () => {
             const graph = await runtime.loadGraph({
                 rootNodeId: 'res',
-                nodes: [
-                    {
-                        id: 'res',
+                nodes: {
+                    res: {
                         ref: 'Number',
                         props: [
                             { key: 'value', linkId: 'p' },
                         ]
                     },
-                    {
-                        id: 'p',
+                    p: {
                         ref: 'String',
                         props: [
                             { key: 'value', value: '42' },
                         ]
                     }
-                ],
+                },
             });
             const { code } = new GraphCompiler().compileComputeEsm(graph);
             const { compute } = await evalEsmModule(code);
@@ -200,22 +190,20 @@ describe('GraphCompiler', () => {
         it('does not convert types when schemas match', async () => {
             const graph = await runtime.loadGraph({
                 rootNodeId: 'res',
-                nodes: [
-                    {
-                        id: 'res',
+                nodes: {
+                    res: {
                         ref: 'Any',
                         props: [
                             { key: 'value', linkId: 'p' },
                         ]
                     },
-                    {
-                        id: 'p',
+                    p: {
                         ref: '@system/Param',
                         props: [
                             { key: 'key', value: 'value' },
                         ]
                     }
-                ],
+                },
             });
             const { code } = new GraphCompiler().compileComputeEsm(graph);
             const { compute } = await evalEsmModule(code);
@@ -235,9 +223,8 @@ describe('GraphCompiler', () => {
         it('supports object entries', async () => {
             const graph = await runtime.loadGraph({
                 rootNodeId: 'res',
-                nodes: [
-                    {
-                        id: 'res',
+                nodes: {
+                    res: {
                         ref: 'Object',
                         props: [
                             {
@@ -249,14 +236,13 @@ describe('GraphCompiler', () => {
                             },
                         ]
                     },
-                    {
-                        id: 'num',
+                    num: {
                         ref: 'Number',
                         props: [
                             { key: 'value', value: '42' }
                         ]
                     }
-                ],
+                },
             });
             const { code } = new GraphCompiler().compileComputeEsm(graph);
             const { compute } = await evalEsmModule(code);
@@ -271,9 +257,8 @@ describe('GraphCompiler', () => {
         it('supports array entries', async () => {
             const graph = await runtime.loadGraph({
                 rootNodeId: 'res',
-                nodes: [
-                    {
-                        id: 'res',
+                nodes: {
+                    res: {
                         ref: 'Array',
                         props: [
                             {
@@ -285,14 +270,13 @@ describe('GraphCompiler', () => {
                             },
                         ]
                     },
-                    {
-                        id: 'num',
+                    num: {
                         ref: 'Number',
                         props: [
                             { key: 'value', value: '42' }
                         ]
                     }
-                ],
+                },
             });
             const { code } = new GraphCompiler().compileComputeEsm(graph);
             const { compute } = await evalEsmModule(code);
@@ -304,9 +288,8 @@ describe('GraphCompiler', () => {
         it('prefers base link over entries if both specified', async () => {
             const graph = await runtime.loadGraph({
                 rootNodeId: 'res',
-                nodes: [
-                    {
-                        id: 'res',
+                nodes: {
+                    res: {
                         ref: 'Array',
                         props: [
                             {
@@ -319,14 +302,13 @@ describe('GraphCompiler', () => {
                             },
                         ]
                     },
-                    {
-                        id: 'p',
+                    p: {
                         ref: '@system/Param',
                         props: [
                             { key: 'key', value: 'value' }
                         ]
                     }
-                ],
+                },
             });
             const { code } = new GraphCompiler().compileComputeEsm(graph);
             const { compute } = await evalEsmModule(code);
@@ -344,17 +326,15 @@ describe('GraphCompiler', () => {
         it('expands a single property', async () => {
             const graph = await runtime.loadGraph({
                 rootNodeId: 'res',
-                nodes: [
-                    {
-                        id: 'res',
+                nodes: {
+                    res: {
                         ref: 'Math.Add',
                         props: [
                             { key: 'a', linkId: 'arr', expand: true },
                             { key: 'b', value: '1' },
                         ]
                     },
-                    {
-                        id: 'arr',
+                    arr: {
                         ref: 'Array',
                         props: [
                             {
@@ -367,7 +347,7 @@ describe('GraphCompiler', () => {
                             }
                         ]
                     }
-                ],
+                },
             });
             const { code } = new GraphCompiler().compileComputeEsm(graph);
             const { compute } = await evalEsmModule(code);
@@ -379,17 +359,15 @@ describe('GraphCompiler', () => {
         it('expands multiple properties, same array length', async () => {
             const graph = await runtime.loadGraph({
                 rootNodeId: 'res',
-                nodes: [
-                    {
-                        id: 'res',
+                nodes: {
+                    res: {
                         ref: 'Math.Add',
                         props: [
                             { key: 'a', linkId: 'arr', expand: true },
                             { key: 'b', linkId: 'arr', expand: true },
                         ]
                     },
-                    {
-                        id: 'arr',
+                    arr: {
                         ref: 'Array',
                         props: [
                             {
@@ -402,7 +380,7 @@ describe('GraphCompiler', () => {
                             }
                         ]
                     }
-                ],
+                },
             });
             const { code } = new GraphCompiler().compileComputeEsm(graph);
             const { compute } = await evalEsmModule(code);
@@ -414,17 +392,15 @@ describe('GraphCompiler', () => {
         it('expands multiple properties, different array lengths', async () => {
             const graph = await runtime.loadGraph({
                 rootNodeId: 'res',
-                nodes: [
-                    {
-                        id: 'res',
+                nodes: {
+                    res: {
                         ref: 'Math.Add',
                         props: [
                             { key: 'a', linkId: 'arr1', expand: true },
                             { key: 'b', linkId: 'arr2', expand: true },
                         ]
                     },
-                    {
-                        id: 'arr1',
+                    arr1: {
                         ref: 'Array',
                         props: [
                             {
@@ -437,8 +413,7 @@ describe('GraphCompiler', () => {
                             }
                         ]
                     },
-                    {
-                        id: 'arr2',
+                    arr2: {
                         ref: 'Array',
                         props: [
                             {
@@ -450,7 +425,7 @@ describe('GraphCompiler', () => {
                             }
                         ]
                     }
-                ],
+                },
             });
             const { code } = new GraphCompiler().compileComputeEsm(graph);
             const { compute } = await evalEsmModule(code);
@@ -462,9 +437,8 @@ describe('GraphCompiler', () => {
         it('supports entries', async () => {
             const graph = await runtime.loadGraph({
                 rootNodeId: 'res',
-                nodes: [
-                    {
-                        id: 'res',
+                nodes: {
+                    res: {
                         ref: 'Object',
                         props: [
                             {
@@ -477,8 +451,7 @@ describe('GraphCompiler', () => {
                             }
                         ]
                     },
-                    {
-                        id: 'arr1',
+                    arr1: {
                         ref: 'Array',
                         props: [
                             {
@@ -491,8 +464,7 @@ describe('GraphCompiler', () => {
                             }
                         ]
                     },
-                    {
-                        id: 'arr2',
+                    arr2: {
                         ref: 'Array',
                         props: [
                             {
@@ -504,7 +476,7 @@ describe('GraphCompiler', () => {
                             }
                         ]
                     }
-                ],
+                },
             });
             const { code } = new GraphCompiler().compileComputeEsm(graph);
             const { compute } = await evalEsmModule(code);
@@ -520,23 +492,21 @@ describe('GraphCompiler', () => {
         it('converts non-arrays to single-element array', async () => {
             const graph = await runtime.loadGraph({
                 rootNodeId: 'res',
-                nodes: [
-                    {
-                        id: 'res',
+                nodes: {
+                    res: {
                         ref: 'Math.Add',
                         props: [
                             { key: 'a', value: '2', expand: true },
                             { key: 'b', linkId: 'p', expand: true },
                         ]
                     },
-                    {
-                        id: 'p',
+                    p: {
                         ref: 'String',
                         props: [
                             { key: 'value', value: '42' },
                         ]
                     }
-                ],
+                },
             });
             const { code } = new GraphCompiler().compileComputeEsm(graph);
             const { compute } = await evalEsmModule(code);
@@ -548,16 +518,14 @@ describe('GraphCompiler', () => {
         it('emits progress', async () => {
             const graph = await runtime.loadGraph({
                 rootNodeId: 'res',
-                nodes: [
-                    {
-                        id: 'res',
+                nodes: {
+                    res: {
                         ref: 'Any',
                         props: [
                             { key: 'value', linkId: 'arr', expand: true },
                         ]
                     },
-                    {
-                        id: 'arr',
+                    arr: {
                         ref: 'Array',
                         props: [
                             {
@@ -570,7 +538,7 @@ describe('GraphCompiler', () => {
                             }
                         ]
                     }
-                ],
+                },
             });
             const { code } = new GraphCompiler().compileComputeEsm(graph, { introspect: true });
             const { compute } = await evalEsmModule(code);
@@ -597,23 +565,21 @@ describe('GraphCompiler', () => {
         it('does not evaluate same node twice if its result is used more than once', async () => {
             const graph = await runtime.loadGraph({
                 rootNodeId: 'res',
-                nodes: [
-                    {
-                        id: 'res',
+                nodes: {
+                    res: {
                         ref: 'Math.Add',
                         props: [
                             { key: 'a', linkId: 'p' },
                             { key: 'b', linkId: 'p' },
                         ]
                     },
-                    {
-                        id: 'p',
+                    p: {
                         ref: 'String',
                         props: [
                             { key: 'value', value: '42' },
                         ]
                     }
-                ],
+                },
             });
             const { code } = new GraphCompiler().compileComputeEsm(graph, { introspect: true });
             const { compute } = await evalEsmModule(code);
@@ -635,23 +601,21 @@ describe('GraphCompiler', () => {
         it('does not cache node when its result is only used once', async () => {
             const graph = await runtime.loadGraph({
                 rootNodeId: 'res',
-                nodes: [
-                    {
-                        id: 'res',
+                nodes: {
+                    res: {
                         ref: 'Math.Add',
                         props: [
                             { key: 'a', linkId: 'p' },
                             { key: 'b', value: '12' },
                         ]
                     },
-                    {
-                        id: 'p',
+                    p: {
                         ref: 'String',
                         props: [
                             { key: 'value', value: '42' },
                         ]
                     }
-                ],
+                },
             });
             const { code } = new GraphCompiler().compileComputeEsm(graph, { introspect: true });
             const { compute } = await evalEsmModule(code);
@@ -676,17 +640,15 @@ describe('GraphCompiler', () => {
         it('evaluates locals and scoped nodes', async () => {
             const graph = await runtime.loadGraph({
                 rootNodeId: 'res',
-                nodes: [
-                    {
-                        id: 'res',
+                nodes: {
+                    res: {
                         ref: 'Lambda.Map',
                         props: [
                             { key: 'array', linkId: 'arr' },
                             { key: 'fn', linkId: 'fn' },
                         ]
                     },
-                    {
-                        id: 'arr',
+                    arr: {
                         ref: 'Array',
                         props: [
                             {
@@ -699,8 +661,7 @@ describe('GraphCompiler', () => {
                             },
                         ]
                     },
-                    {
-                        id: 'fn',
+                    fn: {
                         ref: 'Array',
                         props: [
                             {
@@ -712,21 +673,19 @@ describe('GraphCompiler', () => {
                             }
                         ]
                     },
-                    {
-                        id: 'index',
+                    index: {
                         ref: '@system/Local',
                         props: [
                             { key: 'key', value: 'index' },
                         ]
                     },
-                    {
-                        id: 'item',
+                    item: {
                         ref: '@system/Local',
                         props: [
                             { key: 'key', value: 'item' },
                         ]
                     }
-                ],
+                },
             });
             const { code } = new GraphCompiler().compileComputeEsm(graph);
             const { compute } = await evalEsmModule(code);
@@ -745,30 +704,27 @@ describe('GraphCompiler', () => {
 
         it('compiles sync function when the tree is sync (even if there are other async nodes)', async () => {
             const graph = await runtime.loadGraph({
-                nodes: [
-                    {
-                        id: 'p1',
+                nodes: {
+                    p1: {
                         ref: 'Number',
                         props: [
                             { key: 'value', value: '42' },
                         ]
                     },
-                    {
-                        id: 'res',
+                    res: {
                         ref: 'Math.Add',
                         props: [
                             { key: 'a', linkId: 'p1' },
                             { key: 'b', value: '1' },
                         ]
                     },
-                    {
-                        id: 'promise',
+                    id: {
                         ref: 'Promise',
                         props: [
                             { key: 'value', linkId: 'res' },
                         ]
                     }
-                ],
+                },
             });
             const { code } = new GraphCompiler().compileComputeEsm(graph, { rootNodeId: 'res' });
             const { compute } = await evalEsmModule(code);
@@ -782,30 +738,27 @@ describe('GraphCompiler', () => {
         it('compiles async function if one of the nodes is async', async () => {
             const graph = await runtime.loadGraph({
                 rootNodeId: 'res',
-                nodes: [
-                    {
-                        id: 'p1',
+                nodes: {
+                    p1: {
                         ref: 'Number',
                         props: [
                             { key: 'value', value: '42' },
                         ]
                     },
-                    {
-                        id: 'res',
+                    res: {
                         ref: 'Math.Add',
                         props: [
                             { key: 'a', linkId: 'p1' },
                             { key: 'b', value: '1' },
                         ]
                     },
-                    {
-                        id: 'promise',
+                    promise: {
                         ref: 'Promise',
                         props: [
                             { key: 'value', linkId: 'res' },
                         ]
                     }
-                ],
+                },
             });
             const { code } = new GraphCompiler().compileComputeEsm(graph, { rootNodeId: 'promise' });
             const { compute } = await evalEsmModule(code);
@@ -822,39 +775,35 @@ describe('GraphCompiler', () => {
 
         it('emits nodeMap', async () => {
             const graph = await runtime.loadGraph({
-                nodes: [
-                    {
-                        id: 'p1',
+                nodes: {
+                    p1: {
                         ref: '@system/Param',
                         props: [
                             { key: 'key', value: 'value' },
                         ]
                     },
-                    {
-                        id: 'plus1',
+                    plus1: {
                         ref: 'Math.Add',
                         props: [
                             { key: 'a', linkId: 'p1' },
                             { key: 'b', value: '1' },
                         ]
                     },
-                    {
-                        id: 'plus2',
+                    plus2: {
                         ref: 'Math.Add',
                         props: [
                             { key: 'a', linkId: 'p1' },
                             { key: 'b', value: '2' },
                         ]
                     },
-                    {
-                        id: 'mul2',
+                    mul2: {
                         ref: 'Math.Add',
                         props: [
                             { key: 'a', linkId: 'p1' },
                             { key: 'b', linkId: 'p1' },
                         ]
                     },
-                ],
+                },
             });
             const { code } = new GraphCompiler().compileComputeEsm(graph, {
                 rootNodeId: 'plus1',
@@ -872,7 +821,6 @@ describe('GraphCompiler', () => {
             const mul2 = await nodeMap.get('mul2')({ value: 80 }, ctx);
             assert.strictEqual(mul2, 160);
         });
-
     });
 
 });

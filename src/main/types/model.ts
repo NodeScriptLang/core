@@ -2,13 +2,14 @@ import { ModuleSpec } from './module.js';
 
 export interface GraphSpec {
     moduleSpec: ModuleSpec;
-    nodes: NodeSpec[];
+    nodes: {
+        [id: string]: NodeSpec;
+    };
     rootNodeId: string;
     metadata: Record<string, any>;
 }
 
 export interface NodeSpec {
-    id: string;
     ref: string;
     props: PropSpec[];
     metadata: Record<string, any>;

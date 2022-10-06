@@ -34,9 +34,10 @@ export class StandardGraphLoader implements GraphLoader {
 
     async loadGraph(spec: DeepPartial<GraphSpec>, options: GraphLoaderOptions = {}): Promise<GraphView> {
         const graphSpec = GraphSpecSchema.decode(spec);
-        const refs = new Set(graphSpec.nodes.map(_ => _.ref));
+        const allRefs = Object.values(graphSpec.nodes).map(_ => _.ref);
+        const uniqueRefs = new Set(allRefs);
         const promises = [];
-        for (const moduleName of refs) {
+        for (const moduleName of uniqueRefs) {
             const promise = this.loadModule(moduleName)
                 .catch(error => {
                     if (options.ignoreFailedDefs) {

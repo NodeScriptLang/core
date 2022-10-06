@@ -114,7 +114,7 @@ class GraphCompilerContext {
             return this.graphView.getNodes();
         }
         if (this.rootNode) {
-            return this.graphView.computeOrder(this.rootNode.id);
+            return this.graphView.computeOrder(this.rootNode.nodeId);
         }
         return [];
     }
@@ -145,8 +145,8 @@ class GraphCompilerContext {
         this.emitComment('Node Map');
         this.code.line('export const nodeMap = new Map()');
         for (const node of this.order) {
-            const sym = this.getNodeSym(node.id);
-            this.code.line(`nodeMap.set(${JSON.stringify(node.id)}, ${sym})`);
+            const sym = this.getNodeSym(node.nodeId);
+            this.code.line(`nodeMap.set(${JSON.stringify(node.nodeId)}, ${sym})`);
         }
     }
 
@@ -168,18 +168,18 @@ class GraphCompilerContext {
     }
 
     private emitNode(node: NodeView) {
-        this.emitComment(`${node.ref} ${node.id}`);
-        const sym = this.getNodeSym(node.id);
+        this.emitComment(`${node.ref} ${node.nodeId}`);
+        const sym = this.getNodeSym(node.nodeId);
         this.code.block(`${this.asyncSym}function ${sym}(params, ctx) {`, `}`, () => {
             this.emitNodePreamble(node);
             if (this.isNodeCached(node)) {
-                this.code.line(`const $c = ctx.cache.get("${node.id}");`);
+                this.code.line(`const $c = ctx.cache.get("${node.nodeId}");`);
                 this.code.line('if ($c) { if ($c.error) { throw $c.error } return $c.result }');
                 this.code.block('try {', '}', () => {
                     this.emitNodeBodyIntrospect(node);
                 });
                 this.code.block('catch (error) {', '}', () => {
-                    this.code.line(`ctx.cache.set("${node.id}", { error });`);
+                    this.code.line(`ctx.cache.set("${node.nodeId}", { error });`);
                     this.code.line(`throw error;`);
                 });
             } else {
@@ -202,16 +202,16 @@ class GraphCompilerContext {
         if (this.options.introspect) {
             this.code.block('try {', '}', () => {
                 if (this.options.evalMode === 'manual') {
-                    this.code.line(`ctx.checkPendingNode(${JSON.stringify(node.id)});`);
+                    this.code.line(`ctx.checkPendingNode(${JSON.stringify(node.nodeId)});`);
                 }
                 this.code.line(`${this.sym.nodeEvaluated}.emit({` +
-                    `nodeId: ${JSON.stringify(node.id)},` +
+                    `nodeId: ${JSON.stringify(node.nodeId)},` +
                     `progress: 0` +
                 `});`);
                 this.emitNodeBodyRaw(node, resSym);
                 if (this.options.introspect) {
                     this.code.line(`${this.sym.nodeEvaluated}.emit({` +
-                        `nodeId: ${JSON.stringify(node.id)},` +
+                        `nodeId: ${JSON.stringify(node.nodeId)},` +
                         `result: ${resSym}` +
                     `});`);
                 }
@@ -219,7 +219,7 @@ class GraphCompilerContext {
             });
             this.code.block('catch (error) {', '}', () => {
                 this.code.line(`${this.sym.nodeEvaluated}.emit({` +
-                    `nodeId: ${JSON.stringify(node.id)},` +
+                    `nodeId: ${JSON.stringify(node.nodeId)},` +
                     `error` +
                 `});`);
                 this.code.line('throw error;');
@@ -307,7 +307,7 @@ class GraphCompilerContext {
     private emitRegularNode(node: NodeView, resSym: string) {
         this.emitNodeCompute(node, resSym);
         if (this.isNodeCached(node)) {
-            this.code.line(`ctx.cache.set("${node.id}", { result: ${resSym} });`);
+            this.code.line(`ctx.cache.set("${node.nodeId}", { result: ${resSym} });`);
         }
     }
 
@@ -341,7 +341,7 @@ class GraphCompilerContext {
         this.code.block(`for (let $i = 0; $i < $l; $i++) {`, `}`, () => {
             if (this.options.introspect) {
                 this.code.line(`${this.sym.nodeEvaluated}.emit({` +
-                    `nodeId: ${JSON.stringify(node.id)},` +
+                    `nodeId: ${JSON.stringify(node.nodeId)},` +
                     `progress: $i / $l` +
                 `});`);
             }
@@ -351,7 +351,7 @@ class GraphCompilerContext {
             this.code.line(`${resSym}.push(${tempSym});`);
         });
         if (this.isNodeCached(node)) {
-            this.code.line(`ctx.cache.set("${node.id}", { result: ${resSym} });`);
+            this.code.line(`ctx.cache.set("${node.nodeId}", { result: ${resSym} });`);
         }
     }
 
@@ -447,7 +447,7 @@ class GraphCompilerContext {
     }
 
     private nodeResultExpr(node: NodeView) {
-        const sym = this.getNodeSym(node.id);
+        const sym = this.getNodeSym(node.nodeId);
         return `${this.awaitSym}${sym}(params, ctx)`;
     }
 
@@ -458,7 +458,7 @@ class GraphCompilerContext {
             return `() => ${this.convertTypeExpr(prop.propSpec.value, paramSpec.schema)}`;
         }
         const targetSchema = linkNode.getModuleSpec().result.schema;
-        const linkSym = this.getNodeSym(linkNode.id);
+        const linkSym = this.getNodeSym(linkNode.nodeId);
         const schemaCompatible = isSchemaCompatible(paramSpec.schema, targetSchema);
         return `${this.asyncSym}(p) => {
             const childCtx = ctx.newScope(p);
@@ -499,7 +499,7 @@ class GraphCompilerContext {
         const cache = node.getModuleSpec().cacheMode ?? 'auto';
         switch (cache) {
             case 'auto': {
-                const links = this.linkMap.get(node.id);
+                const links = this.linkMap.get(node.nodeId);
                 if (links.size > 1) {
                     return true;
                 }
@@ -515,7 +515,7 @@ class GraphCompilerContext {
     private prepareSymbols() {
         for (const node of this.order) {
             const sym = this.nextSym('r');
-            this.symtable.set(`node:${node.id}`, sym);
+            this.symtable.set(`node:${node.nodeId}`, sym);
         }
     }
 }

@@ -10,9 +10,8 @@ describe('EvalJson', () => {
     it('returns hardcoded json', async () => {
         const graph = await runtime.loadGraph({
             rootNodeId: 'res',
-            nodes: [
-                {
-                    id: 'res',
+            nodes: {
+                res: {
                     ref: '@system/EvalJson',
                     props: [
                         {
@@ -21,7 +20,7 @@ describe('EvalJson', () => {
                         }
                     ]
                 }
-            ],
+            },
         });
         const { code } = new GraphCompiler().compileComputeEsm(graph);
         const { compute } = await evalEsmModule(code);
