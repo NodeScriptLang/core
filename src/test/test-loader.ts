@@ -1,4 +1,4 @@
-import { StandardGraphLoader } from '../main/model/GraphLoader.js';
+import { StandardGraphLoader } from '../main/runtime/GraphLoader.js';
 import { ModuleSpecSchema } from '../main/schema/ModuleSpec.js';
 import { ModuleSpec } from '../main/types/module.js';
 import { runtime } from './runtime.js';

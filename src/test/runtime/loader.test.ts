@@ -53,7 +53,7 @@ describe('GraphLoader', () => {
             ],
         });
         const node = graph.getNodeById('node1');
-        const def = node!.$module;
+        const def = node!.getModuleSpec();
         assert.strictEqual(def.label, 'Math.Add');
     });
 

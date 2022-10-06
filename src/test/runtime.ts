@@ -1,6 +1,6 @@
 import { DeepPartial } from '@flexent/schema';
 
-import { Graph } from '../main/model/index.js';
+import { GraphView } from '../main/runtime/GraphView.js';
 import { GraphSpec } from '../main/types/index.js';
 import { TestGraphLoader } from './test-loader.js';
 
@@ -22,7 +22,7 @@ export class TestRuntime {
         return loader;
     }
 
-    async loadGraph(spec: DeepPartial<GraphSpec>): Promise<Graph> {
+    async loadGraph(spec: DeepPartial<GraphSpec>): Promise<GraphView> {
         const loader = await this.createLoader();
         const graph = await loader.loadGraph(spec);
         return graph;

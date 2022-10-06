@@ -6,7 +6,6 @@ import glob from 'glob';
 generateIndexes('./src/main/types');
 generateIndexes('./src/main/util');
 generateIndexes('./src/main/schema');
-generateIndexes('./src/main/model');
 generateIndexes('./src/main/system');
 generateIndexes('./src/main/runtime');
 

@@ -1,7 +1,7 @@
 import assert from 'assert';
 
-import { GraphCompiler } from '../../main/runtime/compiler.js';
-import { GraphEvalContext } from '../../main/runtime/ctx.js';
+import { GraphCompiler } from '../../main/runtime/GraphCompiler.js';
+import { GraphEvalContext } from '../../main/runtime/GraphEvalContext.js';
 import { evalEsmModule } from '../../main/util/eval.js';
 import { runtime } from '../runtime.js';
 
@@ -41,7 +41,7 @@ describe('EvalSync', () => {
                 }
             ],
         });
-        const code = new GraphCompiler().compileComputeEsm(graph);
+        const { code } = new GraphCompiler().compileComputeEsm(graph);
         const { compute } = await evalEsmModule(code);
         const ctx = new GraphEvalContext();
         const res = compute({}, ctx);
@@ -85,7 +85,7 @@ describe('EvalSync', () => {
                 }
             ],
         });
-        const code = new GraphCompiler().compileComputeEsm(graph);
+        const { code } = new GraphCompiler().compileComputeEsm(graph);
         const { compute } = await evalEsmModule(code);
         const ctx = new GraphEvalContext();
         const res = compute({}, ctx);

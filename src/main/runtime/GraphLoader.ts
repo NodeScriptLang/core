@@ -4,14 +4,14 @@ import { GraphSpecSchema } from '../schema/GraphSpec.js';
 import { ModuleSpecSchema } from '../schema/ModuleSpec.js';
 import * as systemNodes from '../system/index.js';
 import { GraphSpec, ModuleDefinition, ModuleSpec } from '../types/index.js';
-import { Graph } from './Graph.js';
+import { GraphView } from './GraphView.js';
 
 export interface GraphLoaderOptions {
     ignoreFailedDefs?: boolean;
 }
 
 export interface GraphLoader {
-    loadGraph(spec: DeepPartial<GraphSpec>, options?: GraphLoaderOptions): Promise<Graph>;
+    loadGraph(spec: DeepPartial<GraphSpec>, options?: GraphLoaderOptions): Promise<GraphView>;
     resolveModuleUrl(moduleName: string): string;
     resolveComputeUrl(moduleName: string): string;
     resolveModule(moduleName: string): ModuleSpec;
@@ -32,7 +32,7 @@ export class StandardGraphLoader implements GraphLoader {
         this.defineModule('@system/EvalJson', systemNodes.EvalJson);
     }
 
-    async loadGraph(spec: DeepPartial<GraphSpec>, options: GraphLoaderOptions = {}): Promise<Graph> {
+    async loadGraph(spec: DeepPartial<GraphSpec>, options: GraphLoaderOptions = {}): Promise<GraphView> {
         const graphSpec = GraphSpecSchema.decode(spec);
         const refs = new Set(graphSpec.nodes.map(_ => _.ref));
         const promises = [];
@@ -47,7 +47,7 @@ export class StandardGraphLoader implements GraphLoader {
             promises.push(promise);
         }
         await Promise.all(promises);
-        return new Graph(this, spec);
+        return new GraphView(this, graphSpec);
     }
 
     resolveModuleUrl(moduleName: string) {
