@@ -16,6 +16,10 @@ export abstract class PropLineView {
         protected propLine: PropLine,
     ) {}
 
+    toJSON() {
+        return structuredClone(this.propLine);
+    }
+
     abstract getLineId(): string;
     abstract getParamSpec(): ModuleParamSpec;
     abstract getSchema(): DataSchemaSpec;

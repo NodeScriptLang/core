@@ -10,6 +10,10 @@ export class GraphView {
         protected graphSpec: GraphSpec,
     ) {}
 
+    toJSON() {
+        return structuredClone(this.graphSpec);
+    }
+
     get moduleSpec() {
         return this.graphSpec.moduleSpec;
     }
