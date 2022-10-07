@@ -26,6 +26,14 @@ export class NodeView {
         return this.graph.loader;
     }
 
+    get ref() {
+        return this.nodeSpec.ref;
+    }
+
+    get metadata() {
+        return this.nodeSpec.metadata;
+    }
+
     getModuleSpec() {
         if (!this._moduleSpec || this._ref !== this.nodeSpec.ref) {
             this._moduleSpec = this.loader.resolveModule(this.nodeSpec.ref);
@@ -33,10 +41,6 @@ export class NodeView {
             return this._moduleSpec;
         }
         return this._moduleSpec;
-    }
-
-    get ref() {
-        return this.nodeSpec.ref;
     }
 
     isRoot() {
