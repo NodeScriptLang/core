@@ -3,7 +3,6 @@ import { MultiMap } from '../util/multimap.js';
 import { GraphLoader } from './GraphLoader.js';
 import { NodeLink, NodeView } from './NodeView.js';
 
-// TODO make sure `async` is set when async modules are used!
 export class GraphView {
 
     constructor(
