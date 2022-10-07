@@ -1,14 +1,12 @@
 import { Schema } from '@flexent/schema';
 
 import { PropSpec } from '../types/index.js';
-import { IdSchema, shortId } from '../util/id.js';
+import { PropEntrySpecSchema } from './PropEntrySpec.js';
 
 export const PropSpecSchema = new Schema<PropSpec>({
     id: 'PropSpec',
     type: 'object',
     properties: {
-        id: { ...IdSchema.schema, default: shortId },
-        key: { type: 'string' },
         value: { type: 'string' },
         linkId: {
             type: 'string',
@@ -18,10 +16,7 @@ export const PropSpecSchema = new Schema<PropSpec>({
         entries: {
             type: 'array',
             optional: true,
-            items: {
-                type: 'ref',
-                schemaId: 'PropSpec',
-            },
+            items: PropEntrySpecSchema.schema,
         }
     },
 });

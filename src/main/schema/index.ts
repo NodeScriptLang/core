@@ -9,4 +9,5 @@ export * from './NodeEvalMode.js';
 export * from './NodeResizeMode.js';
 export * from './NodeResult.js';
 export * from './NodeSpec.js';
+export * from './PropEntrySpec.js';
 export * from './PropSpec.js';

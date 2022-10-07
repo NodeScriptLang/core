@@ -29,10 +29,10 @@ describe('GraphLoader', () => {
     it('loads all graph dependencies', async () => {
         const loader = new TestGraphLoader();
         await loader.loadGraph({
-            nodes: [
-                { ref: 'Math.Add' },
-                { ref: 'String' },
-            ],
+            nodes: {
+                a: { ref: 'Math.Add' },
+                b: { ref: 'String' },
+            },
         });
         assert.strictEqual(loader.resolveModule('Math.Add').label, 'Math.Add');
         assert.strictEqual(loader.resolveModule('String').label, 'String');
@@ -41,19 +41,18 @@ describe('GraphLoader', () => {
     it('allows graph node to resolve module definitions synchronously', async () => {
         const loader = new TestGraphLoader();
         const graph = await loader.loadGraph({
-            nodes: [
-                {
-                    id: 'node1',
+            nodes: {
+                node1: {
                     ref: 'Math.Add',
-                    props: [
-                        { key: 'a', value: '12' },
-                        { key: 'b', value: '21' },
-                    ]
+                    props: {
+                        a: { value: '12' },
+                        b: { value: '21' },
+                    }
                 }
-            ],
+            },
         });
         const node = graph.getNodeById('node1');
-        const def = node!.$module;
+        const def = node!.getModuleSpec();
         assert.strictEqual(def.label, 'Math.Add');
     });
 

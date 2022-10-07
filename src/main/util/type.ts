@@ -40,17 +40,6 @@ export function getType(data: unknown): DataType {
     return 'any';
 }
 
-export function checkType(data: unknown, allowedTypes: DataType | DataType[]) {
-    const actualType = getType(data);
-    const types = Array.isArray(allowedTypes) ? allowedTypes : [allowedTypes];
-    for (const type of types) {
-        if (actualType === type) {
-            return;
-        }
-    }
-    throw new InvalidTypeError(`Expected ${types.join(' or ')}, instead got ${actualType}`);
-}
-
 export function isSchemaCompatible(desiredSchema: DataSchemaSpec, actualSchema: DataSchemaSpec): boolean {
     switch (desiredSchema.type) {
         case 'any':

@@ -1,7 +1,7 @@
 import assert from 'assert';
 
-import { GraphCompiler } from '../../main/runtime/compiler.js';
-import { GraphEvalContext } from '../../main/runtime/ctx.js';
+import { GraphCompiler } from '../../main/runtime/GraphCompiler.js';
+import { GraphEvalContext } from '../../main/runtime/GraphEvalContext.js';
 import { evalEsmModule } from '../../main/util/eval.js';
 import { runtime } from '../runtime.js';
 
@@ -10,38 +10,33 @@ describe('EvalAsync', () => {
     it('evaluates async javascript', async () => {
         const graph = await runtime.loadGraph({
             rootNodeId: 'res',
-            nodes: [
-                {
-                    id: 'res',
+            nodes: {
+                res: {
                     ref: 'Math.Add',
-                    props: [
-                        { key: 'a', linkId: 'e1' },
-                        { key: 'b', linkId: 'e2' },
-                    ]
+                    props: {
+                        a: { linkId: 'e1' },
+                        b: { linkId: 'e2' },
+                    }
                 },
-                {
-                    id: 'e1',
+                e1: {
                     ref: '@system/EvalAsync',
-                    props: [
-                        {
-                            key: 'code',
+                    props: {
+                        code: {
                             value: 'return await new Promise(r => r(42))',
                         }
-                    ]
+                    }
                 },
-                {
-                    id: 'e2',
+                e2: {
                     ref: '@system/EvalAsync',
-                    props: [
-                        {
-                            key: 'code',
+                    props: {
+                        code: {
                             value: 'return await new Promise(r => r(1))',
                         }
-                    ]
+                    }
                 }
-            ]
+            }
         });
-        const code = new GraphCompiler().compileComputeEsm(graph);
+        const { code } = new GraphCompiler().compileComputeEsm(graph);
         const { compute } = await evalEsmModule(code);
         const ctx = new GraphEvalContext();
         const res = await compute({}, ctx);
@@ -51,41 +46,36 @@ describe('EvalAsync', () => {
     it('supports arguments', async () => {
         const graph = await runtime.loadGraph({
             rootNodeId: 'res',
-            nodes: [
-                {
-                    id: 's1',
+            nodes: {
+                s1: {
                     ref: 'String',
-                    props: [
-                        { key: 'value', value: 'hello' },
-                    ]
+                    props: {
+                        value: { value: 'hello' },
+                    }
                 },
-                {
-                    id: 's2',
+                s2: {
                     ref: 'String',
-                    props: [
-                        { key: 'value', value: 'world' },
-                    ]
+                    props: {
+                        value: { value: 'world' },
+                    }
                 },
-                {
-                    id: 'res',
+                res: {
                     ref: '@system/EvalAsync',
-                    props: [
-                        {
-                            key: 'code',
+                    props: {
+                        code: {
                             value: 'return await new Promise(r => r(a + b))',
                         },
-                        {
-                            key: 'args',
+                        args: {
                             entries: [
                                 { key: 'a', linkId: 's1' },
                                 { key: 'b', linkId: 's2' },
                             ]
                         }
-                    ]
+                    }
                 }
-            ]
+            }
         });
-        const code = new GraphCompiler().compileComputeEsm(graph);
+        const { code } = new GraphCompiler().compileComputeEsm(graph);
         const { compute } = await evalEsmModule(code);
         const ctx = new GraphEvalContext();
         const res = await compute({}, ctx);

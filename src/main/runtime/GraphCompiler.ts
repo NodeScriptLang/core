@@ -1,8 +1,9 @@
-import { Graph, Node, NodeLink, Prop } from '../model/index.js';
-import * as t from '../types/index.js';
-import { NodeEvalMode } from '../types/index.js';
+import { DataSchemaSpec, NodeEvalMode } from '../types/index.js';
 import { isSchemaCompatible, MultiMap } from '../util/index.js';
-import { CodeBuilder } from './code.js';
+import { CodeBuilder } from './CodeBuilder.js';
+import { GraphView } from './GraphView.js';
+import { NodeLink, NodeView } from './NodeView.js';
+import { PropLineView, PropView } from './PropView.js';
 
 export interface GraphCompilerOptions {
     rootNodeId: string;
@@ -11,6 +12,11 @@ export interface GraphCompilerOptions {
     emitNodeMap: boolean;
     emitAll: boolean;
     evalMode: NodeEvalMode;
+}
+
+export interface GraphCompilerResult {
+    code: string;
+    async: boolean;
 }
 
 /**
@@ -26,9 +32,14 @@ export interface GraphCompilerOptions {
  */
 export class GraphCompiler {
 
-    compileComputeEsm(graph: Graph, options: Partial<GraphCompilerOptions> = {}) {
-        const gcc = new GraphCompilerContext(graph, options);
-        return gcc.emitComputeEsm();
+    compileComputeEsm(graphView: GraphView, options: Partial<GraphCompilerOptions> = {}): GraphCompilerResult {
+        const gcc = new GraphCompilerContext(graphView, options);
+        const code = gcc.emitComputeEsm();
+        const async = gcc.async;
+        return {
+            code,
+            async,
+        };
     }
 
 }
@@ -42,7 +53,7 @@ class GraphCompilerContext {
     // Buffered code
     code = new CodeBuilder();
     // The order in which nodes need to be computed to fulfill the root node
-    order: Node[] = [];
+    order: NodeView[] = [];
     // The cached dependency map of a graph
     linkMap: MultiMap<string, NodeLink>;
     // Whether the outcome is asynchronous or not
@@ -59,11 +70,11 @@ class GraphCompilerContext {
     };
 
     constructor(
-        readonly graph: Graph,
+        readonly graphView: GraphView,
         options: Partial<GraphCompilerOptions> = {},
     ) {
         this.options = {
-            rootNodeId: this.graph.rootNodeId,
+            rootNodeId: this.graphView.graphSpec.rootNodeId,
             comments: false,
             introspect: false,
             emitNodeMap: false,
@@ -72,11 +83,20 @@ class GraphCompilerContext {
             ...options
         };
         this.order = this.computeOrder();
-        this.linkMap = graph.computeLinkMap();
-        this.async = this.order.some(_ => _.$module.result.async);
+        this.linkMap = graphView.computeLinkMap();
+        // TODO r1 make sure compiled moduleSpec is updated
+        this.async = this.order.some(_ => _.getModuleSpec().result.async);
         this.asyncSym = this.async ? 'async ' : '';
         this.awaitSym = this.async ? 'await ' : '';
         this.prepareSymbols();
+    }
+
+    get loader() {
+        return this.graphView.loader;
+    }
+
+    get rootNode() {
+        return this.graphView.getNodeById(this.options.rootNodeId);
     }
 
     emitComputeEsm() {
@@ -89,16 +109,12 @@ class GraphCompilerContext {
         return this.code.toString();
     }
 
-    get rootNode() {
-        return this.graph.getNodeById(this.options.rootNodeId);
-    }
-
     private computeOrder() {
         if (this.options.emitAll) {
-            return this.graph.nodes;
+            return this.graphView.getNodes();
         }
         if (this.rootNode) {
-            return this.graph.computeOrder(this.rootNode.id);
+            return this.graphView.computeOrder(this.rootNode.nodeId);
         }
         return [];
     }
@@ -110,9 +126,9 @@ class GraphCompilerContext {
             if (moduleName.startsWith('@system/')) {
                 continue;
             }
-            const module = this.graph.$loader.resolveModule(moduleName);
+            const module = this.loader.resolveModule(moduleName);
             const computeUrl = module.attributes?.customImportUrl ??
-                this.graph.$loader.resolveComputeUrl(moduleName);
+                this.loader.resolveComputeUrl(moduleName);
             const sym = this.nextSym('n');
             this.symtable.set(`def:${moduleName}`, sym);
             this.code.line(`import { compute as ${sym} } from '${computeUrl}'`);
@@ -129,8 +145,8 @@ class GraphCompilerContext {
         this.emitComment('Node Map');
         this.code.line('export const nodeMap = new Map()');
         for (const node of this.order) {
-            const sym = this.getNodeSym(node.id);
-            this.code.line(`nodeMap.set(${JSON.stringify(node.id)}, ${sym})`);
+            const sym = this.getNodeSym(node.nodeId);
+            this.code.line(`nodeMap.set(${JSON.stringify(node.nodeId)}, ${sym})`);
         }
     }
 
@@ -151,19 +167,19 @@ class GraphCompilerContext {
         }
     }
 
-    private emitNode(node: Node) {
-        this.emitComment(`${node.ref} ${node.id}`);
-        const sym = this.getNodeSym(node.id);
+    private emitNode(node: NodeView) {
+        this.emitComment(`${node.ref} ${node.nodeId}`);
+        const sym = this.getNodeSym(node.nodeId);
         this.code.block(`${this.asyncSym}function ${sym}(params, ctx) {`, `}`, () => {
             this.emitNodePreamble(node);
             if (this.isNodeCached(node)) {
-                this.code.line(`const $c = ctx.cache.get("${node.id}");`);
+                this.code.line(`const $c = ctx.cache.get("${node.nodeId}");`);
                 this.code.line('if ($c) { if ($c.error) { throw $c.error } return $c.result }');
                 this.code.block('try {', '}', () => {
                     this.emitNodeBodyIntrospect(node);
                 });
                 this.code.block('catch (error) {', '}', () => {
-                    this.code.line(`ctx.cache.set("${node.id}", { error });`);
+                    this.code.line(`ctx.cache.set("${node.nodeId}", { error });`);
                     this.code.line(`throw error;`);
                 });
             } else {
@@ -172,7 +188,7 @@ class GraphCompilerContext {
         });
     }
 
-    private emitNodePreamble(_node: Node) {
+    private emitNodePreamble(_node: NodeView) {
         this.code.line(`const {` +
             `convertType:${this.sym.convertType},` +
             `toArray:${this.sym.toArray},` +
@@ -180,22 +196,22 @@ class GraphCompilerContext {
         `} = ctx;`);
     }
 
-    private emitNodeBodyIntrospect(node: Node) {
+    private emitNodeBodyIntrospect(node: NodeView) {
         const resSym = '$r';
         this.code.line(`let ${resSym};`);
         if (this.options.introspect) {
             this.code.block('try {', '}', () => {
                 if (this.options.evalMode === 'manual') {
-                    this.code.line(`ctx.checkPendingNode(${JSON.stringify(node.id)});`);
+                    this.code.line(`ctx.checkPendingNode(${JSON.stringify(node.nodeId)});`);
                 }
                 this.code.line(`${this.sym.nodeEvaluated}.emit({` +
-                    `nodeId: ${JSON.stringify(node.id)},` +
+                    `nodeId: ${JSON.stringify(node.nodeId)},` +
                     `progress: 0` +
                 `});`);
                 this.emitNodeBodyRaw(node, resSym);
                 if (this.options.introspect) {
                     this.code.line(`${this.sym.nodeEvaluated}.emit({` +
-                        `nodeId: ${JSON.stringify(node.id)},` +
+                        `nodeId: ${JSON.stringify(node.nodeId)},` +
                         `result: ${resSym}` +
                     `});`);
                 }
@@ -203,7 +219,7 @@ class GraphCompilerContext {
             });
             this.code.block('catch (error) {', '}', () => {
                 this.code.line(`${this.sym.nodeEvaluated}.emit({` +
-                    `nodeId: ${JSON.stringify(node.id)},` +
+                    `nodeId: ${JSON.stringify(node.nodeId)},` +
                     `error` +
                 `});`);
                 this.code.line('throw error;');
@@ -214,7 +230,7 @@ class GraphCompilerContext {
         }
     }
 
-    private emitNodeBodyRaw(node: Node, resSym: string) {
+    private emitNodeBodyRaw(node: NodeView, resSym: string) {
         switch (node.ref) {
             case '@system/Param': return this.emitParamNode(node, resSym);
             case '@system/Local': return this.emitLocalNode(node, resSym);
@@ -230,9 +246,9 @@ class GraphCompilerContext {
         }
     }
 
-    private emitParamNode(node: Node, resSym: string) {
-        const prop = node.getBasePropByKey('key');
-        const key = prop?.value;
+    private emitParamNode(node: NodeView, resSym: string) {
+        const prop = node.getProp('key');
+        const key = prop?.propSpec.value;
         if (key) {
             this.code.line(`${resSym} = params[${JSON.stringify(key)}]`);
         } else {
@@ -240,20 +256,20 @@ class GraphCompilerContext {
         }
     }
 
-    private emitLocalNode(node: Node, resSym: string) {
-        const prop = node.getBasePropByKey('key')!;
-        this.code.line(`${resSym} = ctx.getLocal(${JSON.stringify(prop.value)});`);
+    private emitLocalNode(node: NodeView, resSym: string) {
+        const prop = node.getProp('key')!;
+        this.code.line(`${resSym} = ctx.getLocal(${JSON.stringify(prop.propSpec.value)});`);
     }
 
-    private emitEvalSync(node: Node, resSym: string) {
-        const code = node.props.find(_ => _.key === 'code')?.value ?? '';
+    private emitEvalSync(node: NodeView, resSym: string) {
+        const code = node.getProp('code')?.propSpec.value ?? '';
         this.code.block(`const $p = {`, `}`, () => {
-            const prop = node.getBasePropByKey('args');
+            const prop = node.getProp('args');
             if (prop) {
                 this.emitNodeProp(node, prop);
             }
         });
-        const args = node.props.find(_ => _.key === 'args')?.entries ?? [];
+        const args = node.getProp('args')?.propSpec.entries ?? [];
         const argList = args.map(_ => _.key).join(',');
         const argVals = args.map(_ => `$p.args[${JSON.stringify(_.key)}]`).join(',');
         this.code.block(`${resSym} = ((${argList}) => {`, `})(${argVals})`, () => {
@@ -261,15 +277,15 @@ class GraphCompilerContext {
         });
     }
 
-    private emitEvalAsync(node: Node, resSym: string) {
-        const code = node.props.find(_ => _.key === 'code')?.value ?? '';
+    private emitEvalAsync(node: NodeView, resSym: string) {
+        const code = node.getProp('code')?.propSpec.value ?? '';
         this.code.block(`const $p = {`, `}`, () => {
-            const prop = node.getBasePropByKey('args');
+            const prop = node.getProp('args');
             if (prop) {
                 this.emitNodeProp(node, prop);
             }
         });
-        const args = node.props.find(_ => _.key === 'args')?.entries ?? [];
+        const args = node.getProp('args')?.propSpec.entries ?? [];
         const argList = args.map(_ => _.key).join(',');
         const argVals = args.map(_ => `$p.args[${JSON.stringify(_.key)}]`).join(',');
         this.code.block(`${resSym} = await (async (${argList}) => {`, `})(${argVals})`, () => {
@@ -277,8 +293,8 @@ class GraphCompilerContext {
         });
     }
 
-    private emitEvalJson(node: Node, resSym: string) {
-        const code = node.props.find(_ => _.key === 'code')?.value ?? '';
+    private emitEvalJson(node: NodeView, resSym: string) {
+        const code = node.getProp('code')?.propSpec.value ?? '';
         try {
             // Make sure it's actually a JSON
             JSON.parse(code);
@@ -288,25 +304,42 @@ class GraphCompilerContext {
         }
     }
 
-    private emitRegularNode(node: Node, resSym: string) {
+    private emitRegularNode(node: NodeView, resSym: string) {
         this.emitNodeCompute(node, resSym);
         if (this.isNodeCached(node)) {
-            this.code.line(`ctx.cache.set("${node.id}", { result: ${resSym} });`);
+            this.code.line(`ctx.cache.set("${node.nodeId}", { result: ${resSym} });`);
         }
     }
 
-    private emitExpandedNode(node: Node, resSym: string) {
+    private emitExpandedNode(node: NodeView, resSym: string) {
         // Expanded nodes always produce an array by
         // repeating the computation per each value of expanded property
-        const props = [...node.actualProps()];
-        const expandProps = props.filter(_ => _.isExpanded());
+        this.emitExpandedPreamble(node);
         this.code.line(`${resSym} = []`);
+        this.code.block(`for (let $i = 0; $i < $l; $i++) {`, `}`, () => {
+            if (this.options.introspect) {
+                this.code.line(`${this.sym.nodeEvaluated}.emit({` +
+                    `nodeId: ${JSON.stringify(node.nodeId)},` +
+                    `progress: $i / $l` +
+                `});`);
+            }
+            const tempSym = `$t`;
+            this.code.line(`let ${tempSym};`);
+            this.emitNodeCompute(node, tempSym);
+            this.code.line(`${resSym}.push(${tempSym});`);
+        });
+        if (this.isNodeCached(node)) {
+            this.code.line(`ctx.cache.set("${node.nodeId}", { result: ${resSym} });`);
+        }
+    }
+
+    private emitExpandedPreamble(node: NodeView) {
         const expSyms: string[] = [];
-        for (const prop of expandProps) {
+        for (const line of node.expandedLines()) {
             const propSym = this.nextSym('p');
-            this.symtable.set(`prop:${prop.id}`, propSym);
+            this.symtable.set(`prop:${line.getLineId()}`, propSym);
             expSyms.push(propSym);
-            const linkNode = prop.getLinkNode()!;
+            const linkNode = line.getLinkNode()!;
             const linkExpr = this.nodeResultExpr(linkNode);
             const linkExpanded = linkNode.isExpanded();
             // Each expanded property needs to be awaited and converted into an array
@@ -319,40 +352,23 @@ class GraphCompilerContext {
             }
             this.code.line(`const ${propSym} = ${expr}`);
         }
-        this.code.line(`const $l = Math.min(${
-            expSyms.map(s => `${s}.length`).join(',')
-        });`);
-        this.code.block(`for (let $i = 0; $i < $l; $i++) {`, `}`, () => {
-            if (this.options.introspect) {
-                this.code.line(`${this.sym.nodeEvaluated}.emit({` +
-                    `nodeId: ${JSON.stringify(node.id)},` +
-                    `progress: $i / $l` +
-                `});`);
-            }
-            const tempSym = `$t`;
-            this.code.line(`let ${tempSym};`);
-            this.emitNodeCompute(node, tempSym);
-            this.code.line(`${resSym}.push(${tempSym});`);
-        });
-        if (this.isNodeCached(node)) {
-            this.code.line(`ctx.cache.set("${node.id}", { result: ${resSym} });`);
-        }
+        this.code.line(`const $l = Math.min(${expSyms.map(s => `${s}.length`).join(',')});`);
     }
 
-    private emitNodeCompute(node: Node, resSym: string) {
+    private emitNodeCompute(node: NodeView, resSym: string) {
         const defSym = this.getDefSym(node.ref);
         this.code.block(`${resSym} = ${this.awaitSym}${defSym}({`, `}, ctx.newScope());`, () => {
             this.emitNodeProps(node);
         });
     }
 
-    private emitNodeProps(node: Node) {
-        for (const prop of node.props) {
+    private emitNodeProps(node: NodeView) {
+        for (const prop of node.getProps()) {
             this.emitNodeProp(node, prop);
         }
     }
 
-    private emitNodeProp(node: Node, prop: Prop) {
+    private emitNodeProp(node: NodeView, prop: PropView) {
         if (prop.isUsesEntries()) {
             this.emitEntries(prop);
         } else {
@@ -360,8 +376,8 @@ class GraphCompilerContext {
         }
     }
 
-    private emitEntries(prop: Prop) {
-        const { schema } = prop.$param;
+    private emitEntries(prop: PropView) {
+        const { schema } = prop.getParamSpec();
         switch (schema.type) {
             case 'array':
                 return this.emitArrayEntries(prop);
@@ -370,38 +386,38 @@ class GraphCompilerContext {
         }
     }
 
-    private emitArrayEntries(prop: Prop) {
-        this.code.block(`${JSON.stringify(prop.key)}: [`, '],', () => {
-            for (const p of prop.entries) {
-                const expr = this.singlePropExpr(p);
+    private emitArrayEntries(prop: PropView) {
+        this.code.block(`${JSON.stringify(prop.propKey)}: [`, '],', () => {
+            for (const p of prop.getEntries()) {
+                const expr = this.singleLineExpr(p);
                 this.code.line(`${expr},`);
             }
         });
     }
 
-    private emitObjectEntries(prop: Prop) {
-        this.code.block(`${JSON.stringify(prop.key)}: {`, '},', () => {
-            for (const p of prop.entries) {
-                const expr = this.singlePropExpr(p);
-                this.code.line(`${JSON.stringify(p.key)}: ${expr},`);
+    private emitObjectEntries(prop: PropView) {
+        this.code.block(`${JSON.stringify(prop.propKey)}: {`, '},', () => {
+            for (const p of prop.getEntries()) {
+                const expr = this.singleLineExpr(p);
+                this.code.line(`${JSON.stringify(p.propEntrySpec.key)}: ${expr},`);
             }
         });
     }
 
-    private emitSingleProp(prop: Prop) {
-        const expr = this.singlePropExpr(prop);
-        this.code.line(`${JSON.stringify(prop.key)}: ${expr},`);
+    private emitSingleProp(prop: PropView) {
+        const expr = this.singleLineExpr(prop);
+        this.code.line(`${JSON.stringify(prop.propKey)}: ${expr},`);
     }
 
-    private singlePropExpr(prop: Prop, targetSchema: t.DataSchemaSpec = prop.getTargetSchema()) {
-        if (prop.isLambda()) {
-            return this.lambdaPropExpr(prop);
+    private singleLineExpr(line: PropLineView, targetSchema: DataSchemaSpec = line.getSchema()) {
+        if (line.isLambda()) {
+            return this.lambdaLineExpr(line);
         }
-        let expr = this.rawPropExpr(prop);
-        let sourceSchema: t.DataSchemaSpec = { type: 'string' };
-        const linkNode = prop.getLinkNode();
+        let expr = this.rawLineExpr(line);
+        let sourceSchema: DataSchemaSpec = { type: 'string' };
+        const linkNode = line.getLinkNode();
         if (linkNode) {
-            sourceSchema = linkNode.$module.result.schema;
+            sourceSchema = linkNode.getModuleSpec().result.schema;
         }
         const needsTypeConversion = !isSchemaCompatible(targetSchema, sourceSchema);
         if (needsTypeConversion) {
@@ -410,40 +426,40 @@ class GraphCompilerContext {
         return expr;
     }
 
-    private convertTypeExpr(expr: string, targetSchema: t.DataSchemaSpec) {
+    private convertTypeExpr(expr: string, targetSchema: DataSchemaSpec) {
         return `${this.sym.convertType}(${expr}, ${JSON.stringify(targetSchema)})`;
     }
 
-    private rawPropExpr(prop: Prop) {
+    private rawLineExpr(line: PropLineView) {
         // Property result expression prior to type conversion
-        const expSym = this.symtable.get(`prop:${prop.id}`);
+        const expSym = this.symtable.get(`prop:${line.getLineId()}`);
         if (expSym) {
             // Property was expanded
             return `${expSym}[$i]`;
         }
         // The rest only applies to non-expanded properties
-        let expr = JSON.stringify(String(prop.value));
-        const linkNode = prop.getLinkNode();
+        let expr = JSON.stringify(String(line.propLine.value));
+        const linkNode = line.getLinkNode();
         if (linkNode) {
             expr = this.nodeResultExpr(linkNode);
         }
         return expr;
     }
 
-    private nodeResultExpr(node: Node) {
-        const sym = this.getNodeSym(node.id);
+    private nodeResultExpr(node: NodeView) {
+        const sym = this.getNodeSym(node.nodeId);
         return `${this.awaitSym}${sym}(params, ctx)`;
     }
 
-    private lambdaPropExpr(prop: Prop) {
-        const param = prop.$param;
-        const linkNode = prop.getLinkNode();
+    private lambdaLineExpr(line: PropLineView) {
+        const paramSpec = line.getParamSpec();
+        const linkNode = line.getLinkNode();
         if (!linkNode) {
-            return `() => ${this.convertTypeExpr(prop.value, param.schema)}`;
+            return `() => ${this.convertTypeExpr(line.propLine.value, paramSpec.schema)}`;
         }
-        const targetSchema = linkNode.$module.result.schema;
-        const linkSym = this.getNodeSym(linkNode.id);
-        const schemaCompatible = isSchemaCompatible(param.schema, targetSchema);
+        const targetSchema = linkNode.getModuleSpec().result.schema;
+        const linkSym = this.getNodeSym(linkNode.nodeId);
+        const schemaCompatible = isSchemaCompatible(paramSpec.schema, targetSchema);
         return `${this.asyncSym}(p) => {
             const childCtx = ctx.newScope(p);
             const res = ${this.awaitSym}${linkSym}(params, childCtx);
@@ -479,15 +495,15 @@ class GraphCompilerContext {
         }
     }
 
-    private isNodeCached(node: Node) {
-        const cache = node.$module.cacheMode ?? 'auto';
+    private isNodeCached(node: NodeView) {
+        const cache = node.getModuleSpec().cacheMode ?? 'auto';
         switch (cache) {
             case 'auto': {
-                const links = this.linkMap.get(node.id);
+                const links = this.linkMap.get(node.nodeId);
                 if (links.size > 1) {
                     return true;
                 }
-                return [...links].some(link => link.prop.expand);
+                return [...links].some(link => link.prop.isExpanded());
             }
             case 'always':
                 return true;
@@ -499,7 +515,7 @@ class GraphCompilerContext {
     private prepareSymbols() {
         for (const node of this.order) {
             const sym = this.nextSym('r');
-            this.symtable.set(`node:${node.id}`, sym);
+            this.symtable.set(`node:${node.nodeId}`, sym);
         }
     }
 }
