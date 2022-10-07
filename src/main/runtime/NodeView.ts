@@ -1,5 +1,6 @@
 import { PropSpecSchema } from '../schema/PropSpec.js';
 import { NodeSpec } from '../types/model.js';
+import { ModuleSpec } from '../types/module.js';
 import { GraphView } from './GraphView.js';
 import { PropEntryView, PropLineView, PropView } from './PropView.js';
 
@@ -12,6 +13,9 @@ export type NodeLink = {
 
 export class NodeView {
 
+    private _ref: string = '';
+    private _moduleSpec: ModuleSpec | null = null;
+
     constructor(
         readonly graph: GraphView,
         readonly nodeId: string,
@@ -23,7 +27,12 @@ export class NodeView {
     }
 
     getModuleSpec() {
-        return this.loader.resolveModule(this.nodeSpec.ref);
+        if (!this._moduleSpec || this._ref !== this.nodeSpec.ref) {
+            this._moduleSpec = this.loader.resolveModule(this.nodeSpec.ref);
+            this._ref = this.nodeSpec.ref;
+            return this._moduleSpec;
+        }
+        return this._moduleSpec;
     }
 
     get ref() {
