@@ -114,6 +114,10 @@ export class PropEntryView extends PropLineView {
         super(parent.node, propEntrySpec);
     }
 
+    get id() {
+        return this.propEntrySpec.id;
+    }
+
     get key() {
         return this.propEntrySpec.key;
     }

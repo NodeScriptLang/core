@@ -84,7 +84,6 @@ class GraphCompilerContext {
         };
         this.order = this.computeOrder();
         this.linkMap = graphView.computeLinkMap();
-        // TODO r1 make sure compiled moduleSpec is updated
         this.async = this.order.some(_ => _.getModuleSpec().result.async);
         this.asyncSym = this.async ? 'async ' : '';
         this.awaitSym = this.async ? 'await ' : '';
