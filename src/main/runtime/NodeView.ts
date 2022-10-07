@@ -22,6 +22,10 @@ export class NodeView {
         protected nodeSpec: NodeSpec,
     ) {}
 
+    toJSON() {
+        return structuredClone(this.nodeSpec);
+    }
+
     get loader() {
         return this.graph.loader;
     }
