@@ -19,7 +19,7 @@ export class NodeView {
     constructor(
         readonly graph: GraphView,
         readonly nodeId: string,
-        readonly nodeSpec: NodeSpec,
+        protected nodeSpec: NodeSpec,
     ) {}
 
     get loader() {
@@ -40,7 +40,7 @@ export class NodeView {
     }
 
     isRoot() {
-        return this.graph.graphSpec.rootNodeId === this.nodeId;
+        return this.graph.rootNodeId === this.nodeId;
     }
 
     getProps(): PropView[] {

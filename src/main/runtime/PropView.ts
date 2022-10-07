@@ -13,16 +13,24 @@ export abstract class PropLineView {
 
     constructor(
         readonly node: NodeView,
-        readonly propLine: PropLine,
+        protected propLine: PropLine,
     ) {}
+
+    abstract getLineId(): string;
+    abstract getParamSpec(): ModuleParamSpec;
+    abstract getSchema(): DataSchemaSpec;
 
     get graph() {
         return this.node.graph;
     }
 
-    abstract getLineId(): string;
-    abstract getParamSpec(): ModuleParamSpec;
-    abstract getSchema(): DataSchemaSpec;
+    get value() {
+        return this.propLine.value;
+    }
+
+    get linkId() {
+        return this.propLine.linkId;
+    }
 
     /**
      * Returns the node identified by its linkId.
@@ -34,7 +42,7 @@ export abstract class PropLineView {
 
     isLinked() {
         const { linkId } = this.propLine;
-        return linkId ? !!this.graph.graphSpec.nodes[linkId] : false;
+        return !!linkId && this.graph.isNodeExists(linkId);
     }
 
     isLambda() {
@@ -56,7 +64,7 @@ export class PropView extends PropLineView {
     constructor(
         node: NodeView,
         readonly propKey: string,
-        readonly propSpec: PropSpec,
+        protected propSpec: PropSpec,
     ) {
         super(node, propSpec);
     }
@@ -97,9 +105,13 @@ export class PropEntryView extends PropLineView {
 
     constructor(
         readonly parent: PropView,
-        readonly propEntrySpec: PropEntrySpec,
+        protected propEntrySpec: PropEntrySpec,
     ) {
         super(parent.node, propEntrySpec);
+    }
+
+    get key() {
+        return this.propEntrySpec.key;
     }
 
     getLineId() {

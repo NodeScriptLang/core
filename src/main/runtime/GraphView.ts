@@ -6,9 +6,25 @@ import { NodeLink, NodeView } from './NodeView.js';
 export class GraphView {
 
     constructor(
-        public loader: GraphLoader,
-        public graphSpec: GraphSpec,
+        readonly loader: GraphLoader,
+        protected graphSpec: GraphSpec,
     ) {}
+
+    get moduleSpec() {
+        return this.graphSpec.moduleSpec;
+    }
+
+    get metadata() {
+        return this.graphSpec.metadata;
+    }
+
+    get rootNodeId() {
+        return this.graphSpec.rootNodeId;
+    }
+
+    isNodeExists(id: string) {
+        return this.graphSpec.nodes[id] != null;
+    }
 
     getNodeById(id: string): NodeView | null {
         const nodeSpec = this.graphSpec.nodes[id];
@@ -17,6 +33,10 @@ export class GraphView {
 
     getNodes() {
         return Object.entries(this.graphSpec.nodes).map(_ => new NodeView(this, _[0], _[1]));
+    }
+
+    getRootNode() {
+        return this.getNodeById(this.graphSpec.rootNodeId);
     }
 
     /**

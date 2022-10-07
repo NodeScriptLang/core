@@ -137,10 +137,10 @@ describe('GraphCompiler', () => {
                 },
             });
             const { code: code1 } = new GraphCompiler().compileComputeEsm(graph1);
-            graph1.graphSpec.moduleSpec.attributes = {
+            graph1.moduleSpec.attributes = {
                 customImportUrl: codeToUrl(code1),
             };
-            loader.defineModule('graph1', graph1.graphSpec.moduleSpec);
+            loader.defineModule('graph1', graph1.moduleSpec);
             const graph = await loader.loadGraph({
                 rootNodeId: 'res',
                 nodes: {

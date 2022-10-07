@@ -74,7 +74,7 @@ class GraphCompilerContext {
         options: Partial<GraphCompilerOptions> = {},
     ) {
         this.options = {
-            rootNodeId: this.graphView.graphSpec.rootNodeId,
+            rootNodeId: this.graphView.rootNodeId,
             comments: false,
             introspect: false,
             emitNodeMap: false,
@@ -248,7 +248,7 @@ class GraphCompilerContext {
 
     private emitParamNode(node: NodeView, resSym: string) {
         const prop = node.getProp('key');
-        const key = prop?.propSpec.value;
+        const key = prop?.value;
         if (key) {
             this.code.line(`${resSym} = params[${JSON.stringify(key)}]`);
         } else {
@@ -258,18 +258,18 @@ class GraphCompilerContext {
 
     private emitLocalNode(node: NodeView, resSym: string) {
         const prop = node.getProp('key')!;
-        this.code.line(`${resSym} = ctx.getLocal(${JSON.stringify(prop.propSpec.value)});`);
+        this.code.line(`${resSym} = ctx.getLocal(${JSON.stringify(prop.value)});`);
     }
 
     private emitEvalSync(node: NodeView, resSym: string) {
-        const code = node.getProp('code')?.propSpec.value ?? '';
+        const code = node.getProp('code')?.value ?? '';
         this.code.block(`const $p = {`, `}`, () => {
             const prop = node.getProp('args');
             if (prop) {
                 this.emitNodeProp(node, prop);
             }
         });
-        const args = node.getProp('args')?.propSpec.entries ?? [];
+        const args = node.getProp('args')?.getEntries() ?? [];
         const argList = args.map(_ => _.key).join(',');
         const argVals = args.map(_ => `$p.args[${JSON.stringify(_.key)}]`).join(',');
         this.code.block(`${resSym} = ((${argList}) => {`, `})(${argVals})`, () => {
@@ -278,14 +278,14 @@ class GraphCompilerContext {
     }
 
     private emitEvalAsync(node: NodeView, resSym: string) {
-        const code = node.getProp('code')?.propSpec.value ?? '';
+        const code = node.getProp('code')?.value ?? '';
         this.code.block(`const $p = {`, `}`, () => {
             const prop = node.getProp('args');
             if (prop) {
                 this.emitNodeProp(node, prop);
             }
         });
-        const args = node.getProp('args')?.propSpec.entries ?? [];
+        const args = node.getProp('args')?.getEntries() ?? [];
         const argList = args.map(_ => _.key).join(',');
         const argVals = args.map(_ => `$p.args[${JSON.stringify(_.key)}]`).join(',');
         this.code.block(`${resSym} = await (async (${argList}) => {`, `})(${argVals})`, () => {
@@ -294,7 +294,7 @@ class GraphCompilerContext {
     }
 
     private emitEvalJson(node: NodeView, resSym: string) {
-        const code = node.getProp('code')?.propSpec.value ?? '';
+        const code = node.getProp('code')?.value ?? '';
         try {
             // Make sure it's actually a JSON
             JSON.parse(code);
@@ -399,7 +399,7 @@ class GraphCompilerContext {
         this.code.block(`${JSON.stringify(prop.propKey)}: {`, '},', () => {
             for (const p of prop.getEntries()) {
                 const expr = this.singleLineExpr(p);
-                this.code.line(`${JSON.stringify(p.propEntrySpec.key)}: ${expr},`);
+                this.code.line(`${JSON.stringify(p.key)}: ${expr},`);
             }
         });
     }
@@ -438,7 +438,7 @@ class GraphCompilerContext {
             return `${expSym}[$i]`;
         }
         // The rest only applies to non-expanded properties
-        let expr = JSON.stringify(String(line.propLine.value));
+        let expr = JSON.stringify(String(line.value));
         const linkNode = line.getLinkNode();
         if (linkNode) {
             expr = this.nodeResultExpr(linkNode);
@@ -455,7 +455,7 @@ class GraphCompilerContext {
         const paramSpec = line.getParamSpec();
         const linkNode = line.getLinkNode();
         if (!linkNode) {
-            return `() => ${this.convertTypeExpr(line.propLine.value, paramSpec.schema)}`;
+            return `() => ${this.convertTypeExpr(line.value, paramSpec.schema)}`;
         }
         const targetSchema = linkNode.getModuleSpec().result.schema;
         const linkSym = this.getNodeSym(linkNode.nodeId);
