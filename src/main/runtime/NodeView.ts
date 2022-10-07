@@ -1,12 +1,13 @@
 import { PropSpecSchema } from '../schema/PropSpec.js';
 import { NodeSpec } from '../types/model.js';
 import { GraphView } from './GraphView.js';
-import { PropView } from './PropView.js';
+import { PropEntryView, PropLineView, PropView } from './PropView.js';
 
 export type NodeLink = {
     node: NodeView;
-    prop: PropView;
     linkNode: NodeView;
+    prop: PropView;
+    entry?: PropEntryView;
 };
 
 export class NodeView {
@@ -35,20 +36,19 @@ export class NodeView {
 
     getProps(): PropView[] {
         const props: PropView[] = [];
-        for (const [paramKey, paramSpec] of Object.entries(this.getModuleSpec().params)) {
-            const propSpec = this.nodeSpec.props.find(_ => _.key === paramKey) ?? PropSpecSchema.create({
-                key: paramKey,
+        for (const [propKey, paramSpec] of Object.entries(this.getModuleSpec().params)) {
+            const propSpec = this.nodeSpec.props[propKey] ?? PropSpecSchema.create({
                 value: paramSpec.schema.default ?? '',
             });
-            const prop = new PropView(this, propSpec);
+            const prop = new PropView(this, propKey, propSpec);
             props.push(prop);
         }
         return props;
     }
 
-    getBasePropByKey(key: string): PropView | null {
-        const propSpec = this.nodeSpec.props.find(_ => _.key === key);
-        return propSpec ? new PropView(this, propSpec) : null;
+    getProp(key: string): PropView | null {
+        const propSpec = this.nodeSpec.props[key];
+        return propSpec ? new PropView(this, key, propSpec) : null;
     }
 
     getDefaultProp(): PropView | null {
@@ -57,40 +57,55 @@ export class NodeView {
         return firstProp ?? null;
     }
 
-    /**
-     * Props used in actual computation; may include base props and/or entries.
-     */
-    *actualProps(): Iterable<PropView> {
-        for (const prop of this.getProps()) {
-            if (prop.isUsesEntries()) {
-                yield* prop.getEntries();
-            } else {
-                yield prop;
-            }
-        }
-    }
-
-    /**
-     * Props displayed in node editor.
-     * Entries are hidden if base prop has a connected socket.
-     */
-    *displayedProps(): Iterable<PropView> {
-        for (const prop of this.getProps()) {
-            if (prop.isUsesEntries()) {
-                yield prop;
-                yield* prop.getEntries();
-            } else {
-                yield prop;
-            }
-        }
-    }
-
     isExpanded() {
-        return [...this.actualProps()].some(_ => _.isExpanded());
+        for (const _ of this.expandedLines()) {
+            return true;
+        }
+        return false;
+    }
+
+    *expandedLines(): Iterable<PropLineView> {
+        for (const prop of this.getProps()) {
+            if (prop.isUsesEntries()) {
+                for (const entry of prop.getEntries()) {
+                    if (entry.isExpanded()) {
+                        yield entry;
+                    }
+                }
+            } else if (prop.isExpanded()) {
+                yield prop;
+            }
+        }
     }
 
     getOutboundLinks(linkMap = this.graph.computeLinkMap()) {
         return linkMap.get(this.nodeId);
+    }
+
+    *inboundLinks(): Iterable<NodeLink> {
+        for (const prop of this.getProps()) {
+            const linkNode = prop.getLinkNode();
+            if (linkNode) {
+                yield {
+                    node: this,
+                    linkNode,
+                    prop,
+                };
+            }
+            if (prop.isSupportsEntries()) {
+                for (const entry of prop.getEntries()) {
+                    const linkNode = entry.getLinkNode();
+                    if (linkNode) {
+                        yield {
+                            node: this,
+                            linkNode,
+                            prop,
+                            entry,
+                        };
+                    }
+                }
+            }
+        }
     }
 
     *leftNodes(visited: Set<string> = new Set()): Iterable<NodeView> {
@@ -123,12 +138,6 @@ export class NodeView {
             }
         }
         return true;
-    }
-
-    *inboundLinks(): Iterable<NodeLink> {
-        for (const prop of this.getProps()) {
-            yield* prop.getInboundLinks();
-        }
     }
 
 }

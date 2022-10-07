@@ -11,15 +11,23 @@ export interface GraphSpec {
 
 export interface NodeSpec {
     ref: string;
-    props: PropSpec[];
+    props: {
+        [key: string]: PropSpec;
+    };
     metadata: Record<string, any>;
 }
 
 export interface PropSpec {
+    value: string;
+    linkId?: string;
+    expand: boolean;
+    entries?: PropEntrySpec[];
+}
+
+export interface PropEntrySpec {
     id: string;
     key: string;
     value: string;
     linkId?: string;
     expand: boolean;
-    entries?: PropSpec[];
 }

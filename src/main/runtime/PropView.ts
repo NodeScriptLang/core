@@ -1,57 +1,86 @@
 import { DataSchemaSpec } from '../types/data-schema.js';
-import { PropSpec } from '../types/model.js';
+import { PropEntrySpec, PropSpec } from '../types/model.js';
 import { ModuleParamSpec } from '../types/module.js';
-import { NodeLink, NodeView } from './NodeView.js';
+import { NodeView } from './NodeView.js';
 
-export type PropParentView = NodeView | PropView;
+export type PropLine = {
+    value: string;
+    linkId?: string;
+    expand: boolean;
+};
 
-export class PropView {
+export abstract class PropLineView {
 
     constructor(
-        readonly parent: PropParentView,
-        readonly propSpec: PropSpec,
+        readonly node: NodeView,
+        readonly propLine: PropLine,
     ) {}
-
-    get node(): NodeView {
-        return this.parent instanceof NodeView ? this.parent : this.parent.node;
-    }
 
     get graph() {
         return this.node.graph;
     }
 
-    getParamKey() {
-        // For entries the parameter key is defined by their enclosing base prop `key` field
-        return this.parent instanceof PropView ? this.parent.propSpec.key : this.propSpec.key;
+    abstract getLineId(): string;
+    abstract getParamSpec(): ModuleParamSpec;
+    abstract getSchema(): DataSchemaSpec;
+
+    /**
+     * Returns the node identified by its linkId.
+     */
+    getLinkNode(): NodeView | null {
+        const { linkId } = this.propLine;
+        return linkId ? this.graph.getNodeById(linkId) : null;
     }
 
-    getParamSpec(): ModuleParamSpec {
-        return this.node.getModuleSpec().params[this.getParamKey()] ?? {
-            schema: { type: 'any' },
-        };
-    }
-
-    getBaseProp(): PropView {
-        return this.parent instanceof PropView ? this.parent : this;
-    }
-
-    getEntries(): PropView[] {
-        if (this.isSupportsEntries()) {
-            return (this.propSpec.entries ?? []).map(_ => new PropView(this, _));
-        }
-        return [];
+    isLinked() {
+        const { linkId } = this.propLine;
+        return linkId ? !!this.graph.graphSpec.nodes[linkId] : false;
     }
 
     isLambda() {
         return this.getParamSpec().kind === 'lambda';
     }
 
-    isEntry() {
-        return this.parent instanceof PropView;
+    canExpand() {
+        return !this.isLambda();
+    }
+
+    isExpanded() {
+        return this.canExpand() && this.propLine.expand && this.isLinked();
+    }
+
+}
+
+export class PropView extends PropLineView {
+
+    constructor(
+        node: NodeView,
+        readonly propKey: string,
+        readonly propSpec: PropSpec,
+    ) {
+        super(node, propSpec);
+    }
+
+    getLineId() {
+        return this.node.nodeId + ':' + this.propKey;
+    }
+
+    getParamSpec(): ModuleParamSpec {
+        return this.node.getModuleSpec().params[this.propKey] ?? {
+            schema: { type: 'any' },
+        };
+    }
+
+    getSchema(): DataSchemaSpec {
+        return this.getParamSpec().schema;
+    }
+
+    getEntries() {
+        return (this.propSpec.entries ?? []).map(_ => new PropEntryView(this, _));
     }
 
     isSupportsEntries() {
-        if (this.isEntry() || this.isLambda()) {
+        if (this.isLambda()) {
             return false;
         }
         const { schema, hideEntries } = this.getParamSpec();
@@ -62,57 +91,35 @@ export class PropView {
         return this.isSupportsEntries() && !this.getLinkNode();
     }
 
-    /*
-     * Returns the node identified by its linkId.
-     */
-    getLinkNode(): NodeView | null {
-        if (this.propSpec.linkId) {
-            return this.graph.getNodeById(this.propSpec.linkId);
-        }
-        return null;
+}
+
+export class PropEntryView extends PropLineView {
+
+    constructor(
+        readonly parent: PropView,
+        readonly propEntrySpec: PropEntrySpec,
+    ) {
+        super(parent.node, propEntrySpec);
     }
 
-    /**
-     * Returns all links used in actual computation.
-     */
-    getInboundLinks(): NodeLink[] {
-        const node = this.node;
-        const linkNode = this.getLinkNode();
-        if (linkNode && linkNode.canLinkTo(node)) {
-            return [
-                {
-                    node,
-                    prop: this,
-                    linkNode,
-                }
-            ];
-        }
-        return this.getEntries().flatMap(e => e.getInboundLinks());
+    getLineId() {
+        return this.parent.getLineId() + ':' + this.propEntrySpec.id;
     }
 
-    canExpand() {
-        return !this.isLambda();
+    getParamSpec(): ModuleParamSpec {
+        return this.parent.getParamSpec();
     }
 
-    isExpanded() {
-        return this.canExpand() && !!this.propSpec.expand && !!this.getLinkNode();
-    }
-
-    /**
-     * If the prop is an entry, returns the subschema (i.e. `items` if the base prop
-     * is an array or `additionalProperties` if the base prop is an object)
-     */
-    getTargetSchema(): DataSchemaSpec {
-        const baseSchema = this.getParamSpec().schema;
-        if (this.isEntry()) {
-            if (baseSchema.type === 'array') {
+    getSchema(): DataSchemaSpec {
+        const baseSchema = this.parent.getSchema();
+        switch (baseSchema.type) {
+            case 'array':
                 return baseSchema.items ?? { type: 'any' };
-            }
-            if (baseSchema.type === 'object') {
+            case 'object':
                 return baseSchema.additionalProperties ?? { type: 'any' };
-            }
+            default:
+                return { type: 'any' };
         }
-        return baseSchema;
     }
 
 }

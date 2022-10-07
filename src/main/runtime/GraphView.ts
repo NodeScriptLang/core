@@ -46,15 +46,8 @@ export class GraphView {
     computeLinkMap() {
         const map = new MultiMap<string, NodeLink>();
         for (const node of this.getNodes()) {
-            for (const prop of node.actualProps()) {
-                const linkNode = prop.getLinkNode();
-                if (linkNode) {
-                    map.add(linkNode.nodeId, {
-                        node,
-                        prop,
-                        linkNode,
-                    });
-                }
+            for (const link of node.inboundLinks()) {
+                map.add(link.linkNode.nodeId, link);
             }
         }
         return map;
@@ -74,15 +67,13 @@ export class GraphView {
 
     protected _computeOrder(order: NodeView[], node: NodeView) {
         order.unshift(node);
-        for (const prop of node.actualProps()) {
-            const linkNode = prop.getLinkNode();
-            if (linkNode) {
-                const i = order.findIndex(_ => _.nodeId === linkNode.nodeId);
-                if (i > -1) {
-                    order.splice(i, 1);
-                }
-                this._computeOrder(order, linkNode);
+        for (const link of node.inboundLinks()) {
+            const { linkNode } = link;
+            const i = order.findIndex(_ => _.nodeId === linkNode.nodeId);
+            if (i > -1) {
+                order.splice(i, 1);
             }
+            this._computeOrder(order, linkNode);
         }
     }
 

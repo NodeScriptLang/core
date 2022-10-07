@@ -9,8 +9,9 @@ export const NodeSpecSchema = new Schema<NodeSpec>({
     properties: {
         ref: { type: 'string' },
         props: {
-            type: 'array',
-            items: PropSpecSchema.schema,
+            type: 'object',
+            properties: {},
+            additionalProperties: PropSpecSchema.schema,
         },
         metadata: {
             type: 'object',

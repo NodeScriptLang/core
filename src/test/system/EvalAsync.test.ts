@@ -13,28 +13,26 @@ describe('EvalAsync', () => {
             nodes: {
                 res: {
                     ref: 'Math.Add',
-                    props: [
-                        { key: 'a', linkId: 'e1' },
-                        { key: 'b', linkId: 'e2' },
-                    ]
+                    props: {
+                        a: { linkId: 'e1' },
+                        b: { linkId: 'e2' },
+                    }
                 },
                 e1: {
                     ref: '@system/EvalAsync',
-                    props: [
-                        {
-                            key: 'code',
+                    props: {
+                        code: {
                             value: 'return await new Promise(r => r(42))',
                         }
-                    ]
+                    }
                 },
                 e2: {
                     ref: '@system/EvalAsync',
-                    props: [
-                        {
-                            key: 'code',
+                    props: {
+                        code: {
                             value: 'return await new Promise(r => r(1))',
                         }
-                    ]
+                    }
                 }
             }
         });
@@ -51,31 +49,29 @@ describe('EvalAsync', () => {
             nodes: {
                 s1: {
                     ref: 'String',
-                    props: [
-                        { key: 'value', value: 'hello' },
-                    ]
+                    props: {
+                        value: { value: 'hello' },
+                    }
                 },
                 s2: {
                     ref: 'String',
-                    props: [
-                        { key: 'value', value: 'world' },
-                    ]
+                    props: {
+                        value: { value: 'world' },
+                    }
                 },
                 res: {
                     ref: '@system/EvalAsync',
-                    props: [
-                        {
-                            key: 'code',
+                    props: {
+                        code: {
                             value: 'return await new Promise(r => r(a + b))',
                         },
-                        {
-                            key: 'args',
+                        args: {
                             entries: [
                                 { key: 'a', linkId: 's1' },
                                 { key: 'b', linkId: 's2' },
                             ]
                         }
-                    ]
+                    }
                 }
             }
         });

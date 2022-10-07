@@ -13,12 +13,11 @@ describe('EvalJson', () => {
             nodes: {
                 res: {
                     ref: '@system/EvalJson',
-                    props: [
-                        {
-                            key: 'code',
+                    props: {
+                        code: {
                             value: '{ "foo": { "bar": 42 }, "bar": [1, 2, 3] }',
                         }
-                    ]
+                    }
                 }
             },
         });

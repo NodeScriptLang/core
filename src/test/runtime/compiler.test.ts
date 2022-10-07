@@ -16,10 +16,10 @@ describe('GraphCompiler', () => {
                 nodes: {
                     res: {
                         ref: 'Math.Add',
-                        props: [
-                            { key: 'a', value: '12' },
-                            { key: 'b', value: '21' },
-                        ]
+                        props: {
+                            a: { value: '12' },
+                            b: { value: '21' },
+                        }
                     }
                 },
             });
@@ -36,16 +36,16 @@ describe('GraphCompiler', () => {
                 nodes: {
                     p1: {
                         ref: '@system/Param',
-                        props: [
-                            { key: 'key', value: 'value' },
-                        ]
+                        props: {
+                            key: { value: 'value' },
+                        }
                     },
                     res: {
                         ref: 'Math.Add',
-                        props: [
-                            { key: 'a', linkId: 'p1' },
-                            { key: 'b', value: '21' },
-                        ]
+                        props: {
+                            a: { linkId: 'p1' },
+                            b: { value: '21' },
+                        }
                     }
                 }
             });
@@ -78,16 +78,16 @@ describe('GraphCompiler', () => {
                 nodes: {
                     p1: {
                         ref: '@system/Param',
-                        props: [
-                            { key: 'key', value: 'value' },
-                        ]
+                        props: {
+                            key: { value: 'value' },
+                        }
                     },
                     res: {
                         ref: 'Math.Add',
-                        props: [
-                            { key: 'a', linkId: 'p1' },
-                            { key: 'b', value: '1' },
-                        ]
+                        props: {
+                            a: { linkId: 'p1' },
+                            b: { value: '1' },
+                        }
                     }
                 },
             });
@@ -123,16 +123,16 @@ describe('GraphCompiler', () => {
                 nodes: {
                     p1: {
                         ref: '@system/Param',
-                        props: [
-                            { key: 'key', value: 'val' },
-                        ]
+                        props: {
+                            key: { value: 'val' },
+                        }
                     },
                     res: {
                         ref: 'Math.Add',
-                        props: [
-                            { key: 'a', linkId: 'p1' },
-                            { key: 'b', value: '1' },
-                        ]
+                        props: {
+                            a: { linkId: 'p1' },
+                            b: { value: '1' },
+                        }
                     }
                 },
             });
@@ -146,9 +146,9 @@ describe('GraphCompiler', () => {
                 nodes: {
                     res: {
                         ref: 'graph1',
-                        props: [
-                            { key: 'val', value: '123' },
-                        ]
+                        props: {
+                            val: { value: '123' },
+                        }
                     }
                 },
             });
@@ -168,15 +168,15 @@ describe('GraphCompiler', () => {
                 nodes: {
                     res: {
                         ref: 'Number',
-                        props: [
-                            { key: 'value', linkId: 'p' },
-                        ]
+                        props: {
+                            value: { linkId: 'p' },
+                        }
                     },
                     p: {
                         ref: 'String',
-                        props: [
-                            { key: 'value', value: '42' },
-                        ]
+                        props: {
+                            value: { value: '42' },
+                        }
                     }
                 },
             });
@@ -193,15 +193,15 @@ describe('GraphCompiler', () => {
                 nodes: {
                     res: {
                         ref: 'Any',
-                        props: [
-                            { key: 'value', linkId: 'p' },
-                        ]
+                        props: {
+                            value: { linkId: 'p' },
+                        }
                     },
                     p: {
                         ref: '@system/Param',
-                        props: [
-                            { key: 'key', value: 'value' },
-                        ]
+                        props: {
+                            key: { value: 'value' },
+                        }
                     }
                 },
             });
@@ -226,21 +226,20 @@ describe('GraphCompiler', () => {
                 nodes: {
                     res: {
                         ref: 'Object',
-                        props: [
-                            {
-                                key: 'properties',
+                        props: {
+                            properties: {
                                 entries: [
                                     { key: 'foo', value: '42' },
                                     { key: 'bar', linkId: 'num' },
                                 ]
                             },
-                        ]
+                        }
                     },
                     num: {
                         ref: 'Number',
-                        props: [
-                            { key: 'value', value: '42' }
-                        ]
+                        props: {
+                            value: { value: '42' }
+                        }
                     }
                 },
             });
@@ -260,21 +259,20 @@ describe('GraphCompiler', () => {
                 nodes: {
                     res: {
                         ref: 'Array',
-                        props: [
-                            {
-                                key: 'items',
+                        props: {
+                            items: {
                                 entries: [
                                     { value: '42' },
                                     { linkId: 'num' },
                                 ]
                             },
-                        ]
+                        }
                     },
                     num: {
                         ref: 'Number',
-                        props: [
-                            { key: 'value', value: '42' }
-                        ]
+                        props: {
+                            value: { value: '42' }
+                        }
                     }
                 },
             });
@@ -291,22 +289,21 @@ describe('GraphCompiler', () => {
                 nodes: {
                     res: {
                         ref: 'Array',
-                        props: [
-                            {
-                                key: 'items',
+                        props: {
+                            items: {
                                 linkId: 'p',
                                 entries: [
                                     { value: 'one' },
                                     { value: 'two' },
                                 ]
                             },
-                        ]
+                        }
                     },
                     p: {
                         ref: '@system/Param',
-                        props: [
-                            { key: 'key', value: 'value' }
-                        ]
+                        props: {
+                            key: { value: 'value' }
+                        }
                     }
                 },
             });
@@ -329,23 +326,22 @@ describe('GraphCompiler', () => {
                 nodes: {
                     res: {
                         ref: 'Math.Add',
-                        props: [
-                            { key: 'a', linkId: 'arr', expand: true },
-                            { key: 'b', value: '1' },
-                        ]
+                        props: {
+                            a: { linkId: 'arr', expand: true },
+                            b: { value: '1' },
+                        }
                     },
                     arr: {
                         ref: 'Array',
-                        props: [
-                            {
-                                key: 'items',
+                        props: {
+                            items: {
                                 entries: [
-                                    { key: 'value', value: '1' },
-                                    { key: 'value', value: '2' },
-                                    { key: 'value', value: '42' },
+                                    { value: '1' },
+                                    { value: '2' },
+                                    { value: '42' },
                                 ]
                             }
-                        ]
+                        }
                     }
                 },
             });
@@ -362,23 +358,22 @@ describe('GraphCompiler', () => {
                 nodes: {
                     res: {
                         ref: 'Math.Add',
-                        props: [
-                            { key: 'a', linkId: 'arr', expand: true },
-                            { key: 'b', linkId: 'arr', expand: true },
-                        ]
+                        props: {
+                            a: { linkId: 'arr', expand: true },
+                            b: { linkId: 'arr', expand: true },
+                        }
                     },
                     arr: {
                         ref: 'Array',
-                        props: [
-                            {
-                                key: 'items',
+                        props: {
+                            items: {
                                 entries: [
-                                    { key: 'value', value: '1' },
-                                    { key: 'value', value: '2' },
-                                    { key: 'value', value: '42' },
+                                    { value: '1' },
+                                    { value: '2' },
+                                    { value: '42' },
                                 ]
                             }
-                        ]
+                        }
                     }
                 },
             });
@@ -395,35 +390,33 @@ describe('GraphCompiler', () => {
                 nodes: {
                     res: {
                         ref: 'Math.Add',
-                        props: [
-                            { key: 'a', linkId: 'arr1', expand: true },
-                            { key: 'b', linkId: 'arr2', expand: true },
-                        ]
+                        props: {
+                            a: { linkId: 'arr1', expand: true },
+                            b: { linkId: 'arr2', expand: true },
+                        }
                     },
                     arr1: {
                         ref: 'Array',
-                        props: [
-                            {
-                                key: 'items',
+                        props: {
+                            items: {
                                 entries: [
-                                    { key: 'value', value: '1' },
-                                    { key: 'value', value: '2' },
-                                    { key: 'value', value: '42' },
+                                    { value: '1' },
+                                    { value: '2' },
+                                    { value: '42' },
                                 ]
                             }
-                        ]
+                        }
                     },
                     arr2: {
                         ref: 'Array',
-                        props: [
-                            {
-                                key: 'items',
+                        props: {
+                            items: {
                                 entries: [
-                                    { key: 'value', value: '2' },
-                                    { key: 'value', value: '3' },
+                                    { value: '2' },
+                                    { value: '3' },
                                 ]
                             }
-                        ]
+                        }
                     }
                 },
             });
@@ -440,41 +433,38 @@ describe('GraphCompiler', () => {
                 nodes: {
                     res: {
                         ref: 'Object',
-                        props: [
-                            {
-                                key: 'properties',
+                        props: {
+                            properties: {
                                 entries: [
                                     { key: 'foo', linkId: 'arr1', expand: true },
                                     { key: 'bar', linkId: 'arr2' },
                                     { key: 'baz', value: '42' },
                                 ]
                             }
-                        ]
+                        }
                     },
                     arr1: {
                         ref: 'Array',
-                        props: [
-                            {
-                                key: 'items',
+                        props: {
+                            items: {
                                 entries: [
-                                    { key: 'value', value: 'one' },
-                                    { key: 'value', value: 'two' },
-                                    { key: 'value', value: 'three' },
+                                    { value: 'one' },
+                                    { value: 'two' },
+                                    { value: 'three' },
                                 ]
                             }
-                        ]
+                        }
                     },
                     arr2: {
                         ref: 'Array',
-                        props: [
-                            {
-                                key: 'items',
+                        props: {
+                            items: {
                                 entries: [
-                                    { key: 'value', value: '1' },
-                                    { key: 'value', value: '2' },
+                                    { value: '1' },
+                                    { value: '2' },
                                 ]
                             }
-                        ]
+                        }
                     }
                 },
             });
@@ -495,16 +485,16 @@ describe('GraphCompiler', () => {
                 nodes: {
                     res: {
                         ref: 'Math.Add',
-                        props: [
-                            { key: 'a', value: '2', expand: true },
-                            { key: 'b', linkId: 'p', expand: true },
-                        ]
+                        props: {
+                            a: { value: '2', expand: true },
+                            b: { linkId: 'p', expand: true },
+                        }
                     },
                     p: {
                         ref: 'String',
-                        props: [
-                            { key: 'value', value: '42' },
-                        ]
+                        props: {
+                            value: { value: '42' },
+                        }
                     }
                 },
             });
@@ -521,22 +511,21 @@ describe('GraphCompiler', () => {
                 nodes: {
                     res: {
                         ref: 'Any',
-                        props: [
-                            { key: 'value', linkId: 'arr', expand: true },
-                        ]
+                        props: {
+                            value: { linkId: 'arr', expand: true },
+                        }
                     },
                     arr: {
                         ref: 'Array',
-                        props: [
-                            {
-                                key: 'items',
+                        props: {
+                            items: {
                                 entries: [
-                                    { key: 'value', value: '1' },
-                                    { key: 'value', value: '2' },
-                                    { key: 'value', value: '42' },
+                                    { value: '1' },
+                                    { value: '2' },
+                                    { value: '42' },
                                 ]
                             }
-                        ]
+                        }
                     }
                 },
             });
@@ -568,16 +557,16 @@ describe('GraphCompiler', () => {
                 nodes: {
                     res: {
                         ref: 'Math.Add',
-                        props: [
-                            { key: 'a', linkId: 'p' },
-                            { key: 'b', linkId: 'p' },
-                        ]
+                        props: {
+                            a: { linkId: 'p' },
+                            b: { linkId: 'p' },
+                        }
                     },
                     p: {
                         ref: 'String',
-                        props: [
-                            { key: 'value', value: '42' },
-                        ]
+                        props: {
+                            value: { value: '42' },
+                        }
                     }
                 },
             });
@@ -604,16 +593,16 @@ describe('GraphCompiler', () => {
                 nodes: {
                     res: {
                         ref: 'Math.Add',
-                        props: [
-                            { key: 'a', linkId: 'p' },
-                            { key: 'b', value: '12' },
-                        ]
+                        props: {
+                            a: { linkId: 'p' },
+                            b: { value: '12' },
+                        }
                     },
                     p: {
                         ref: 'String',
-                        props: [
-                            { key: 'value', value: '42' },
-                        ]
+                        props: {
+                            value: { value: '42' },
+                        }
                     }
                 },
             });
@@ -643,47 +632,45 @@ describe('GraphCompiler', () => {
                 nodes: {
                     res: {
                         ref: 'Lambda.Map',
-                        props: [
-                            { key: 'array', linkId: 'arr' },
-                            { key: 'fn', linkId: 'fn' },
-                        ]
+                        props: {
+                            array: { linkId: 'arr' },
+                            fn: { linkId: 'fn' },
+                        }
                     },
                     arr: {
                         ref: 'Array',
-                        props: [
-                            {
-                                key: 'items',
+                        props: {
+                            items: {
                                 entries: [
                                     { value: 'one' },
                                     { value: 'two' },
                                     { value: 'three' },
                                 ]
                             },
-                        ]
+                        }
                     },
                     fn: {
                         ref: 'Array',
-                        props: [
-                            {
-                                key: 'items',
+                        props: {
+                            items: {
                                 entries: [
                                     { linkId: 'index' },
                                     { linkId: 'item' },
                                 ]
                             }
-                        ]
+                        }
                     },
                     index: {
                         ref: '@system/Local',
-                        props: [
-                            { key: 'key', value: 'index' },
-                        ]
+                        props: {
+                            key: { value: 'index' },
+                        }
                     },
                     item: {
                         ref: '@system/Local',
-                        props: [
-                            { key: 'key', value: 'item' },
-                        ]
+                        props: {
+                            key: { value: 'item' },
+                        }
                     }
                 },
             });
@@ -707,22 +694,22 @@ describe('GraphCompiler', () => {
                 nodes: {
                     p1: {
                         ref: 'Number',
-                        props: [
-                            { key: 'value', value: '42' },
-                        ]
+                        props: {
+                            value: { value: '42' },
+                        }
                     },
                     res: {
                         ref: 'Math.Add',
-                        props: [
-                            { key: 'a', linkId: 'p1' },
-                            { key: 'b', value: '1' },
-                        ]
+                        props: {
+                            a: { linkId: 'p1' },
+                            b: { value: '1' },
+                        }
                     },
                     id: {
                         ref: 'Promise',
-                        props: [
-                            { key: 'value', linkId: 'res' },
-                        ]
+                        props: {
+                            value: { linkId: 'res' },
+                        }
                     }
                 },
             });
@@ -741,22 +728,22 @@ describe('GraphCompiler', () => {
                 nodes: {
                     p1: {
                         ref: 'Number',
-                        props: [
-                            { key: 'value', value: '42' },
-                        ]
+                        props: {
+                            value: { value: '42' },
+                        }
                     },
                     res: {
                         ref: 'Math.Add',
-                        props: [
-                            { key: 'a', linkId: 'p1' },
-                            { key: 'b', value: '1' },
-                        ]
+                        props: {
+                            a: { linkId: 'p1' },
+                            b: { value: '1' },
+                        }
                     },
                     promise: {
                         ref: 'Promise',
-                        props: [
-                            { key: 'value', linkId: 'res' },
-                        ]
+                        props: {
+                            value: { linkId: 'res' },
+                        }
                     }
                 },
             });
@@ -778,30 +765,30 @@ describe('GraphCompiler', () => {
                 nodes: {
                     p1: {
                         ref: '@system/Param',
-                        props: [
-                            { key: 'key', value: 'value' },
-                        ]
+                        props: {
+                            key: { value: 'value' },
+                        }
                     },
                     plus1: {
                         ref: 'Math.Add',
-                        props: [
-                            { key: 'a', linkId: 'p1' },
-                            { key: 'b', value: '1' },
-                        ]
+                        props: {
+                            a: { linkId: 'p1' },
+                            b: { value: '1' },
+                        }
                     },
                     plus2: {
                         ref: 'Math.Add',
-                        props: [
-                            { key: 'a', linkId: 'p1' },
-                            { key: 'b', value: '2' },
-                        ]
+                        props: {
+                            a: { linkId: 'p1' },
+                            b: { value: '2' },
+                        }
                     },
                     mul2: {
                         ref: 'Math.Add',
-                        props: [
-                            { key: 'a', linkId: 'p1' },
-                            { key: 'b', linkId: 'p1' },
-                        ]
+                        props: {
+                            a: { linkId: 'p1' },
+                            b: { linkId: 'p1' },
+                        }
                     },
                 },
             });

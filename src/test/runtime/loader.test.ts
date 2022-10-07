@@ -44,10 +44,10 @@ describe('GraphLoader', () => {
             nodes: {
                 node1: {
                     ref: 'Math.Add',
-                    props: [
-                        { key: 'a', value: '12' },
-                        { key: 'b', value: '21' },
-                    ]
+                    props: {
+                        a: { value: '12' },
+                        b: { value: '21' },
+                    }
                 }
             },
         });
