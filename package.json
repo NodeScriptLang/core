@@ -7,7 +7,6 @@
         "./types": "./out/main/types/index.js",
         "./util": "./out/main/util/index.js",
         "./schema": "./out/main/schema/index.js",
-        "./model": "./out/main/model/index.js",
         "./runtime": "./out/main/runtime/index.js",
         "./system": "./out/main/system/index.js"
     },
