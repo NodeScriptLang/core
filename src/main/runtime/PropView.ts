@@ -96,7 +96,7 @@ export class PropView extends PropLineView {
     }
 
     isUsesEntries() {
-        return this.isSupportsEntries() && !this.getLinkNode();
+        return this.isSupportsEntries() && !this.isLinked();
     }
 
 }
