@@ -1,4 +1,5 @@
 import { GraphSpec } from '../types/model.js';
+import { clone } from '../util/clone.js';
 import { MultiMap } from '../util/multimap.js';
 import { GraphLoader } from './GraphLoader.js';
 import { NodeLink, NodeView } from './NodeView.js';
@@ -11,7 +12,7 @@ export class GraphView {
     ) {}
 
     toJSON() {
-        return structuredClone(this.graphSpec);
+        return clone(this.graphSpec);
     }
 
     get moduleSpec() {

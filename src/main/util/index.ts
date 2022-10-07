@@ -1,4 +1,5 @@
 // This file is auto-generated
+export * from './clone.js';
 export * from './eval.js';
 export * from './id.js';
 export * from './multimap.js';

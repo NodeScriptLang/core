@@ -1,6 +1,7 @@
 import { DataSchemaSpec } from '../types/data-schema.js';
 import { PropEntrySpec, PropSpec } from '../types/model.js';
 import { ModuleParamSpec } from '../types/module.js';
+import { clone } from '../util/clone.js';
 import { NodeView } from './NodeView.js';
 
 export type PropLine = {
@@ -17,7 +18,7 @@ export abstract class PropLineView {
     ) {}
 
     toJSON() {
-        return structuredClone(this.propLine);
+        return clone(this.propLine);
     }
 
     abstract getLineId(): string;

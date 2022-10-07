@@ -1,6 +1,7 @@
 import { PropSpecSchema } from '../schema/PropSpec.js';
 import { NodeSpec } from '../types/model.js';
 import { ModuleSpec } from '../types/module.js';
+import { clone } from '../util/clone.js';
 import { GraphView } from './GraphView.js';
 import { PropEntryView, PropLineView, PropView } from './PropView.js';
 
@@ -23,7 +24,7 @@ export class NodeView {
     ) {}
 
     toJSON() {
-        return structuredClone(this.nodeSpec);
+        return clone(this.nodeSpec);
     }
 
     get loader() {
