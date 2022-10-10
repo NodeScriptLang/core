@@ -2,6 +2,7 @@ import { DataSchemaSpec } from '../types/data-schema.js';
 import { PropEntrySpec, PropSpec } from '../types/model.js';
 import { ModuleParamSpec } from '../types/module.js';
 import { clone } from '../util/clone.js';
+import { humanize } from '../util/string.js';
 import { NodeView } from './NodeView.js';
 
 export type PropLine = {
@@ -90,6 +91,10 @@ export class PropView extends PropLineView {
 
     getSchema(): DataSchemaSpec {
         return this.getParamSpec().schema;
+    }
+
+    getLabel() {
+        return this.getParamSpec().label ?? humanize(this.propKey);
     }
 
     getEntries() {

@@ -36,12 +36,30 @@ export class NodeView {
         return this.nodeSpec.ref;
     }
 
+    get label() {
+        return this.nodeSpec.label;
+    }
+
     get metadata() {
         return this.nodeSpec.metadata;
     }
 
     getModuleSpec() {
         return this._moduleSpec;
+    }
+
+    getEffectiveLabel() {
+        if (this.label) {
+            return this.label;
+        }
+        const { label, labelParam } = this.getModuleSpec();
+        if (labelParam) {
+            const prop = this.getProp(labelParam);
+            if (prop && !prop.isLinked() && prop.value) {
+                return prop.value;
+            }
+        }
+        return label;
     }
 
     isRoot() {

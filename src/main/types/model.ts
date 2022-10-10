@@ -11,6 +11,7 @@ export interface GraphSpec {
 
 export interface NodeSpec {
     ref: string;
+    label: string;
     props: {
         [key: string]: PropSpec;
     };
