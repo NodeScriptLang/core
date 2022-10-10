@@ -12,17 +12,23 @@ export type PropLine = {
 
 export abstract class PropLineView {
 
+    private _paramSpec: ModuleParamSpec;
+
     constructor(
         readonly node: NodeView,
+        readonly propKey: string,
         protected propLine: PropLine,
-    ) {}
+    ) {
+        this._paramSpec = this.node.getModuleSpec().params[this.propKey] ?? {
+            schema: { type: 'any' },
+        };
+    }
 
     toJSON() {
         return clone(this.propLine);
     }
 
     abstract getLineId(): string;
-    abstract getParamSpec(): ModuleParamSpec;
     abstract getSchema(): DataSchemaSpec;
 
     get graph() {
@@ -35,6 +41,10 @@ export abstract class PropLineView {
 
     get linkId() {
         return this.propLine.linkId;
+    }
+
+    getParamSpec() {
+        return this._paramSpec;
     }
 
     /**
@@ -68,20 +78,14 @@ export class PropView extends PropLineView {
 
     constructor(
         node: NodeView,
-        readonly propKey: string,
+        propKey: string,
         protected propSpec: PropSpec,
     ) {
-        super(node, propSpec);
+        super(node, propKey, propSpec);
     }
 
     getLineId() {
         return this.node.nodeId + ':' + this.propKey;
-    }
-
-    getParamSpec(): ModuleParamSpec {
-        return this.node.getModuleSpec().params[this.propKey] ?? {
-            schema: { type: 'any' },
-        };
     }
 
     getSchema(): DataSchemaSpec {
@@ -109,10 +113,10 @@ export class PropView extends PropLineView {
 export class PropEntryView extends PropLineView {
 
     constructor(
-        readonly parent: PropView,
+        readonly parentProp: PropView,
         protected propEntrySpec: PropEntrySpec,
     ) {
-        super(parent.node, propEntrySpec);
+        super(parentProp.node, parentProp.propKey, propEntrySpec);
     }
 
     get id() {
@@ -124,15 +128,11 @@ export class PropEntryView extends PropLineView {
     }
 
     getLineId() {
-        return this.parent.getLineId() + ':' + this.propEntrySpec.id;
-    }
-
-    getParamSpec(): ModuleParamSpec {
-        return this.parent.getParamSpec();
+        return this.parentProp.getLineId() + ':' + this.propEntrySpec.id;
     }
 
     getSchema(): DataSchemaSpec {
-        const baseSchema = this.parent.getSchema();
+        const baseSchema = this.parentProp.getSchema();
         switch (baseSchema.type) {
             case 'array':
                 return baseSchema.items ?? { type: 'any' };

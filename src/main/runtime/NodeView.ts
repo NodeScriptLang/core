@@ -14,14 +14,15 @@ export type NodeLink = {
 
 export class NodeView {
 
-    private _ref: string = '';
-    private _moduleSpec: ModuleSpec | null = null;
+    private _moduleSpec: ModuleSpec;
 
     constructor(
         readonly graph: GraphView,
         readonly nodeId: string,
         protected nodeSpec: NodeSpec,
-    ) {}
+    ) {
+        this._moduleSpec = this.loader.resolveModule(this.nodeSpec.ref);
+    }
 
     toJSON() {
         return clone(this.nodeSpec);
@@ -40,11 +41,6 @@ export class NodeView {
     }
 
     getModuleSpec() {
-        if (!this._moduleSpec || this._ref !== this.nodeSpec.ref) {
-            this._moduleSpec = this.loader.resolveModule(this.nodeSpec.ref);
-            this._ref = this.nodeSpec.ref;
-            return this._moduleSpec;
-        }
         return this._moduleSpec;
     }
 
