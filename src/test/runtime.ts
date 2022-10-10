@@ -1,8 +1,9 @@
 import { DeepPartial } from '@flexent/schema';
 
 import { GraphView } from '../main/runtime/GraphView.js';
+import { GraphSpecSchema } from '../main/schema/GraphSpec.js';
 import { GraphSpec } from '../main/types/index.js';
-import { TestGraphLoader } from './test-loader.js';
+import { TestModuleLoader } from './test-loader.js';
 
 /**
  * Test runtime utilities.
@@ -18,13 +19,15 @@ export class TestRuntime {
     }
 
     async createLoader() {
-        const loader = new TestGraphLoader();
+        const loader = new TestModuleLoader();
         return loader;
     }
 
     async loadGraph(spec: DeepPartial<GraphSpec>): Promise<GraphView> {
         const loader = await this.createLoader();
-        const graph = await loader.loadGraph(spec);
+        const graphSpec = GraphSpecSchema.decode(spec);
+        const graph = new GraphView(loader, graphSpec);
+        await graph.loadRefs();
         return graph;
     }
 }

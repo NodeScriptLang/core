@@ -1,13 +1,13 @@
 import { GraphSpec } from '../types/model.js';
 import { clone } from '../util/clone.js';
 import { MultiMap } from '../util/multimap.js';
-import { GraphLoader } from './GraphLoader.js';
+import { ModuleLoader } from './ModuleLoader.js';
 import { NodeLink, NodeView } from './NodeView.js';
 
 export class GraphView {
 
     constructor(
-        readonly loader: GraphLoader,
+        readonly loader: ModuleLoader,
         protected graphSpec: GraphSpec,
     ) {}
 
@@ -99,6 +99,19 @@ export class GraphView {
             }
             this._computeOrder(order, linkNode);
         }
+    }
+
+    getUniqueRefs() {
+        return new Set(Object.values(this.graphSpec.nodes).map(_ => _.ref));
+    }
+
+    async loadRefs() {
+        const promises = [];
+        for (const moduleName of this.getUniqueRefs()) {
+            const promise = this.loader.loadModule(moduleName);
+            promises.push(promise);
+        }
+        return await Promise.allSettled(promises);
     }
 
 }

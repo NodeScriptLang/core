@@ -1,11 +1,12 @@
 import assert from 'assert';
 
-import { TestGraphLoader } from '../test-loader.js';
+import { runtime } from '../runtime.js';
+import { TestModuleLoader } from '../test-loader.js';
 
-describe('GraphLoader', () => {
+describe('ModuleLoader', () => {
 
     it('loads modules by moduleName', async () => {
-        const loader = new TestGraphLoader();
+        const loader = new TestModuleLoader();
         const def = await loader.loadModule('Math.Add');
         assert.deepStrictEqual(def, {
             moduleName: 'Math.Add',
@@ -27,20 +28,18 @@ describe('GraphLoader', () => {
     });
 
     it('loads all graph dependencies', async () => {
-        const loader = new TestGraphLoader();
-        await loader.loadGraph({
+        const graph = await runtime.loadGraph({
             nodes: {
                 a: { ref: 'Math.Add' },
                 b: { ref: 'String' },
             },
         });
-        assert.strictEqual(loader.resolveModule('Math.Add').label, 'Math.Add');
-        assert.strictEqual(loader.resolveModule('String').label, 'String');
+        assert.strictEqual(graph.loader.resolveModule('Math.Add').label, 'Math.Add');
+        assert.strictEqual(graph.loader.resolveModule('String').label, 'String');
     });
 
     it('allows graph node to resolve module definitions synchronously', async () => {
-        const loader = new TestGraphLoader();
-        const graph = await loader.loadGraph({
+        const graph = await runtime.loadGraph({
             nodes: {
                 node1: {
                     ref: 'Math.Add',

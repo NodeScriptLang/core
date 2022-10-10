@@ -1,4 +1,4 @@
-import { StandardGraphLoader } from '../main/runtime/GraphLoader.js';
+import { StandardModuleLoader } from '../main/runtime/ModuleLoader.js';
 import { ModuleSpecSchema } from '../main/schema/ModuleSpec.js';
 import { ModuleSpec } from '../main/types/module.js';
 import { runtime } from './runtime.js';
@@ -9,7 +9,7 @@ import { runtime } from './runtime.js';
  * Loads the module from out/test/defs directory using `await import`.
  * This is just to save hassle of pre-bundling test module definitions.
  */
-export class TestGraphLoader extends StandardGraphLoader {
+export class TestModuleLoader extends StandardModuleLoader {
 
     override resolveModuleUrl(moduleName: string): string {
         return runtime.makeUrl(`/out/test/modules/${moduleName}.js`);

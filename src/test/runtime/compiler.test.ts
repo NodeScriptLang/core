@@ -1,10 +1,11 @@
 import assert from 'assert';
 
-import { GraphCompiler, GraphEvalContext } from '../../main/runtime/index.js';
+import { GraphCompiler, GraphEvalContext, GraphView } from '../../main/runtime/index.js';
+import { GraphSpecSchema } from '../../main/schema/GraphSpec.js';
 import * as t from '../../main/types/index.js';
 import { codeToUrl, evalEsmModule } from '../../main/util/index.js';
 import { runtime } from '../runtime.js';
-import { TestGraphLoader } from '../test-loader.js';
+import { TestModuleLoader } from '../test-loader.js';
 
 describe('GraphCompiler', () => {
 
@@ -105,8 +106,8 @@ describe('GraphCompiler', () => {
     describe('custom graphs', () => {
 
         it('can compile graph and use it as a node', async () => {
-            const loader = new TestGraphLoader();
-            const graph1 = await loader.loadGraph({
+            const loader = new TestModuleLoader();
+            const graph1 = new GraphView(loader, GraphSpecSchema.create({
                 moduleSpec: {
                     params: {
                         val: {
@@ -135,13 +136,14 @@ describe('GraphCompiler', () => {
                         }
                     }
                 },
-            });
+            }));
+            await graph1.loadRefs();
             const { code: code1 } = new GraphCompiler().compileComputeEsm(graph1);
             graph1.moduleSpec.attributes = {
                 customImportUrl: codeToUrl(code1),
             };
             loader.defineModule('graph1', graph1.moduleSpec);
-            const graph = await loader.loadGraph({
+            const graph2 = new GraphView(loader, GraphSpecSchema.create({
                 rootNodeId: 'res',
                 nodes: {
                     res: {
@@ -151,8 +153,9 @@ describe('GraphCompiler', () => {
                         }
                     }
                 },
-            });
-            const { code: code2 } = new GraphCompiler().compileComputeEsm(graph);
+            }));
+            await graph2.loadRefs();
+            const { code: code2 } = new GraphCompiler().compileComputeEsm(graph2);
             const { compute } = await evalEsmModule(code2);
             const ctx = new GraphEvalContext();
             const res = await compute({}, ctx);

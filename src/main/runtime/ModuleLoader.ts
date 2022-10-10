@@ -1,24 +1,15 @@
-import { DeepPartial } from '@flexent/schema';
-
-import { GraphSpecSchema } from '../schema/GraphSpec.js';
 import { ModuleSpecSchema } from '../schema/ModuleSpec.js';
 import * as systemNodes from '../system/index.js';
-import { GraphSpec, ModuleDefinition, ModuleSpec } from '../types/index.js';
-import { GraphView } from './GraphView.js';
+import { ModuleDefinition, ModuleSpec } from '../types/index.js';
 
-export interface GraphLoaderOptions {
-    ignoreFailedDefs?: boolean;
-}
-
-export interface GraphLoader {
-    loadGraph(spec: DeepPartial<GraphSpec>, options?: GraphLoaderOptions): Promise<GraphView>;
+export interface ModuleLoader {
     resolveModuleUrl(moduleName: string): string;
     resolveComputeUrl(moduleName: string): string;
     resolveModule(moduleName: string): ModuleSpec;
     loadModule(moduleName: string): Promise<ModuleSpec>;
 }
 
-export class StandardGraphLoader implements GraphLoader {
+export class StandardModuleLoader implements ModuleLoader {
     modules = new Map<string, ModuleSpec>();
     registryUrl = 'https://registry.nodescript.dev';
 
@@ -30,25 +21,6 @@ export class StandardGraphLoader implements GraphLoader {
         this.defineModule('@system/EvalSync', systemNodes.EvalSync);
         this.defineModule('@system/EvalAsync', systemNodes.EvalAsync);
         this.defineModule('@system/EvalJson', systemNodes.EvalJson);
-    }
-
-    async loadGraph(spec: DeepPartial<GraphSpec>, options: GraphLoaderOptions = {}): Promise<GraphView> {
-        const graphSpec = GraphSpecSchema.decode(spec);
-        const allRefs = Object.values(graphSpec.nodes).map(_ => _.ref);
-        const uniqueRefs = new Set(allRefs);
-        const promises = [];
-        for (const moduleName of uniqueRefs) {
-            const promise = this.loadModule(moduleName)
-                .catch(error => {
-                    if (options.ignoreFailedDefs) {
-                        return;
-                    }
-                    throw error;
-                });
-            promises.push(promise);
-        }
-        await Promise.all(promises);
-        return new GraphView(this, graphSpec);
     }
 
     resolveModuleUrl(moduleName: string) {
