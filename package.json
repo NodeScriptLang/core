@@ -1,6 +1,6 @@
 {
     "name": "@nodescript/core",
-    "version": "2.0.0-rc.10",
+    "version": "2.0.0",
     "type": "module",
     "description": "Visual programming language for Browser and Node",
     "exports": {
