@@ -7,6 +7,8 @@ export interface ModuleLoader {
     resolveComputeUrl(moduleName: string): string;
     resolveModule(moduleName: string): ModuleSpec;
     loadModule(moduleName: string): Promise<ModuleSpec>;
+    addModule(module: ModuleSpec): void;
+    removeModule(moduleName: string): void;
 }
 
 export class StandardModuleLoader implements ModuleLoader {
@@ -14,13 +16,13 @@ export class StandardModuleLoader implements ModuleLoader {
     registryUrl = 'https://registry.nodescript.dev';
 
     constructor() {
-        this.defineModule('@system/Comment', systemNodes.Comment);
-        this.defineModule('@system/Frame', systemNodes.Frame);
-        this.defineModule('@system/Local', systemNodes.Local);
-        this.defineModule('@system/Param', systemNodes.Param);
-        this.defineModule('@system/EvalSync', systemNodes.EvalSync);
-        this.defineModule('@system/EvalAsync', systemNodes.EvalAsync);
-        this.defineModule('@system/EvalJson', systemNodes.EvalJson);
+        this.addModule(systemNodes.Comment);
+        this.addModule(systemNodes.Frame);
+        this.addModule(systemNodes.Local);
+        this.addModule(systemNodes.Param);
+        this.addModule(systemNodes.EvalSync);
+        this.addModule(systemNodes.EvalAsync);
+        this.addModule(systemNodes.EvalJson);
     }
 
     resolveModuleUrl(moduleName: string) {
@@ -47,11 +49,11 @@ export class StandardModuleLoader implements ModuleLoader {
         return module;
     }
 
-    getModule(url: string) {
-        return this.modules.get(url) ?? null;
+    getModule(moduleName: string) {
+        return this.modules.get(moduleName) ?? null;
     }
 
-    defineModule(url: string, def: ModuleDefinition | ModuleSpec): ModuleSpec {
+    addModule(def: ModuleDefinition | ModuleSpec): ModuleSpec {
         const spec: ModuleSpec = {
             labelParam: '',
             description: '',
@@ -63,8 +65,12 @@ export class StandardModuleLoader implements ModuleLoader {
             resizeMode: 'horizontal',
             ...def
         };
-        this.modules.set(url, spec);
+        this.modules.set(spec.moduleName, spec);
         return spec;
+    }
+
+    removeModule(moduleName: string): void {
+        this.modules.delete(moduleName);
     }
 
     protected async fetchModule(url: string): Promise<ModuleSpec> {

@@ -109,6 +109,7 @@ describe('GraphCompiler', () => {
             const loader = new TestModuleLoader();
             const graph1 = new GraphView(loader, GraphSpecSchema.create({
                 moduleSpec: {
+                    moduleName: 'graph1',
                     params: {
                         val: {
                             schema: { type: 'number' },
@@ -142,7 +143,7 @@ describe('GraphCompiler', () => {
             graph1.moduleSpec.attributes = {
                 customImportUrl: codeToUrl(code1),
             };
-            loader.defineModule('graph1', graph1.moduleSpec);
+            loader.addModule(graph1.moduleSpec);
             const graph2 = new GraphView(loader, GraphSpecSchema.create({
                 rootNodeId: 'res',
                 nodes: {
