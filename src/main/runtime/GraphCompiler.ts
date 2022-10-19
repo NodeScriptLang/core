@@ -236,6 +236,9 @@ class GraphCompilerContext {
             case '@system/EvalSync': return this.emitEvalSync(node, resSym);
             case '@system/EvalAsync': return this.emitEvalAsync(node, resSym);
             case '@system/EvalJson': return this.emitEvalJson(node, resSym);
+            case '@system/Comment':
+            case '@system/Frame':
+                return;
             default:
                 if (node.isExpanded()) {
                     this.emitExpandedNode(node, resSym);
