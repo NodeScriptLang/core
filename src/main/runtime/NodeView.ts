@@ -71,7 +71,7 @@ export class NodeView {
         for (const key of Object.keys(this.getModuleSpec().params)) {
             const prop = this.getProp(key);
             if (prop) {
-                props.push();
+                props.push(prop);
             }
         }
         return props;
