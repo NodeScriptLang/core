@@ -68,19 +68,24 @@ export class NodeView {
 
     getProps(): PropView[] {
         const props: PropView[] = [];
-        for (const [propKey, paramSpec] of Object.entries(this.getModuleSpec().params)) {
-            const propSpec = this.nodeSpec.props[propKey] ?? PropSpecSchema.create({
-                value: paramSpec.schema.default ?? '',
-            });
-            const prop = new PropView(this, propKey, propSpec);
-            props.push(prop);
+        for (const key of Object.keys(this.getModuleSpec().params)) {
+            const prop = this.getProp(key);
+            if (prop) {
+                props.push();
+            }
         }
         return props;
     }
 
     getProp(key: string): PropView | null {
-        const propSpec = this.nodeSpec.props[key];
-        return propSpec ? new PropView(this, key, propSpec) : null;
+        const paramSpec = this.getModuleSpec().params[key];
+        if (!paramSpec) {
+            return null;
+        }
+        const propSpec = this.nodeSpec.props[key] ?? PropSpecSchema.create({
+            value: paramSpec.schema.default ?? '',
+        });
+        return new PropView(this, key, propSpec);
     }
 
     getDefaultProp(): PropView | null {
