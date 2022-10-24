@@ -14,6 +14,10 @@ export const ModuleSpecSchema = new Schema<ModuleSpec>({
         moduleName: {
             type: 'string',
         },
+        version: {
+            type: 'string',
+            optional: true,
+        },
         label: {
             type: 'string',
         },
