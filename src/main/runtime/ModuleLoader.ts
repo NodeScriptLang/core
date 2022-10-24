@@ -85,6 +85,7 @@ export class StandardModuleLoader implements ModuleLoader {
     protected createUnresolved(moduleName: string): ModuleSpec {
         return {
             moduleName: 'System.Unresolved',
+            version: '0.0.0',
             label: 'Unresolved',
             labelParam: '',
             keywords: [],

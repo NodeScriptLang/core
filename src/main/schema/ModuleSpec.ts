@@ -3,6 +3,7 @@ import { Schema } from '@flexent/schema';
 import { ModuleSpec } from '../types/index.js';
 import { ModuleParamSpecSchema } from './ModuleParamSpec.js';
 import { ModuleResultSpecSchema } from './ModuleResultSpec.js';
+import { ModuleVersionSchema } from './ModuleVersion.js';
 import { NodeCacheModeSchema } from './NodeCacheMode.js';
 import { NodeEvalModeSchema } from './NodeEvalMode.js';
 import { NodeResizeModeSchema } from './NodeResizeMode.js';
@@ -14,10 +15,7 @@ export const ModuleSpecSchema = new Schema<ModuleSpec>({
         moduleName: {
             type: 'string',
         },
-        version: {
-            type: 'string',
-            optional: true,
-        },
+        version: ModuleVersionSchema.schema,
         label: {
             type: 'string',
         },

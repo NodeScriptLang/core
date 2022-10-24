@@ -110,6 +110,7 @@ describe('GraphCompiler', () => {
             const graph1 = new GraphView(loader, GraphSpecSchema.create({
                 moduleSpec: {
                     moduleName: 'graph1',
+                    version: '1.0.0',
                     params: {
                         val: {
                             schema: { type: 'number' },

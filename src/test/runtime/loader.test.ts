@@ -10,6 +10,7 @@ describe('ModuleLoader', () => {
         const def = await loader.loadModule('Math.Add');
         assert.deepStrictEqual(def, {
             moduleName: 'Math.Add',
+            version: '1.0.0',
             label: 'Math.Add',
             labelParam: '',
             description: 'Computes a sum of two numbers.',

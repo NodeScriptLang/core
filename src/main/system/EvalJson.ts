@@ -8,6 +8,7 @@ type R = unknown;
 
 export const EvalJson: ModuleDefinition<P, R> = {
     moduleName: '@system/EvalJson',
+    version: '0.0.0',
     label: 'Json',
     description: 'Returns a JSON value.',
     keywords: ['eval', 'json', 'data'],

@@ -4,6 +4,7 @@ export const Param: ModuleDefinition<{
     key: string;
 }, any> = {
     moduleName: '@system/Param',
+    version: '0.0.0',
     label: 'Param',
     resizeMode: 'none',
     hidden: true,

@@ -8,6 +8,7 @@ type R = any;
 
 export const module: ModuleDefinition<P, R> = {
     moduleName: 'Object',
+    version: '1.0.0',
     label: 'Object',
     description: 'Creates an object.',
     params: {

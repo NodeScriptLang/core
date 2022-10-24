@@ -8,6 +8,7 @@ type R = Promise<any>;
 
 export const module: ModuleDefinition<P, R> = {
     moduleName: 'Promise',
+    version: '1.0.0',
     label: 'Promise',
     description: 'Returns the value asynchronously.',
     params: {

@@ -4,6 +4,7 @@ export * from './GraphSpec.js';
 export * from './ModuleParamSpec.js';
 export * from './ModuleResultSpec.js';
 export * from './ModuleSpec.js';
+export * from './ModuleVersion.js';
 export * from './NodeCacheMode.js';
 export * from './NodeEvalMode.js';
 export * from './NodeResizeMode.js';

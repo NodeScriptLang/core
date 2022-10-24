@@ -4,6 +4,7 @@ export const Comment: ModuleDefinition<{
     comment: string;
 }, any> = {
     moduleName: '@system/Comment',
+    version: '0.0.0',
     label: 'Comment',
     resizeMode: 'all',
     params: {

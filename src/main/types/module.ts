@@ -2,7 +2,7 @@ import { DataSchemaSpec } from './data-schema.js';
 
 export interface ModuleSpec {
     moduleName: string;
-    version?: string;
+    version: string;
     label: string;
     labelParam: string;
     description: string;
