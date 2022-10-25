@@ -44,6 +44,16 @@ export class GraphView {
         return this.getNodeById(this.graphSpec.rootNodeId);
     }
 
+    getNodesByRef(ref: string): NodeView[] {
+        const results: NodeView[] = [];
+        for (const [nodeId, nodeSpec] of Object.entries(this.graphSpec.nodes)) {
+            if (nodeSpec.ref === ref) {
+                results.push(new NodeView(this, nodeId, nodeSpec));
+            }
+        }
+        return results;
+    }
+
     /**
      * Returns an array of the nodes that have no outbound links.
      */
