@@ -1,6 +1,7 @@
 import { Schema } from '@flexent/schema';
 
 import { ModuleSpec } from '../types/index.js';
+import { ModuleIdSchema } from './ModuleId.js';
 import { ModuleParamSpecSchema } from './ModuleParamSpec.js';
 import { ModuleResultSpecSchema } from './ModuleResultSpec.js';
 import { ModuleVersionSchema } from './ModuleVersion.js';
@@ -12,9 +13,7 @@ export const ModuleSpecSchema = new Schema<ModuleSpec>({
     id: 'ModuleSpec',
     type: 'object',
     properties: {
-        moduleId: {
-            type: 'string',
-        },
+        moduleId: ModuleIdSchema.schema,
         version: ModuleVersionSchema.schema,
         label: {
             type: 'string',
