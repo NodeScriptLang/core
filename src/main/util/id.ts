@@ -1,9 +1,8 @@
 import { Schema } from '@flexent/schema';
 import { customAlphabet } from 'nanoid';
 
-const safeAlphabet = 'abcdefghijklmnopqrstuvwxyz0123456789';
-
-export const shortId = customAlphabet(safeAlphabet, 8);
+export const shortId = customAlphabet('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', 8);
+export const standardId = customAlphabet('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', 16);
 
 export const IdSchema = new Schema<string>({
     id: 'Id',
