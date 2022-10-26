@@ -12,7 +12,7 @@ export const ModuleSpecSchema = new Schema<ModuleSpec>({
     id: 'ModuleSpec',
     type: 'object',
     properties: {
-        moduleName: {
+        moduleId: {
             type: 'string',
         },
         version: ModuleVersionSchema.schema,

@@ -3,7 +3,7 @@ import { ModuleDefinition } from '../types/index.js';
 export const Local: ModuleDefinition<{
     key: string;
 }, any> = {
-    moduleName: '@system/Local',
+    moduleId: '@system/Local',
     version: '0.0.0',
     label: 'Local',
     resizeMode: 'none',

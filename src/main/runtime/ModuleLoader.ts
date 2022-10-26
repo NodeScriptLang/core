@@ -3,12 +3,12 @@ import * as systemNodes from '../system/index.js';
 import { ModuleDefinition, ModuleSpec } from '../types/index.js';
 
 export interface ModuleLoader {
-    resolveModuleUrl(moduleName: string): string;
-    resolveComputeUrl(moduleName: string): string;
-    resolveModule(moduleName: string): ModuleSpec;
-    loadModule(moduleName: string): Promise<ModuleSpec>;
+    resolveModuleUrl(moduleId: string): string;
+    resolveComputeUrl(moduleId: string): string;
+    resolveModule(moduleId: string): ModuleSpec;
+    loadModule(moduleId: string): Promise<ModuleSpec>;
     addModule(module: ModuleSpec): void;
-    removeModule(moduleName: string): void;
+    removeModule(moduleId: string): void;
 }
 
 export class StandardModuleLoader implements ModuleLoader {
@@ -25,32 +25,32 @@ export class StandardModuleLoader implements ModuleLoader {
         this.addModule(systemNodes.EvalJson);
     }
 
-    resolveModuleUrl(moduleName: string) {
-        return new URL(moduleName + '.json', this.registryUrl).toString();
+    resolveModuleUrl(moduleId: string) {
+        return new URL(moduleId + '.json', this.registryUrl).toString();
     }
 
-    resolveComputeUrl(moduleName: string): string {
-        return new URL(moduleName + '.mjs', this.registryUrl).toString();
+    resolveComputeUrl(moduleId: string): string {
+        return new URL(moduleId + '.mjs', this.registryUrl).toString();
     }
 
-    resolveModule(moduleName: string): ModuleSpec {
-        return this.getModule(moduleName) ?? this.createUnresolved(moduleName);
+    resolveModule(moduleId: string): ModuleSpec {
+        return this.getModule(moduleId) ?? this.createUnresolved(moduleId);
     }
 
-    async loadModule(moduleName: string): Promise<ModuleSpec> {
-        const existing = this.getModule(moduleName);
+    async loadModule(moduleId: string): Promise<ModuleSpec> {
+        const existing = this.getModule(moduleId);
         if (existing) {
             // Do not import twice
             return existing;
         }
-        const moduleUrl = this.resolveModuleUrl(moduleName);
+        const moduleUrl = this.resolveModuleUrl(moduleId);
         const module = await this.fetchModule(moduleUrl);
-        this.modules.set(moduleName, module);
+        this.modules.set(moduleId, module);
         return module;
     }
 
-    getModule(moduleName: string) {
-        return this.modules.get(moduleName) ?? null;
+    getModule(moduleId: string) {
+        return this.modules.get(moduleId) ?? null;
     }
 
     addModule(def: ModuleDefinition | ModuleSpec): ModuleSpec {
@@ -65,12 +65,12 @@ export class StandardModuleLoader implements ModuleLoader {
             resizeMode: 'horizontal',
             ...def
         };
-        this.modules.set(spec.moduleName, spec);
+        this.modules.set(spec.moduleId, spec);
         return spec;
     }
 
-    removeModule(moduleName: string): void {
-        this.modules.delete(moduleName);
+    removeModule(moduleId: string): void {
+        this.modules.delete(moduleId);
     }
 
     protected async fetchModule(url: string): Promise<ModuleSpec> {
@@ -82,14 +82,14 @@ export class StandardModuleLoader implements ModuleLoader {
         return ModuleSpecSchema.decode(json);
     }
 
-    protected createUnresolved(moduleName: string): ModuleSpec {
+    protected createUnresolved(moduleId: string): ModuleSpec {
         return {
-            moduleName: 'System.Unresolved',
+            moduleId: 'System.Unresolved',
             version: '0.0.0',
             label: 'Unresolved',
             labelParam: '',
             keywords: [],
-            description: `Module ${moduleName} not found`,
+            description: `Module ${moduleId} not found`,
             deprecated: '',
             hidden: true,
             params: {},

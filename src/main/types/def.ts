@@ -6,7 +6,7 @@ import { ModuleParamSpec, ModuleResultSpec, ModuleSpec } from './module.js';
 export type Lambda<Params, Result> = (params: Params) => Promise<Result>;
 
 export type ModuleDefinition<P = unknown, R = unknown> = Omit<Partial<ModuleSpec>, 'params' | 'result'> & {
-    moduleName: string;
+    moduleId: string;
     version: ModuleVersion;
     label: string;
     params: ParamsDefinition<P>;

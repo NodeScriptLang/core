@@ -109,7 +109,7 @@ describe('GraphCompiler', () => {
             const loader = new TestModuleLoader();
             const graph1 = new GraphView(loader, GraphSpecSchema.create({
                 moduleSpec: {
-                    moduleName: 'graph1',
+                    moduleId: 'graph1',
                     version: '1.0.0',
                     params: {
                         val: {

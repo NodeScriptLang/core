@@ -5,11 +5,11 @@ import { TestModuleLoader } from '../test-loader.js';
 
 describe('ModuleLoader', () => {
 
-    it('loads modules by moduleName', async () => {
+    it('loads modules by moduleId', async () => {
         const loader = new TestModuleLoader();
         const def = await loader.loadModule('Math.Add');
         assert.deepStrictEqual(def, {
-            moduleName: 'Math.Add',
+            moduleId: 'Math.Add',
             version: '1.0.0',
             label: 'Math.Add',
             labelParam: '',

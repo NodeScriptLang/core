@@ -7,7 +7,7 @@ type P = {
 type R = string;
 
 export const module: ModuleDefinition<P, R> = {
-    moduleName: 'Param.Default',
+    moduleId: 'Param.Default',
     version: '1.0.0',
     label: 'Default Param',
     description: 'A node that has a parameter with default value',

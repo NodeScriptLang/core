@@ -8,7 +8,7 @@ type P = {
 type R = number;
 
 export const module: ModuleDefinition<P, R> = {
-    moduleName: 'Math.Add',
+    moduleId: 'Math.Add',
     version: '1.0.0',
     label: 'Math.Add',
     description: 'Computes a sum of two numbers.',

@@ -121,15 +121,15 @@ class GraphCompilerContext {
     private emitImports() {
         this.emitComment('Imports');
         const moduleNames = new Set(this.order.map(_ => _.ref));
-        for (const moduleName of moduleNames) {
-            if (moduleName.startsWith('@system/')) {
+        for (const moduleId of moduleNames) {
+            if (moduleId.startsWith('@system/')) {
                 continue;
             }
-            const module = this.loader.resolveModule(moduleName);
+            const module = this.loader.resolveModule(moduleId);
             const computeUrl = module.attributes?.customImportUrl ??
-                this.loader.resolveComputeUrl(moduleName);
+                this.loader.resolveComputeUrl(moduleId);
             const sym = this.nextSym('n');
-            this.symtable.set(`def:${moduleName}`, sym);
+            this.symtable.set(`def:${moduleId}`, sym);
             this.code.line(`import { compute as ${sym} } from '${computeUrl}'`);
         }
     }

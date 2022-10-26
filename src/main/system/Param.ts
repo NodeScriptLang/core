@@ -3,7 +3,7 @@ import { ModuleDefinition } from '../types/index.js';
 export const Param: ModuleDefinition<{
     key: string;
 }, any> = {
-    moduleName: '@system/Param',
+    moduleId: '@system/Param',
     version: '0.0.0',
     label: 'Param',
     resizeMode: 'none',

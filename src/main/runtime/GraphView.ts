@@ -117,8 +117,8 @@ export class GraphView {
 
     async loadRefs() {
         const promises = [];
-        for (const moduleName of this.getUniqueRefs()) {
-            const promise = this.loader.loadModule(moduleName);
+        for (const moduleId of this.getUniqueRefs()) {
+            const promise = this.loader.loadModule(moduleId);
             promises.push(promise);
         }
         return await Promise.allSettled(promises);
