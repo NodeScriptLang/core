@@ -17,7 +17,6 @@ export interface GraphCompilerOptions {
 export interface GraphCompilerResult {
     code: string;
     async: boolean;
-    schema: DataSchemaSpec;
 }
 
 /**
@@ -36,11 +35,9 @@ export class GraphCompiler {
     compileComputeEsm(graphView: GraphView, options: Partial<GraphCompilerOptions> = {}): GraphCompilerResult {
         const gcc = new GraphCompilerContext(graphView, options);
         const code = gcc.emitComputeEsm();
-        const schema: DataSchemaSpec = gcc.rootNode ? gcc.rootNode.getModuleSpec().result.schema : { type: 'any' };
         return {
             code,
             async: gcc.async,
-            schema,
         };
     }
 
