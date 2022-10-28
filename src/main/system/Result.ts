@@ -1,21 +1,22 @@
 import { ModuleDefinition } from '../types/index.js';
 
-export const Local: ModuleDefinition<{
-    key: string;
+export const Result: ModuleDefinition<{
+    value: unknown;
 }, any> = {
-    moduleId: '@system/Local',
+    moduleId: '@system/Result',
     version: '0.0.0',
-    label: 'Local',
+    label: 'Result',
     resizeMode: 'none',
     hidden: true,
     params: {
-        key: {
+        value: {
             schema: {
-                type: 'string',
+                type: 'any',
             },
         }
     },
     result: {
         schema: { type: 'any' },
+        hideSocket: true,
     },
 };

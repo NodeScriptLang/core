@@ -7,11 +7,6 @@ export const ModuleParamSpecSchema = new Schema<ModuleParamSpec>({
     id: 'ModuleParamSpec',
     type: 'object',
     properties: {
-        kind: {
-            type: 'string',
-            enum: ['lambda'],
-            optional: true,
-        },
         label: {
             type: 'string',
             optional: true,

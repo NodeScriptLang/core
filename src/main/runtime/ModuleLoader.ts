@@ -18,8 +18,8 @@ export class StandardModuleLoader implements ModuleLoader {
     constructor() {
         this.addModule(systemNodes.Comment);
         this.addModule(systemNodes.Frame);
-        this.addModule(systemNodes.Local);
         this.addModule(systemNodes.Param);
+        this.addModule(systemNodes.Result);
         this.addModule(systemNodes.EvalSync);
         this.addModule(systemNodes.EvalAsync);
         this.addModule(systemNodes.EvalJson);

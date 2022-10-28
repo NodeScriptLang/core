@@ -193,7 +193,7 @@ class GraphCompilerContext {
         this.code.line(`const {` +
             `convertType:${this.sym.convertType},` +
             `toArray:${this.sym.toArray},` +
-            `nodeEvaluated:${this.sym.nodeEvaluated},` +
+            (this.options.introspect ? `nodeEvaluated:${this.sym.nodeEvaluated},` : '') +
         `} = ctx;`);
     }
 
@@ -234,7 +234,7 @@ class GraphCompilerContext {
     private emitNodeBodyRaw(node: NodeView, resSym: string) {
         switch (node.ref) {
             case '@system/Param': return this.emitParamNode(node, resSym);
-            case '@system/Local': return this.emitLocalNode(node, resSym);
+            case '@system/Result': return this.emitResultNode(node, resSym);
             case '@system/EvalSync': return this.emitEvalSync(node, resSym);
             case '@system/EvalAsync': return this.emitEvalAsync(node, resSym);
             case '@system/EvalJson': return this.emitEvalJson(node, resSym);
@@ -260,9 +260,10 @@ class GraphCompilerContext {
         }
     }
 
-    private emitLocalNode(node: NodeView, resSym: string) {
-        const prop = node.getProp('key')!;
-        this.code.line(`${resSym} = ctx.getLocal(${JSON.stringify(prop.value)});`);
+    private emitResultNode(node: NodeView, resSym: string) {
+        const prop = node.getProp('value')!;
+        const expr = this.singleLineExpr(prop, this.graphView.moduleSpec.result.schema);
+        this.code.line(`${resSym} = ${expr};`);
     }
 
     private emitEvalSync(node: NodeView, resSym: string) {
@@ -414,9 +415,6 @@ class GraphCompilerContext {
     }
 
     private singleLineExpr(line: PropLineView, targetSchema: DataSchemaSpec = line.getSchema()) {
-        if (line.isLambda()) {
-            return this.lambdaLineExpr(line);
-        }
         let expr = this.rawLineExpr(line);
         let sourceSchema: DataSchemaSpec = { type: 'string' };
         const linkNode = line.getLinkNode();
@@ -453,22 +451,6 @@ class GraphCompilerContext {
     private nodeResultExpr(node: NodeView) {
         const sym = this.getNodeSym(node.nodeId);
         return `${this.awaitSym}${sym}(params, ctx)`;
-    }
-
-    private lambdaLineExpr(line: PropLineView) {
-        const paramSpec = line.getParamSpec();
-        const linkNode = line.getLinkNode();
-        if (!linkNode) {
-            return `() => ${this.convertTypeExpr(line.value, paramSpec.schema)}`;
-        }
-        const targetSchema = linkNode.getModuleSpec().result.schema;
-        const linkSym = this.getNodeSym(linkNode.nodeId);
-        const schemaCompatible = isSchemaCompatible(paramSpec.schema, targetSchema);
-        return `${this.asyncSym}(p) => {
-            const childCtx = ctx.newScope(p);
-            const res = ${this.awaitSym}${linkSym}(params, childCtx);
-            return ${schemaCompatible ? 'res' : this.convertTypeExpr(`res`, targetSchema)};
-        }`;
     }
 
     private getNodeSym(nodeId: string) {
