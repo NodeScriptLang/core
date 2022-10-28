@@ -4,8 +4,7 @@ import { getType, Schema } from '@flexent/schema';
 import * as t from '../types/index.js';
 
 /**
- * GraphEvalContext provides runtime tools for graph computation
- * and facilitates compute features like lambdas (with sub scopes),
+ * GraphEvalContext provides runtime tools for graph computation,
  * node caching, introspection, etc.
  */
 export abstract class BaseContext implements t.GraphEvalContext {
@@ -42,8 +41,6 @@ export abstract class BaseContext implements t.GraphEvalContext {
 
 /**
  * Top-level scope.
- * In graphs with no lambdas this will be a single instance passed to all nodes.
- * Has no locals.
  */
 export class GraphEvalContext extends BaseContext {
     nodeEvaluated = new Event<t.NodeResult>();
@@ -55,7 +52,7 @@ export class GraphEvalContext extends BaseContext {
 }
 
 /**
- * Sub-scope eval context, created when a lambda is evaluated.
+ * Sub-scope eval context, created when a sub-graph is evaluated.
  * Locals are passed by node implementation and are looked up hierarchically,
  * i.e. if the local is not found in one scope, the request is delegated to parent.
  *

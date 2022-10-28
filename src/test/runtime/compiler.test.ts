@@ -103,7 +103,66 @@ describe('GraphCompiler', () => {
 
     });
 
-    describe('custom graphs', () => {
+    describe('result', () => {
+
+        it('returns value unmodified by default', async () => {
+            const graph = await runtime.loadGraph({
+                rootNodeId: 'res',
+                nodes: {
+                    p: {
+                        ref: 'String',
+                        props: {
+                            value: { value: '123' },
+                        }
+                    },
+                    res: {
+                        ref: '@system/Result',
+                        props: {
+                            value: { linkId: 'p' },
+                        }
+                    }
+                },
+            });
+            const { code } = new GraphCompiler().compileComputeEsm(graph);
+            const { compute } = await evalEsmModule(code);
+            const ctx = new GraphEvalContext();
+            const res = await compute({}, ctx);
+            assert.strictEqual(res, '123');
+        });
+
+        it('converts value as per graph result schema', async () => {
+            const graph = await runtime.loadGraph({
+                rootNodeId: 'res',
+                moduleSpec: {
+                    result: {
+                        schema: { type: 'number' },
+                    }
+                },
+                nodes: {
+                    p: {
+                        ref: 'String',
+                        props: {
+                            value: { value: '123' },
+                        }
+                    },
+                    res: {
+                        ref: '@system/Result',
+                        props: {
+                            value: { linkId: 'p' },
+                        }
+                    }
+                },
+            });
+            const { code } = new GraphCompiler().compileComputeEsm(graph);
+            const { compute } = await evalEsmModule(code);
+            const ctx = new GraphEvalContext();
+            const res = await compute({}, ctx);
+            assert.strictEqual(res, 123);
+        });
+
+    });
+
+    describe('graphs as modules', () => {
 
         it('can compile graph and use it as a node', async () => {
             const loader = new TestModuleLoader();
@@ -625,69 +684,6 @@ describe('GraphCompiler', () => {
                 { nodeId: 'res', result: 54 },
             ]);
             assert.deepStrictEqual(ctx.cache.size, 0);
-        });
-
-    });
-
-    describe('lambda', () => {
-
-        it('evaluates locals and scoped nodes', async () => {
-            const graph = await runtime.loadGraph({
-                rootNodeId: 'res',
-                nodes: {
-                    res: {
-                        ref: 'Lambda.Map',
-                        props: {
-                            array: { linkId: 'arr' },
-                            fn: { linkId: 'fn' },
-                        }
-                    },
-                    arr: {
-                        ref: 'Array',
-                        props: {
-                            items: {
-                                entries: [
-                                    { value: 'one' },
-                                    { value: 'two' },
-                                    { value: 'three' },
-                                ]
-                            },
-                        }
-                    },
-                    fn: {
-                        ref: 'Array',
-                        props: {
-                            items: {
-                                entries: [
-                                    { linkId: 'index' },
-                                    { linkId: 'item' },
-                                ]
-                            }
-                        }
-                    },
-                    index: {
-                        ref: '@system/Local',
-                        props: {
-                            key: { value: 'index' },
-                        }
-                    },
-                    item: {
-                        ref: '@system/Local',
-                        props: {
-                            key: { value: 'item' },
-                        }
-                    }
-                },
-            });
-            const { code } = new GraphCompiler().compileComputeEsm(graph);
-            const { compute } = await evalEsmModule(code);
-            const ctx = new GraphEvalContext();
-            const res = await compute({}, ctx);
-            assert.deepStrictEqual(res, [
-                [0, 'one'],
-                [1, 'two'],
-                [2, 'three'],
-            ]);
         });
 
     });

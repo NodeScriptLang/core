@@ -18,7 +18,6 @@ export interface ModuleSpec {
 }
 
 export interface ModuleParamSpec {
-    kind?: 'lambda';
     schema: DataSchemaSpec;
     scope?: Record<string, DataSchemaSpec>;
     default?: string;

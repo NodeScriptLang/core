@@ -61,12 +61,8 @@ export abstract class PropLineView {
         return !!linkId && this.graph.isNodeExists(linkId);
     }
 
-    isLambda() {
-        return this.getParamSpec().kind === 'lambda';
-    }
-
     canExpand() {
-        return !this.isLambda();
+        return true;
     }
 
     isExpanded() {
@@ -102,9 +98,6 @@ export class PropView extends PropLineView {
     }
 
     isSupportsEntries() {
-        if (this.isLambda()) {
-            return false;
-        }
         const { schema, hideEntries } = this.getParamSpec();
         return !hideEntries && (schema.type === 'object' || schema.type === 'array');
     }
