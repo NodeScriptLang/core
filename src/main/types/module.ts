@@ -14,7 +14,7 @@ export interface ModuleSpec {
     cacheMode: NodeCacheMode;
     evalMode: NodeEvalMode;
     resizeMode: NodeResizeMode;
-    attributes?: Record<string, any>;
+    attributes: Record<string, any>;
 }
 
 export interface ModuleParamSpec {

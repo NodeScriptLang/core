@@ -63,6 +63,7 @@ export class StandardModuleLoader implements ModuleLoader {
             cacheMode: 'auto',
             evalMode: 'auto',
             resizeMode: 'horizontal',
+            attributes: {},
             ...def
         };
         this.modules.set(spec.moduleId, spec);
@@ -99,6 +100,9 @@ export class StandardModuleLoader implements ModuleLoader {
             cacheMode: 'auto',
             evalMode: 'auto',
             resizeMode: 'horizontal',
+            attributes: {
+                moduleId,
+            },
         };
     }
 }
