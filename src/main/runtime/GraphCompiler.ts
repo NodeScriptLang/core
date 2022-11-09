@@ -119,8 +119,8 @@ class GraphCompilerContext {
 
     private emitImports() {
         this.emitComment('Imports');
-        const moduleNames = new Set(this.order.map(_ => _.ref));
-        for (const moduleId of moduleNames) {
+        const moduleIds = new Set(this.order.map(_ => _.ref));
+        for (const moduleId of moduleIds) {
             if (moduleId.startsWith('@system/')) {
                 continue;
             }
