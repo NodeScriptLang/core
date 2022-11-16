@@ -26,6 +26,6 @@ export const module: ModuleDefinition<P, R> = {
     },
 };
 
-export const compute: ModuleCompute<P, R> = (params: P) => {
+export const compute: ModuleCompute<P, R> = async (params: P) => {
     return params.value;
 };

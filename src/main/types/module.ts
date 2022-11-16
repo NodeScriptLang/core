@@ -20,8 +20,9 @@ export interface ModuleSpec {
 export interface ModuleParamSpec {
     schema: DataSchemaSpec;
     scope?: Record<string, DataSchemaSpec>;
-    default?: string;
     label?: string;
+    default?: string;
+    deferred?: boolean;
     addItemLabel?: string;
     removeItemLabel?: string;
     keyPlaceholder?: string;

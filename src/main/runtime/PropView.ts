@@ -69,6 +69,10 @@ export abstract class PropLineView {
         return this.canExpand() && this.propLine.expand && this.isLinked();
     }
 
+    isDeferred() {
+        return this.getParamSpec().deferred && this.isLinked() && !this.propLine.expand;
+    }
+
 }
 
 export class PropView extends PropLineView {
