@@ -412,6 +412,9 @@ class GraphCompilerContext {
     }
 
     private singleLineExpr(line: PropLineView, targetSchema: DataSchemaSpec = line.getSchema()) {
+        if (line.isDeferred()) {
+            return this.deferredLineExpr(line);
+        }
         let expr = this.rawLineExpr(line);
         let sourceSchema: DataSchemaSpec = { type: 'string' };
         const linkNode = line.getLinkNode();
@@ -425,15 +428,11 @@ class GraphCompilerContext {
         return expr;
     }
 
-    private convertTypeExpr(expr: string, targetSchema: DataSchemaSpec) {
-        return `${this.sym.convertType}(${expr}, ${JSON.stringify(targetSchema)})`;
-    }
-
+    // Property result expression prior to type conversion
     private rawLineExpr(line: PropLineView) {
-        // Property result expression prior to type conversion
+        // Expanded properties are added to symtable
         const expSym = this.symtable.get(`prop:${line.getLineId()}`);
         if (expSym) {
-            // Property was expanded
             return `${expSym}[$i]`;
         }
         // The rest only applies to non-expanded properties
@@ -443,6 +442,19 @@ class GraphCompilerContext {
             expr = this.nodeResultExpr(linkNode);
         }
         return expr;
+    }
+
+    private deferredLineExpr(line: PropLineView) {
+        const paramSpec = line.getParamSpec();
+        const linkNode = line.getLinkNode()!;
+        const targetSchema = linkNode.getModuleSpec().result.schema;
+        const linkSym = this.getNodeSym(linkNode.nodeId);
+        const schemaCompatible = isSchemaCompatible(paramSpec.schema, targetSchema);
+        return `ctx.deferred(() => ${linkSym}(params, ctx), ${schemaCompatible ? 'undefined' : JSON.stringify(targetSchema)})`;
+    }
+
+    private convertTypeExpr(expr: string, targetSchema: DataSchemaSpec) {
+        return `${this.sym.convertType}(${expr}, ${JSON.stringify(targetSchema)})`;
     }
 
     private nodeResultExpr(node: NodeView) {

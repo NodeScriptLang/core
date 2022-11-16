@@ -22,6 +22,10 @@ export const ModuleParamSpecSchema = new Schema<ModuleParamSpec>({
             type: 'string',
             optional: true,
         },
+        deferred: {
+            type: 'boolean',
+            optional: true,
+        },
         addItemLabel: {
             type: 'string',
             optional: true,

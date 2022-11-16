@@ -5,4 +5,6 @@ export interface GraphEvalContext {
     getLocal(key: string): unknown;
     getType(value: unknown): DataType;
     convertType<T>(value: unknown, schema: DataSchema<T>): T;
+    deferred(fn: () => unknown, schema?: DataSchema<unknown>): unknown;
+    resolveDeferred(value: unknown): unknown;
 }

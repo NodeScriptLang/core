@@ -3,6 +3,14 @@ import { getType, Schema } from '@flexent/schema';
 
 import * as t from '../types/index.js';
 
+export const SYM_DEFERRED = Symbol.for('NodeScript:Deferred');
+
+export type Deferred = {
+    [SYM_DEFERRED]: true;
+    resolve: () => unknown;
+    schema: t.DataSchema<unknown> | undefined;
+};
+
 /**
  * GraphEvalContext provides runtime tools for graph computation,
  * node caching, introspection, etc.
@@ -36,6 +44,30 @@ export abstract class BaseContext implements t.GraphEvalContext {
         if (this.pendingNodeIds.has(nodeId)) {
             throw new NodePendingError('Node evaluation is suspended.');
         }
+    }
+
+    deferred(fn: () => unknown, schema?: t.DataSchema<unknown> | undefined): Deferred {
+        return {
+            [SYM_DEFERRED]: true,
+            resolve: fn,
+            schema,
+        };
+    }
+
+    resolveDeferred(value: unknown): unknown {
+        if ((value as any)[SYM_DEFERRED]) {
+            const deferred = value as Deferred;
+            const { schema, resolve } = deferred;
+            const val = resolve();
+            if (schema) {
+                if (val instanceof Promise) {
+                    return val.then(v => this.convertType(v, schema));
+                }
+                return this.convertType(val, schema);
+            }
+            return val;
+        }
+        return value;
     }
 }
 
