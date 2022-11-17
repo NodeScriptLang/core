@@ -88,27 +88,22 @@ export class GraphView {
     }
 
     /**
-     * Returns the nodes in the order they are evaluated by the compiler.
+     * Returns nodes in right-to-left order based on topology.
      */
-    computeOrder(nodeId: string = this.graphSpec.rootNodeId): NodeView[] {
-        const order: NodeView[] = [];
-        const node = this.getNodeById(nodeId);
-        if (node) {
-            this._computeOrder(order, node);
-        }
-        return order;
-    }
-
-    protected _computeOrder(order: NodeView[], node: NodeView) {
-        order.unshift(node);
-        for (const link of node.inboundLinks()) {
-            const { linkNode } = link;
-            const i = order.findIndex(_ => _.nodeId === linkNode.nodeId);
-            if (i > -1) {
-                order.splice(i, 1);
+    orderNodes(nodes: NodeView[]): NodeView[] {
+        const result = nodes.slice();
+        for (let i = 0; i < result.length; i++) {
+            const node = result[i];
+            for (const link of node.inboundLinks()) {
+                const index = result.findIndex(_ => _.nodeId === link.linkNode.nodeId);
+                if (index > -1 && index < i) {
+                    result.splice(i, 1);
+                    result.splice(index, 0, node);
+                    i = index;
+                }
             }
-            this._computeOrder(order, linkNode);
         }
+        return result;
     }
 
     getUniqueRefs() {

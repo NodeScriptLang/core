@@ -53,7 +53,7 @@ class GraphCompilerContext {
     // Buffered code
     code = new CodeBuilder();
     // The order in which nodes need to be computed to fulfill the root node
-    order: NodeView[] = [];
+    emittedNodes: NodeView[] = [];
     // The cached dependency map of a graph
     linkMap: MultiMap<string, NodeLink>;
     // Whether the outcome is asynchronous or not
@@ -83,9 +83,9 @@ class GraphCompilerContext {
             cacheErrors: false,
             ...options
         };
-        this.order = this.computeOrder();
+        this.emittedNodes = this.getEmittedNodes();
         this.linkMap = graphView.computeLinkMap();
-        this.async = this.order.some(_ => _.getModuleSpec().result.async);
+        this.async = this.emittedNodes.some(_ => _.getModuleSpec().result.async);
         this.asyncSym = this.async ? 'async ' : '';
         this.awaitSym = this.async ? 'await ' : '';
         this.prepareSymbols();
@@ -109,19 +109,19 @@ class GraphCompilerContext {
         return this.code.toString();
     }
 
-    private computeOrder() {
+    private getEmittedNodes() {
         if (this.options.emitAll) {
             return this.graphView.getNodes();
         }
         if (this.rootNode) {
-            return this.graphView.computeOrder(this.rootNode.nodeId);
+            return this.graphView.orderNodes([...this.rootNode.leftNodes()]);
         }
         return [];
     }
 
     private emitImports() {
         this.emitComment('Imports');
-        const moduleIds = new Set(this.order.map(_ => _.ref));
+        const moduleIds = new Set(this.emittedNodes.map(_ => _.ref));
         for (const moduleId of moduleIds) {
             if (moduleId.startsWith('@system/')) {
                 continue;
@@ -136,7 +136,7 @@ class GraphCompilerContext {
     }
 
     private emitNodeFunctions() {
-        for (const node of this.order) {
+        for (const node of this.emittedNodes) {
             this.emitNode(node);
         }
     }
@@ -144,7 +144,7 @@ class GraphCompilerContext {
     private emitNodeMap() {
         this.emitComment('Node Map');
         this.code.line('export const nodeMap = new Map()');
-        for (const node of this.order) {
+        for (const node of this.emittedNodes) {
             const sym = this.getNodeSym(node.nodeId);
             this.code.line(`nodeMap.set(${JSON.stringify(node.nodeId)}, ${sym})`);
         }
@@ -514,7 +514,7 @@ class GraphCompilerContext {
     }
 
     private prepareSymbols() {
-        for (const node of this.order) {
+        for (const node of this.emittedNodes) {
             const sym = this.nextSym('r');
             this.symtable.set(`node:${node.nodeId}`, sym);
         }
