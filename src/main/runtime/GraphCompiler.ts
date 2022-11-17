@@ -12,6 +12,7 @@ export interface GraphCompilerOptions {
     emitNodeMap: boolean;
     emitAll: boolean;
     evalMode: NodeEvalMode;
+    cacheErrors: boolean;
 }
 
 export interface GraphCompilerResult {
@@ -79,6 +80,7 @@ class GraphCompilerContext {
             emitNodeMap: false,
             emitAll: false,
             evalMode: 'auto',
+            cacheErrors: false,
             ...options
         };
         this.order = this.computeOrder();
@@ -173,13 +175,17 @@ class GraphCompilerContext {
             if (this.isNodeCached(node)) {
                 this.code.line(`const $c = ctx.cache.get("${node.nodeId}");`);
                 this.code.line('if ($c) { if ($c.error) { throw $c.error } return $c.result }');
-                this.code.block('try {', '}', () => {
+                if (this.options.cacheErrors) {
+                    this.code.block('try {', '}', () => {
+                        this.emitNodeBodyIntrospect(node);
+                    });
+                    this.code.block('catch (error) {', '}', () => {
+                        this.code.line(`ctx.cache.set("${node.nodeId}", { error });`);
+                        this.code.line(`throw error;`);
+                    });
+                } else {
                     this.emitNodeBodyIntrospect(node);
-                });
-                this.code.block('catch (error) {', '}', () => {
-                    this.code.line(`ctx.cache.set("${node.nodeId}", { error });`);
-                    this.code.line(`throw error;`);
-                });
+                }
             } else {
                 this.emitNodeBodyIntrospect(node);
             }

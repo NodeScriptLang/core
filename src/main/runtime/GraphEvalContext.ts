@@ -42,7 +42,7 @@ export abstract class BaseContext implements t.GraphEvalContext {
 
     checkPendingNode(nodeId: string) {
         if (this.pendingNodeIds.has(nodeId)) {
-            throw new NodePendingError('Node evaluation is suspended.');
+            throw new NodePendingError();
         }
     }
 
