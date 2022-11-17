@@ -90,8 +90,8 @@ export class GraphView {
     /**
      * Returns nodes in right-to-left order based on topology.
      */
-    orderNodes(nodes: NodeView[]): NodeView[] {
-        const result = nodes.slice();
+    orderNodes(nodes: Iterable<NodeView>): NodeView[] {
+        const result = [...nodes];
         for (let i = 0; i < result.length; i++) {
             const node = result[i];
             for (const link of node.inboundLinks()) {
