@@ -1119,6 +1119,61 @@ describe('GraphCompiler', () => {
             ]);
         });
 
+        it('supports deferred entries (Fallback)', async () => {
+            const graph = await runtime.loadGraph({
+                nodes: {
+                    n1: {
+                        ref: '@system/EvalSync',
+                        props: {
+                            code: { value: 'return null' },
+                        }
+                    },
+                    n2: {
+                        ref: 'Promise',
+                        props: {
+                            value: { value: 'Hello' },
+                        }
+                    },
+                    n3: {
+                        ref: 'Promise',
+                        props: {
+                            value: { value: 'Bye' },
+                        }
+                    },
+                    fallback: {
+                        ref: 'Fallback',
+                        props: {
+                            steps: {
+                                entries: [
+                                    { linkId: 'n1' },
+                                    { linkId: 'n2' },
+                                    { linkId: 'n3' },
+                                ]
+                            },
+                        }
+                    },
+                },
+            });
+            const { code } = new GraphCompiler().compileComputeEsm(graph, {
+                rootNodeId: 'fallback',
+                introspect: true,
+            });
+            const ctx = new GraphEvalContext();
+            const results: t.NodeResult[] = [];
+            ctx.nodeEvaluated.on(_ => results.push(_));
+            const { compute } = await evalEsmModule(code);
+            const res = await compute({}, ctx);
+            assert.deepStrictEqual(res, 'Hello');
+            assert.deepStrictEqual(results, [
+                { nodeId: 'fallback', progress: 0 },
+                { nodeId: 'n1', progress: 0 },
+                { nodeId: 'n1', result: null },
+                { nodeId: 'n2', progress: 0 },
+                { nodeId: 'n2', result: 'Hello' },
+                { nodeId: 'fallback', result: 'Hello' },
+            ]);
+        });
+
     });
 
 });

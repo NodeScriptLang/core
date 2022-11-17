@@ -26,7 +26,7 @@ export const module: ModuleDefinition<P, R> = {
     },
     result: {
         schema: {
-            type: 'number',
+            type: 'any',
         }
     }
 };
