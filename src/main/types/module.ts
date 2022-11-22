@@ -19,7 +19,6 @@ export interface ModuleSpec {
 
 export interface ModuleParamSpec {
     schema: DataSchemaSpec;
-    scope?: Record<string, DataSchemaSpec>;
     label?: string;
     default?: string;
     deferred?: boolean;
@@ -31,6 +30,7 @@ export interface ModuleParamSpec {
     hideEntries?: boolean;
     hideValue?: boolean;
     renderer?: string;
+    attributes: Record<string, any>;
 }
 
 export interface ModuleResultSpec {

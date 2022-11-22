@@ -12,12 +12,6 @@ export const ModuleParamSpecSchema = new Schema<ModuleParamSpec>({
             optional: true,
         },
         schema: DataSchemaSpecSchema.schema as any,
-        scope: {
-            type: 'object',
-            properties: {},
-            additionalProperties: DataSchemaSpecSchema.schema,
-            optional: true,
-        },
         default: {
             type: 'string',
             optional: true,
@@ -58,5 +52,12 @@ export const ModuleParamSpecSchema = new Schema<ModuleParamSpec>({
             type: 'string',
             optional: true,
         },
+        attributes: {
+            type: 'object',
+            properties: {},
+            additionalProperties: {
+                type: 'any',
+            }
+        }
     }
 });
