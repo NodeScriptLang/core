@@ -16,8 +16,14 @@ describe('ModuleLoader', () => {
             description: 'Computes a sum of two numbers.',
             keywords: ['math', 'add', 'plus', 'sum'],
             params: {
-                a: { schema: { type: 'number' } },
-                b: { schema: { type: 'number' } },
+                a: {
+                    schema: { type: 'number' },
+                    attributes: {},
+                },
+                b: {
+                    schema: { type: 'number' },
+                    attributes: {},
+                },
             },
             result: {
                 schema: { type: 'number' }
