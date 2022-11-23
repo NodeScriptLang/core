@@ -3,5 +3,5 @@ export function capitalizeWords(str: string) {
 }
 
 export function humanize(str: string) {
-    return capitalizeWords(str.replace(/([A-Z])/g, ` $1`).trim());
+    return capitalizeWords(str.replace(/[_-]?([A-Z]+)/g, ` $1`).trim());
 }
