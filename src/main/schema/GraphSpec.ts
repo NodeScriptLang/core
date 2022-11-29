@@ -1,4 +1,4 @@
-import { Schema } from '@flexent/schema';
+import { Schema } from '@nodescript/schema';
 
 import { GraphSpec } from '../types/model.js';
 import { ModuleSpecSchema } from './ModuleSpec.js';

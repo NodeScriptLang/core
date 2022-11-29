@@ -1,4 +1,4 @@
-import { Schema } from '@flexent/schema';
+import { Schema } from '@nodescript/schema';
 
 import { PropSpec } from '../types/index.js';
 import { PropEntrySpecSchema } from './PropEntrySpec.js';

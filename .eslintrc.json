@@ -1,5 +1,5 @@
 {
     "extends": [
-        "@flexent/eslint-config"
+        "@nodescript/eslint-config"
     ]
 }

@@ -34,12 +34,12 @@
         "lint"
     ],
     "dependencies": {
-        "@flexent/event": "^2.1.0",
-        "@flexent/schema": "^5.1.0",
+        "@nodescript/event": "^2.1.1",
+        "@nodescript/schema": "^5.2.1",
         "nanoid": "^3.3.4"
     },
     "devDependencies": {
-        "@flexent/eslint-config": "^1.0.3",
+        "@nodescript/eslint-config": "^1.0.3",
         "@types/glob": "^7.2.0",
         "@types/mocha": "^9.1.1",
         "@types/node": "^18.7.23",

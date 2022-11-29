@@ -1,4 +1,4 @@
-import { Schema } from '@flexent/schema';
+import { Schema } from '@nodescript/schema';
 
 import { ModuleParamSpec } from '../types/index.js';
 import { DataSchemaSpecSchema } from './DataSchemaSpec.js';

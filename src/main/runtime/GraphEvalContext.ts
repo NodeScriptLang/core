@@ -1,5 +1,5 @@
-import { Event } from '@flexent/event';
-import { getType, Schema } from '@flexent/schema';
+import { Event } from '@nodescript/event';
+import { getType, Schema } from '@nodescript/schema';
 
 import * as t from '../types/index.js';
 
