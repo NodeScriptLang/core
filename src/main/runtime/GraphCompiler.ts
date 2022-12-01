@@ -18,6 +18,7 @@ export interface GraphCompilerOptions {
 export interface GraphCompilerResult {
     code: string;
     async: boolean;
+    evalMode: NodeEvalMode;
 }
 
 /**
@@ -39,6 +40,7 @@ export class GraphCompiler {
         return {
             code,
             async: gcc.async,
+            evalMode: gcc.evalMode,
         };
     }
 
@@ -58,6 +60,8 @@ class GraphCompilerContext {
     linkMap: MultiMap<string, NodeLink>;
     // Whether the outcome is asynchronous or not
     async: boolean;
+    // The default eval mode, changed to `manual` if at least one compiled node is manual
+    evalMode: NodeEvalMode;
     // Async/await keywords
     asyncSym: string;
     awaitSym: string;
@@ -86,6 +90,7 @@ class GraphCompilerContext {
         this.emittedNodes = this.getEmittedNodes();
         this.linkMap = graphView.computeLinkMap();
         this.async = this.emittedNodes.some(_ => _.getModuleSpec().result.async);
+        this.evalMode = this.computeEvalMode();
         this.asyncSym = this.async ? 'async ' : '';
         this.awaitSym = this.async ? 'await ' : '';
         this.prepareSymbols();
@@ -518,6 +523,15 @@ class GraphCompilerContext {
             const sym = this.nextSym('r');
             this.symtable.set(`node:${node.nodeId}`, sym);
         }
+    }
+
+    private computeEvalMode() {
+        for (const node of this.emittedNodes) {
+            if (node.metadata.evalMode === 'manual' || node.getModuleSpec().evalMode === 'manual') {
+                return 'manual';
+            }
+        }
+        return 'auto';
     }
 }
 
