@@ -12,10 +12,6 @@ export const ModuleParamSpecSchema = new Schema<ModuleParamSpec>({
             optional: true,
         },
         schema: DataSchemaSpecSchema.schema as any,
-        default: {
-            type: 'string',
-            optional: true,
-        },
         deferred: {
             type: 'boolean',
             optional: true,

@@ -20,7 +20,6 @@ export interface ModuleSpec {
 export interface ModuleParamSpec {
     schema: DataSchemaSpec;
     label?: string;
-    default?: string;
     deferred?: boolean;
     addItemLabel?: string;
     removeItemLabel?: string;
