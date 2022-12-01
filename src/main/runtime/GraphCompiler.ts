@@ -505,6 +505,9 @@ class GraphCompilerContext {
         const cache = node.getModuleSpec().cacheMode ?? 'auto';
         switch (cache) {
             case 'auto': {
+                if (node.getEvalMode() === 'manual') {
+                    return true;
+                }
                 const links = this.linkMap.get(node.nodeId);
                 if (links.size > 1) {
                     return true;
@@ -527,7 +530,7 @@ class GraphCompilerContext {
 
     private computeEvalMode() {
         for (const node of this.emittedNodes) {
-            if (node.metadata.evalMode === 'manual' || node.getModuleSpec().evalMode === 'manual') {
+            if (node.getEvalMode() === 'manual') {
                 return 'manual';
             }
         }
