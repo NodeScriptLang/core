@@ -18,4 +18,5 @@ export const Param: ModuleDefinition<{
     result: {
         schema: { type: 'any' },
     },
+    cacheMode: 'never',
 };

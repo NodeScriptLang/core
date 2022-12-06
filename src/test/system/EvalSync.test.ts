@@ -82,4 +82,59 @@ describe('EvalSync', () => {
         assert.strictEqual(res, 'helloworld');
     });
 
+    it('supports expansions', async () => {
+        const graph = await runtime.loadGraph({
+            rootNodeId: 'res',
+            nodes: {
+                s1: {
+                    ref: 'Array',
+                    props: {
+                        items: {
+                            entries: [
+                                { value: 'one' },
+                                { value: 'two' },
+                                { value: 'three' },
+                            ]
+                        },
+                    }
+                },
+                s2: {
+                    ref: 'Array',
+                    props: {
+                        items: {
+                            entries: [
+                                { value: '1' },
+                                { value: '2' },
+                                { value: '3' },
+                            ]
+                        },
+                    }
+                },
+                res: {
+                    ref: '@system/EvalSync',
+                    props: {
+                        code: {
+                            value: 'return a + b',
+                        },
+                        args: {
+                            entries: [
+                                { key: 'a', linkId: 's1', expand: true },
+                                { key: 'b', linkId: 's2', expand: true },
+                            ]
+                        }
+                    }
+                }
+            }
+        });
+        const { code } = new GraphCompiler().compileComputeEsm(graph);
+        const { compute } = await evalEsmModule(code);
+        const ctx = new GraphEvalContext();
+        const res = compute({}, ctx);
+        assert.deepStrictEqual(res, [
+            'one1',
+            'two2',
+            'three3',
+        ]);
+    });
+
 });

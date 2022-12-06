@@ -240,21 +240,75 @@ class GraphCompilerContext {
     }
 
     private emitNodeBodyRaw(node: NodeView, resSym: string) {
+        if (node.isExpanded()) {
+            this.emitExpandedNode(node, resSym);
+        } else {
+            this.emitRegularNode(node, resSym);
+        }
+    }
+
+    private emitRegularNode(node: NodeView, resSym: string) {
+        this.emitNodeCompute(node, resSym);
+        if (this.isNodeCached(node)) {
+            this.code.line(`ctx.cache.set("${node.nodeId}", { result: ${resSym} });`);
+        }
+    }
+
+    private emitExpandedNode(node: NodeView, resSym: string) {
+        // Expanded nodes always produce an array by
+        // repeating the computation per each value of expanded property
+        this.emitExpandedPreamble(node);
+        this.code.line(`${resSym} = []`);
+        this.code.block(`for (let $i = 0; $i < $l; $i++) {`, `}`, () => {
+            if (this.options.introspect) {
+                this.code.line(`${this.sym.nodeEvaluated}.emit({` +
+                    `nodeId: ${JSON.stringify(node.nodeId)},` +
+                    `progress: $i / $l` +
+                `});`);
+            }
+            const tempSym = `$t`;
+            this.code.line(`let ${tempSym};`);
+            this.emitNodeCompute(node, tempSym);
+            this.code.line(`${resSym}.push(${tempSym});`);
+        });
+        if (this.isNodeCached(node)) {
+            this.code.line(`ctx.cache.set("${node.nodeId}", { result: ${resSym} });`);
+        }
+    }
+
+    private emitExpandedPreamble(node: NodeView) {
+        const expSyms: string[] = [];
+        for (const line of node.expandedLines()) {
+            const propSym = this.nextSym('p');
+            this.symtable.set(`prop:${line.getLineId()}`, propSym);
+            expSyms.push(propSym);
+            const linkNode = line.getLinkNode()!;
+            const linkExpr = this.nodeResultExpr(linkNode);
+            const linkExpanded = linkNode.isExpanded();
+            // Each expanded property needs to be awaited and converted into an array
+            let expr;
+            if (linkExpanded) {
+                // The linked result is already an array, no need to convert
+                expr = `${linkExpr}`;
+            } else {
+                expr = `${this.sym.toArray}(${linkExpr})`;
+            }
+            this.code.line(`const ${propSym} = ${expr}`);
+        }
+        this.code.line(`const $l = Math.min(${expSyms.map(s => `${s}.length`).join(',')});`);
+    }
+
+    private emitNodeCompute(node: NodeView, resSym: string) {
         switch (node.ref) {
             case '@system/Param': return this.emitParamNode(node, resSym);
             case '@system/Result': return this.emitResultNode(node, resSym);
-            case '@system/EvalSync': return this.emitEvalSync(node, resSym);
-            case '@system/EvalAsync': return this.emitEvalAsync(node, resSym);
-            case '@system/EvalJson': return this.emitEvalJson(node, resSym);
             case '@system/Comment':
             case '@system/Frame':
                 return;
-            default:
-                if (node.isExpanded()) {
-                    this.emitExpandedNode(node, resSym);
-                } else {
-                    this.emitRegularNode(node, resSym);
-                }
+            case '@system/EvalSync': return this.emitEvalSync(node, resSym);
+            case '@system/EvalAsync': return this.emitEvalAsync(node, resSym);
+            case '@system/EvalJson': return this.emitEvalJson(node, resSym);
+            default: return this.emitGenericCompute(node, resSym);
         }
     }
 
@@ -317,58 +371,7 @@ class GraphCompilerContext {
         }
     }
 
-    private emitRegularNode(node: NodeView, resSym: string) {
-        this.emitNodeCompute(node, resSym);
-        if (this.isNodeCached(node)) {
-            this.code.line(`ctx.cache.set("${node.nodeId}", { result: ${resSym} });`);
-        }
-    }
-
-    private emitExpandedNode(node: NodeView, resSym: string) {
-        // Expanded nodes always produce an array by
-        // repeating the computation per each value of expanded property
-        this.emitExpandedPreamble(node);
-        this.code.line(`${resSym} = []`);
-        this.code.block(`for (let $i = 0; $i < $l; $i++) {`, `}`, () => {
-            if (this.options.introspect) {
-                this.code.line(`${this.sym.nodeEvaluated}.emit({` +
-                    `nodeId: ${JSON.stringify(node.nodeId)},` +
-                    `progress: $i / $l` +
-                `});`);
-            }
-            const tempSym = `$t`;
-            this.code.line(`let ${tempSym};`);
-            this.emitNodeCompute(node, tempSym);
-            this.code.line(`${resSym}.push(${tempSym});`);
-        });
-        if (this.isNodeCached(node)) {
-            this.code.line(`ctx.cache.set("${node.nodeId}", { result: ${resSym} });`);
-        }
-    }
-
-    private emitExpandedPreamble(node: NodeView) {
-        const expSyms: string[] = [];
-        for (const line of node.expandedLines()) {
-            const propSym = this.nextSym('p');
-            this.symtable.set(`prop:${line.getLineId()}`, propSym);
-            expSyms.push(propSym);
-            const linkNode = line.getLinkNode()!;
-            const linkExpr = this.nodeResultExpr(linkNode);
-            const linkExpanded = linkNode.isExpanded();
-            // Each expanded property needs to be awaited and converted into an array
-            let expr;
-            if (linkExpanded) {
-                // The linked result is already an array, no need to convert
-                expr = `${linkExpr}`;
-            } else {
-                expr = `${this.sym.toArray}(${linkExpr})`;
-            }
-            this.code.line(`const ${propSym} = ${expr}`);
-        }
-        this.code.line(`const $l = Math.min(${expSyms.map(s => `${s}.length`).join(',')});`);
-    }
-
-    private emitNodeCompute(node: NodeView, resSym: string) {
+    private emitGenericCompute(node: NodeView, resSym: string) {
         const defSym = this.getDefSym(node.ref);
         this.code.block(`${resSym} = ${this.awaitSym}${defSym}({`, `}, ctx.newScope());`, () => {
             this.emitNodeProps(node);
