@@ -36,10 +36,6 @@ export class NodeView {
         return this.nodeSpec.ref;
     }
 
-    get label() {
-        return this.nodeSpec.label;
-    }
-
     get metadata() {
         return this.nodeSpec.metadata;
     }
@@ -49,8 +45,8 @@ export class NodeView {
     }
 
     getEffectiveLabel() {
-        if (this.label) {
-            return this.label;
+        if (this.metadata.label) {
+            return this.metadata.label;
         }
         const { label, labelParam } = this.getModuleSpec();
         if (labelParam) {

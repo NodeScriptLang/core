@@ -8,7 +8,6 @@ export const NodeSpecSchema = new Schema<NodeSpec>({
     type: 'object',
     properties: {
         ref: { type: 'string' },
-        label: { type: 'string' },
         props: {
             type: 'object',
             properties: {},
