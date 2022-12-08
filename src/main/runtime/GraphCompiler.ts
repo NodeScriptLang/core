@@ -1,5 +1,5 @@
-import { DataSchemaSpec, NodeEvalMode } from '../types/index.js';
-import { isSchemaCompatible, MultiMap } from '../util/index.js';
+import { DataSchemaSpec, ModuleSpec, NodeEvalMode } from '../types/index.js';
+import { clone, isSchemaCompatible, MultiMap } from '../util/index.js';
 import { CodeBuilder } from './CodeBuilder.js';
 import { GraphView } from './GraphView.js';
 import { NodeLink, NodeView } from './NodeView.js';
@@ -17,8 +17,7 @@ export interface GraphCompilerOptions {
 
 export interface GraphCompilerResult {
     code: string;
-    async: boolean;
-    evalMode: NodeEvalMode;
+    moduleSpec: ModuleSpec;
 }
 
 /**
@@ -39,8 +38,7 @@ export class GraphCompiler {
         const code = gcc.emitComputeEsm();
         return {
             code,
-            async: gcc.async,
-            evalMode: gcc.evalMode,
+            moduleSpec: gcc.getModuleSpec(),
         };
     }
 
@@ -60,9 +58,7 @@ class GraphCompilerContext {
     linkMap: MultiMap<string, NodeLink>;
     // Whether the outcome is asynchronous or not
     async: boolean;
-    // The default eval mode, changed to `manual` if at least one compiled node is manual
-    evalMode: NodeEvalMode;
-    // Async/await keywords
+    // Async/await keywords, replaced with '' if graph is sync
     asyncSym: string;
     awaitSym: string;
 
@@ -90,10 +86,17 @@ class GraphCompilerContext {
         this.emittedNodes = this.getEmittedNodes();
         this.linkMap = graphView.computeLinkMap();
         this.async = this.emittedNodes.some(_ => _.getModuleSpec().result.async);
-        this.evalMode = this.computeEvalMode();
         this.asyncSym = this.async ? 'async ' : '';
         this.awaitSym = this.async ? 'await ' : '';
         this.prepareSymbols();
+    }
+
+    getModuleSpec(): ModuleSpec {
+        const moduleSpec = clone(this.graphView.moduleSpec);
+        moduleSpec.evalMode = this.computeEvalMode();
+        moduleSpec.result.async = this.async;
+        moduleSpec.params = this.computeParamSpecs();
+        return moduleSpec;
     }
 
     get loader() {
@@ -539,6 +542,28 @@ class GraphCompilerContext {
         }
         return 'auto';
     }
+
+    /**
+     * Computes `moduleSpec.params` by sorting the parameters in the order they appear in the graph,
+     * top-to-bottom, left-to-right.
+     */
+    private computeParamSpecs() {
+        const paramEntries = Object.entries(this.graphView.moduleSpec.params);
+        const paramNodes = this.graphView.getNodesByRef('@system/Param');
+        paramNodes.sort((a, b) => {
+            const ax = a.metadata.pos?.x ?? 0;
+            const ay = a.metadata.pos?.y ?? 0;
+            const bx = b.metadata.pos?.x ?? 0;
+            const by = b.metadata.pos?.y ?? 0;
+            return ay === by ? ax - bx : ay - by;
+        });
+        const sortedKeys = paramNodes.map(_ => _.getProp('key')?.value);
+        paramEntries.sort((a, b) => {
+            return sortedKeys.indexOf(a[0]) - sortedKeys.indexOf(b[0]);
+        });
+        return Object.fromEntries(paramEntries);
+    }
+
 }
 
 export class CompilerError extends Error {
