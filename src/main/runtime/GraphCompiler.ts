@@ -376,6 +376,7 @@ class GraphCompilerContext {
 
     private emitGenericCompute(node: NodeView, resSym: string) {
         const defSym = this.getDefSym(node.ref);
+        this.code.line(`ctx.nodeId = ${JSON.stringify(node.nodeId)};`);
         this.code.block(`${resSym} = ${this.awaitSym}${defSym}({`, `}, ctx.newScope());`, () => {
             this.emitNodeProps(node);
         });
