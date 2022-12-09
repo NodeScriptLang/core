@@ -3,7 +3,7 @@ import { Disposable } from './disposable.js';
 
 export interface GraphEvalContext {
     cache: Map<string, any>;
-    getLocal(key: string): unknown;
+    getLocal<T>(key: string, defaultValue?: T): T | undefined;
     setLocal(key: string, value: unknown): void;
     getType(value: unknown): DataType;
     convertType<T>(value: unknown, schema: DataSchema<T>): T;
