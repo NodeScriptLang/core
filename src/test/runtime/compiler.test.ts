@@ -363,7 +363,7 @@ describe('GraphCompiler', () => {
             const ctx = new GraphEvalContext();
             const res = await compute({}, ctx);
             assert.deepStrictEqual(res, {
-                foo: '42',
+                foo: 42,
                 bar: 42,
             });
         });
@@ -395,7 +395,7 @@ describe('GraphCompiler', () => {
             const { compute } = await evalEsmModule(code);
             const ctx = new GraphEvalContext();
             const res = await compute({}, ctx);
-            assert.deepStrictEqual(res, ['42', 42]);
+            assert.deepStrictEqual(res, [42, 42]);
         });
 
         it('prefers base link over entries if both specified', async () => {
@@ -588,9 +588,9 @@ describe('GraphCompiler', () => {
             const ctx = new GraphEvalContext();
             const res = await compute({}, ctx);
             assert.deepStrictEqual(res, [
-                { foo: 'one', bar: ['1', '2'], baz: '42' },
-                { foo: 'two', bar: ['1', '2'], baz: '42' },
-                { foo: 'three', bar: ['1', '2'], baz: '42' },
+                { foo: 'one', bar: [1, 2], baz: 42 },
+                { foo: 'two', bar: [1, 2], baz: 42 },
+                { foo: 'three', bar: [1, 2], baz: 42 },
             ]);
         });
 
@@ -650,15 +650,15 @@ describe('GraphCompiler', () => {
             const results: t.NodeResult[] = [];
             ctx.nodeEvaluated.on(_ => results.push(_));
             const res = await compute({}, ctx);
-            assert.deepStrictEqual(res, ['1', '2', '42']);
+            assert.deepStrictEqual(res, [1, 2, 42]);
             assert.deepStrictEqual(results, [
                 { nodeId: 'res', progress: 0 },
                 { nodeId: 'arr', progress: 0 },
-                { nodeId: 'arr', result: ['1', '2', '42'] },
+                { nodeId: 'arr', result: [1, 2, 42] },
                 { nodeId: 'res', progress: 0 },
                 { nodeId: 'res', progress: 1 / 3 },
                 { nodeId: 'res', progress: 2 / 3 },
-                { nodeId: 'res', result: ['1', '2', '42'] },
+                { nodeId: 'res', result: [1, 2, 42] },
             ]);
         });
 
@@ -965,7 +965,7 @@ describe('GraphCompiler', () => {
             assert.deepStrictEqual(results, [
                 { nodeId: 'if', progress: 0 },
                 { nodeId: 'conditions', progress: 0 },
-                { nodeId: 'conditions', result: ['true', 'false', 'true'] },
+                { nodeId: 'conditions', result: [true, false, true] },
                 { nodeId: 'arr', progress: 0 },
                 { nodeId: 'arr', result: ['one', 'two', 'three'] },
                 { nodeId: 'if', progress: 0 },
@@ -1033,7 +1033,7 @@ describe('GraphCompiler', () => {
             assert.deepStrictEqual(results, [
                 { nodeId: 'if', progress: 0 },
                 { nodeId: 'conditions', progress: 0 },
-                { nodeId: 'conditions', result: ['true', 'true', 'true'] },
+                { nodeId: 'conditions', result: [true, true, true] },
                 { nodeId: 'arr', progress: 0 },
                 { nodeId: 'arr', result: ['one', 'two', 'three'] },
                 { nodeId: 'if', progress: 0 },
@@ -1155,8 +1155,8 @@ describe('GraphCompiler', () => {
                 { nodeId: 'if', progress: 0 },
                 { nodeId: 'conditionsAsync', progress: 0 },
                 { nodeId: 'conditions', progress: 0 },
-                { nodeId: 'conditions', result: ['true', 'false', 'true'] },
-                { nodeId: 'conditionsAsync', result: ['true', 'false', 'true'] },
+                { nodeId: 'conditions', result: [true, false, true] },
+                { nodeId: 'conditionsAsync', result: [true, false, true] },
                 { nodeId: 'arrAsync', progress: 0 },
                 { nodeId: 'arr', progress: 0 },
                 { nodeId: 'arr', result: ['one', 'two', 'three'] },

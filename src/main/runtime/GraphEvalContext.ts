@@ -3,6 +3,7 @@ import { getType, Schema } from '@nodescript/schema';
 
 import * as t from '../types/index.js';
 import { Disposable } from '../types/index.js';
+import { convertAuto } from '../util/convert.js';
 
 export const SYM_DEFERRED = Symbol.for('NodeScript:Deferred');
 
@@ -74,6 +75,10 @@ export class GraphEvalContext implements t.GraphEvalContext {
 
     convertType<T>(value: unknown, schema: t.DataSchema<T>): T {
         return new Schema<T>(schema as any).decode(value);
+    }
+
+    convertAuto(value: string) {
+        return convertAuto(value);
     }
 
     checkPendingNode(nodeId: string) {

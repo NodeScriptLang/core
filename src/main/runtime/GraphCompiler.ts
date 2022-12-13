@@ -446,7 +446,9 @@ class GraphCompilerContext {
         return expr;
     }
 
-    // Property result expression prior to type conversion
+    /**
+     * Returns property result expression prior to type conversion.
+     */
     private rawLineExpr(line: PropLineView) {
         // Expanded properties are added to symtable
         const expSym = this.symtable.get(`prop:${line.getLineId()}`);
@@ -454,12 +456,11 @@ class GraphCompilerContext {
             return `${expSym}[$i]`;
         }
         // The rest only applies to non-expanded properties
-        let expr = JSON.stringify(String(line.value));
         const linkNode = line.getLinkNode();
         if (linkNode) {
-            expr = this.nodeResultExpr(linkNode);
+            return this.nodeResultExpr(linkNode);
         }
-        return expr;
+        return `ctx.convertAuto(${JSON.stringify(String(line.value))})`;
     }
 
     private deferredLineExpr(line: PropLineView) {

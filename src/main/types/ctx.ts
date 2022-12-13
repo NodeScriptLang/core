@@ -9,6 +9,7 @@ export interface GraphEvalContext {
     setLocal(key: string, value: unknown): void;
     getType(value: unknown): DataType;
     convertType<T>(value: unknown, schema: DataSchema<T>): T;
+    convertAuto(value: string): any;
     deferred(fn: () => unknown, schema?: DataSchema<unknown>): unknown;
     resolveDeferred(value: unknown): unknown;
     trackDisposable(key: string, disposable: Disposable): void;
