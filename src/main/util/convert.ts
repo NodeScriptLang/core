@@ -1,6 +1,6 @@
 export function convertAuto(value: string) {
     switch (value) {
-        case '':
+        case 'undefined':
             return undefined;
         case 'null':
             return null;
