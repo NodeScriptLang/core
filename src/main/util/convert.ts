@@ -1,5 +1,7 @@
 export function convertAuto(value: string) {
     switch (value) {
+        case '':
+            return '';
         case 'undefined':
             return undefined;
         case 'null':
