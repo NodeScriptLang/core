@@ -62,13 +62,6 @@ class GraphCompilerContext {
     asyncSym: string;
     awaitSym: string;
 
-    // Commonly used symbols
-    sym = {
-        convertType: this.nextSym('o'),
-        toArray: this.nextSym('o'),
-        nodeEvaluated: this.nextSym('o'),
-    };
-
     constructor(
         readonly graphView: GraphView,
         options: Partial<GraphCompilerOptions> = {},
@@ -200,13 +193,7 @@ class GraphCompilerContext {
         });
     }
 
-    private emitNodePreamble(_node: NodeView) {
-        this.code.line(`const {` +
-            `convertType:${this.sym.convertType},` +
-            `toArray:${this.sym.toArray},` +
-            (this.options.introspect ? `nodeEvaluated:${this.sym.nodeEvaluated},` : '') +
-        `} = ctx;`);
-    }
+    private emitNodePreamble(_node: NodeView) {}
 
     private emitNodeBodyIntrospect(node: NodeView) {
         const resSym = '$r';
@@ -216,13 +203,13 @@ class GraphCompilerContext {
                 if (this.options.evalMode === 'manual') {
                     this.code.line(`ctx.checkPendingNode(${JSON.stringify(node.nodeId)});`);
                 }
-                this.code.line(`${this.sym.nodeEvaluated}.emit({` +
+                this.code.line(`ctx.nodeEvaluated.emit({` +
                     `nodeId: ${JSON.stringify(node.nodeId)},` +
                     `progress: 0` +
                 `});`);
                 this.emitNodeBodyRaw(node, resSym);
                 if (this.options.introspect) {
-                    this.code.line(`${this.sym.nodeEvaluated}.emit({` +
+                    this.code.line(`ctx.nodeEvaluated.emit({` +
                         `nodeId: ${JSON.stringify(node.nodeId)},` +
                         `result: ${resSym}` +
                     `});`);
@@ -230,7 +217,7 @@ class GraphCompilerContext {
                 this.code.line(`return ${resSym};`);
             });
             this.code.block('catch (error) {', '}', () => {
-                this.code.line(`${this.sym.nodeEvaluated}.emit({` +
+                this.code.line(`ctx.nodeEvaluated.emit({` +
                     `nodeId: ${JSON.stringify(node.nodeId)},` +
                     `error` +
                 `});`);
@@ -264,7 +251,7 @@ class GraphCompilerContext {
         this.code.line(`${resSym} = []`);
         this.code.block(`for (let $i = 0; $i < $l; $i++) {`, `}`, () => {
             if (this.options.introspect) {
-                this.code.line(`${this.sym.nodeEvaluated}.emit({` +
+                this.code.line(`ctx.nodeEvaluated.emit({` +
                     `nodeId: ${JSON.stringify(node.nodeId)},` +
                     `progress: $i / $l` +
                 `});`);
@@ -294,7 +281,7 @@ class GraphCompilerContext {
                 // The linked result is already an array, no need to convert
                 expr = `${linkExpr}`;
             } else {
-                expr = `${this.sym.toArray}(${linkExpr})`;
+                expr = `ctx.toArray(${linkExpr})`;
             }
             this.code.line(`const ${propSym} = ${expr}`);
         }
@@ -433,11 +420,24 @@ class GraphCompilerContext {
         if (line.isDeferred()) {
             return this.deferredLineExpr(line);
         }
-        let expr = this.rawLineExpr(line);
-        let sourceSchema: DataSchemaSpec = { type: 'string' };
         const linkNode = line.getLinkNode();
         if (linkNode) {
-            sourceSchema = linkNode.getModuleSpec().result.schema;
+            return this.linkLineExpr(line, linkNode, targetSchema);
+        }
+        return this.constantLineExpr(line, targetSchema);
+    }
+
+    /**
+     * Returns line expression when the line is linked.
+     */
+    private linkLineExpr(line: PropLineView, linkNode: NodeView, targetSchema: DataSchemaSpec) {
+        let expr = '';
+        const sourceSchema: DataSchemaSpec = linkNode.getModuleSpec().result.schema;
+        const expSym = this.symtable.get(`prop:${line.getLineId()}`);
+        if (expSym) {
+            expr = `${expSym}[$i]`;
+        } else {
+            expr = this.nodeResultExpr(linkNode);
         }
         const needsTypeConversion = !isSchemaCompatible(targetSchema, sourceSchema);
         if (needsTypeConversion) {
@@ -447,20 +447,18 @@ class GraphCompilerContext {
     }
 
     /**
-     * Returns property result expression prior to type conversion.
+     * Returns line expression when the line is not linked.
      */
-    private rawLineExpr(line: PropLineView) {
-        // Expanded properties are added to symtable
-        const expSym = this.symtable.get(`prop:${line.getLineId()}`);
-        if (expSym) {
-            return `${expSym}[$i]`;
+    private constantLineExpr(line: PropLineView, targetSchema: DataSchemaSpec) {
+        const valueExpr = JSON.stringify(line.value);
+        switch (targetSchema.type) {
+            case 'any':
+                return `ctx.convertAuto(${valueExpr})`;
+            case 'string':
+                return valueExpr;
+            default:
+                return this.convertTypeExpr(valueExpr, targetSchema);
         }
-        // The rest only applies to non-expanded properties
-        const linkNode = line.getLinkNode();
-        if (linkNode) {
-            return this.nodeResultExpr(linkNode);
-        }
-        return `ctx.convertAuto(${JSON.stringify(String(line.value))})`;
     }
 
     private deferredLineExpr(line: PropLineView) {
@@ -473,7 +471,7 @@ class GraphCompilerContext {
     }
 
     private convertTypeExpr(expr: string, targetSchema: DataSchemaSpec) {
-        return `${this.sym.convertType}(${expr}, ${JSON.stringify(targetSchema)})`;
+        return `ctx.convertType(${expr}, ${JSON.stringify(targetSchema)})`;
     }
 
     private nodeResultExpr(node: NodeView) {
