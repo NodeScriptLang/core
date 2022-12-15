@@ -1,4 +1,4 @@
-import { Schema } from '@nodescript/schema';
+import { Schema } from 'airtight';
 
 import { ModuleResultSpec } from '../types/index.js';
 import { DataSchemaSpecSchema } from './DataSchemaSpec.js';

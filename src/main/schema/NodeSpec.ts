@@ -1,4 +1,4 @@
-import { Schema } from '@nodescript/schema';
+import { Schema } from 'airtight';
 
 import { NodeSpec } from '../types/index.js';
 import { PropSpecSchema } from './PropSpec.js';

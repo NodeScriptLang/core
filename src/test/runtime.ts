@@ -1,4 +1,4 @@
-import { DeepPartial } from '@nodescript/schema';
+import { DeepPartial } from 'airtight';
 
 import { GraphView } from '../main/runtime/GraphView.js';
 import { GraphSpecSchema } from '../main/schema/GraphSpec.js';

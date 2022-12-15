@@ -1,4 +1,4 @@
-import { Schema } from '@nodescript/schema';
+import { Schema } from 'airtight';
 
 import { GraphSpec } from '../types/model.js';
 import { ModuleSpecSchema } from './ModuleSpec.js';

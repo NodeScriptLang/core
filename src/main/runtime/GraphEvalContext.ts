@@ -1,5 +1,5 @@
-import { Event } from '@nodescript/event';
-import { getType, Schema } from '@nodescript/schema';
+import { getType, Schema } from 'airtight';
+import { Event } from 'nanoevent';
 
 import * as t from '../types/index.js';
 import { Disposable } from '../types/index.js';
