@@ -1,4 +1,5 @@
-import { ModuleSpec } from './module.js';
+import { ModuleSpec, NodeEvalMode } from './module.js';
+import { Point } from './point.js';
 
 export interface GraphSpec {
     moduleSpec: ModuleSpec;
@@ -14,7 +15,7 @@ export interface NodeSpec {
     props: {
         [key: string]: PropSpec;
     };
-    metadata: Record<string, any>;
+    metadata: NodeMetadata;
 }
 
 export interface PropSpec {
@@ -30,4 +31,14 @@ export interface PropEntrySpec {
     value: string;
     linkId?: string;
     expand: boolean;
+}
+
+export interface NodeMetadata {
+    pos: Point;
+    w: number;
+    h: number;
+    label: string;
+    collapsed: boolean;
+    evalMode?: NodeEvalMode;
+    [key: string]: any;
 }

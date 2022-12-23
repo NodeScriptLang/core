@@ -1,6 +1,7 @@
 import { Schema } from 'airtight';
 
 import { NodeSpec } from '../types/index.js';
+import { NodeMetadataSchema } from './NodeMetadata.js';
 import { PropSpecSchema } from './PropSpec.js';
 
 export const NodeSpecSchema = new Schema<NodeSpec>({
@@ -13,10 +14,6 @@ export const NodeSpecSchema = new Schema<NodeSpec>({
             properties: {},
             additionalProperties: PropSpecSchema.schema,
         },
-        metadata: {
-            type: 'object',
-            properties: {},
-            additionalProperties: { type: 'any' },
-        }
+        metadata: NodeMetadataSchema.schema,
     }
 });

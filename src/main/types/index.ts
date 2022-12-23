@@ -6,3 +6,4 @@ export * from './disposable.js';
 export * from './model.js';
 export * from './module.js';
 export * from './node-result.js';
+export * from './point.js';
