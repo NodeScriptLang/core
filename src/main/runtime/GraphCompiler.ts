@@ -295,6 +295,7 @@ class GraphCompilerContext {
             case '@system/Comment':
             case '@system/Frame':
                 return;
+            case '@system/Subgraph': return this.emitSubgraph(node, resSym);
             case '@system/EvalSync': return this.emitEvalSync(node, resSym);
             case '@system/EvalAsync': return this.emitEvalAsync(node, resSym);
             case '@system/EvalJson': return this.emitEvalJson(node, resSym);
@@ -316,6 +317,10 @@ class GraphCompilerContext {
         const prop = node.getProp('value')!;
         const expr = this.singleLineExpr(prop, this.graphView.moduleSpec.result.schema);
         this.code.line(`${resSym} = ${expr};`);
+    }
+
+    private emitSubgraph(node: NodeView, resSym: string) {
+        console.log('>>>>>');
     }
 
     private emitEvalSync(node: NodeView, resSym: string) {

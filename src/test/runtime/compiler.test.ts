@@ -2,7 +2,7 @@ import assert from 'assert';
 
 import { GraphCompiler, GraphEvalContext, GraphView } from '../../main/runtime/index.js';
 import { GraphSpecSchema } from '../../main/schema/GraphSpec.js';
-import * as t from '../../main/types/index.js';
+import { NodeResult } from '../../main/types/index.js';
 import { codeToUrl, evalEsmModule } from '../../main/util/index.js';
 import { runtime } from '../runtime.js';
 import { TestModuleLoader } from '../test-loader.js';
@@ -55,7 +55,7 @@ describe('GraphCompiler', () => {
             });
             const { compute } = await evalEsmModule(code);
             const ctx = new GraphEvalContext();
-            const nodeResults: t.NodeResult[] = [];
+            const nodeResults: NodeResult[] = [];
             ctx.nodeEvaluated.on(_ => nodeResults.push(_));
             const res = await compute({
                 value: 12
@@ -647,7 +647,7 @@ describe('GraphCompiler', () => {
             const { code } = new GraphCompiler().compileComputeEsm(graph, { introspect: true });
             const { compute } = await evalEsmModule(code);
             const ctx = new GraphEvalContext();
-            const results: t.NodeResult[] = [];
+            const results: NodeResult[] = [];
             ctx.nodeEvaluated.on(_ => results.push(_));
             const res = await compute({}, ctx);
             assert.deepStrictEqual(res, [1, 2, 42]);
@@ -688,7 +688,7 @@ describe('GraphCompiler', () => {
             const { code } = new GraphCompiler().compileComputeEsm(graph, { introspect: true });
             const { compute } = await evalEsmModule(code);
             const ctx = new GraphEvalContext();
-            const results: t.NodeResult[] = [];
+            const results: NodeResult[] = [];
             ctx.nodeEvaluated.on(_ => results.push(_));
             const res = await compute({}, ctx);
             assert.deepStrictEqual(res, 84);
@@ -724,7 +724,7 @@ describe('GraphCompiler', () => {
             const { code } = new GraphCompiler().compileComputeEsm(graph, { introspect: true });
             const { compute } = await evalEsmModule(code);
             const ctx = new GraphEvalContext();
-            const results: t.NodeResult[] = [];
+            const results: NodeResult[] = [];
             ctx.nodeEvaluated.on(_ => results.push(_));
             const res = await compute({}, ctx);
             assert.deepStrictEqual(res, 54);
@@ -896,7 +896,7 @@ describe('GraphCompiler', () => {
                 introspect: true,
             });
             const ctx = new GraphEvalContext();
-            const results: t.NodeResult[] = [];
+            const results: NodeResult[] = [];
             ctx.nodeEvaluated.on(_ => results.push(_));
             const { compute } = await evalEsmModule(code);
             const res = await compute({}, ctx);
@@ -957,7 +957,7 @@ describe('GraphCompiler', () => {
                 introspect: true,
             });
             const ctx = new GraphEvalContext();
-            const results: t.NodeResult[] = [];
+            const results: NodeResult[] = [];
             ctx.nodeEvaluated.on(_ => results.push(_));
             const { compute } = await evalEsmModule(code);
             const res = await compute({}, ctx);
@@ -1025,7 +1025,7 @@ describe('GraphCompiler', () => {
                 introspect: true,
             });
             const ctx = new GraphEvalContext();
-            const results: t.NodeResult[] = [];
+            const results: NodeResult[] = [];
             ctx.nodeEvaluated.on(_ => results.push(_));
             const { compute } = await evalEsmModule(code);
             const res = await compute({}, ctx);
@@ -1073,7 +1073,7 @@ describe('GraphCompiler', () => {
                 introspect: true,
             });
             const ctx = new GraphEvalContext();
-            const results: t.NodeResult[] = [];
+            const results: NodeResult[] = [];
             ctx.nodeEvaluated.on(_ => results.push(_));
             const { compute } = await evalEsmModule(code);
             const res = await compute({}, ctx);
@@ -1146,7 +1146,7 @@ describe('GraphCompiler', () => {
                 introspect: true,
             });
             const ctx = new GraphEvalContext();
-            const results: t.NodeResult[] = [];
+            const results: NodeResult[] = [];
             ctx.nodeEvaluated.on(_ => results.push(_));
             const { compute } = await evalEsmModule(code);
             const res = await compute({}, ctx);
@@ -1210,7 +1210,7 @@ describe('GraphCompiler', () => {
                 introspect: true,
             });
             const ctx = new GraphEvalContext();
-            const results: t.NodeResult[] = [];
+            const results: NodeResult[] = [];
             ctx.nodeEvaluated.on(_ => results.push(_));
             const { compute } = await evalEsmModule(code);
             const res = await compute({}, ctx);

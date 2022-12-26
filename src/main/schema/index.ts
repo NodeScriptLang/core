@@ -15,3 +15,4 @@ export * from './NodeSpec.js';
 export * from './Point.js';
 export * from './PropEntrySpec.js';
 export * from './PropSpec.js';
+export * from './SubgraphSpec.js';

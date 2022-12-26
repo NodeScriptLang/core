@@ -3,18 +3,20 @@ import { Point } from './point.js';
 
 export interface GraphSpec {
     moduleSpec: ModuleSpec;
-    nodes: {
-        [id: string]: NodeSpec;
-    };
     rootNodeId: string;
+    nodes: Record<string, NodeSpec>;
+    subgraphs: Record<string, SubgraphSpec>;
     metadata: Record<string, any>;
+}
+
+export interface SubgraphSpec {
+    rootNodeId: string;
+    nodes: Record<string, NodeSpec>;
 }
 
 export interface NodeSpec {
     ref: string;
-    props: {
-        [key: string]: PropSpec;
-    };
+    props: Record<string, PropSpec>;
     metadata: NodeMetadata;
 }
 
