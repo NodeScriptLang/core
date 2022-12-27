@@ -12,6 +12,7 @@ export const Subgraph: ModuleDefinition<P, R> = {
     label: 'Subgraph',
     description: 'Evaluates a subgraph with provided arguments.',
     keywords: ['function', 'subroutine'],
+    hidden: true,
     params: {
         args: {
             schema: {
