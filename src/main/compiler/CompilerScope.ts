@@ -327,7 +327,7 @@ export class CompilerScope {
 
     private singleLineExpr(line: PropLineView, targetSchema: DataSchemaSpec = line.getSchema()) {
         if (line.isDeferred()) {
-            return this.deferredLineExpr(line);
+            return this.deferredLineExpr(line, targetSchema);
         }
         const linkNode = line.getLinkNode();
         if (linkNode) {
@@ -370,12 +370,11 @@ export class CompilerScope {
         }
     }
 
-    private deferredLineExpr(line: PropLineView) {
-        const paramSpec = line.getParamSpec();
+    private deferredLineExpr(line: PropLineView, targetSchema: DataSchemaSpec) {
         const linkNode = line.getLinkNode()!;
-        const targetSchema = linkNode.getModuleSpec().result.schema;
+        const sourceSchema = linkNode.getModuleSpec().result.schema;
         const linkSym = this.getNodeSym(linkNode.nodeId);
-        const schemaCompatible = isSchemaCompatible(paramSpec.schema, targetSchema);
+        const schemaCompatible = isSchemaCompatible(sourceSchema, targetSchema);
         return `ctx.deferred(() => ${linkSym}(params, ctx), ${schemaCompatible ? 'undefined' : JSON.stringify(targetSchema)})`;
     }
 
