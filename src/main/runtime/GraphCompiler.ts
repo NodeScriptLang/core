@@ -320,7 +320,10 @@ class GraphCompilerContext {
     }
 
     private emitSubgraph(node: NodeView, resSym: string) {
+
         console.log('>>>>>');
+
+
     }
 
     private emitEvalSync(node: NodeView, resSym: string) {
@@ -328,7 +331,7 @@ class GraphCompilerContext {
         this.code.block(`const $p = {`, `}`, () => {
             const prop = node.getProp('args');
             if (prop) {
-                this.emitNodeProp(node, prop);
+                this.emitProp(prop);
             }
         });
         const args = node.getProp('args')?.getEntries() ?? [];
@@ -344,7 +347,7 @@ class GraphCompilerContext {
         this.code.block(`const $p = {`, `}`, () => {
             const prop = node.getProp('args');
             if (prop) {
-                this.emitNodeProp(node, prop);
+                this.emitProp(prop);
             }
         });
         const args = node.getProp('args')?.getEntries() ?? [];
@@ -376,11 +379,11 @@ class GraphCompilerContext {
 
     private emitNodeProps(node: NodeView) {
         for (const prop of node.getProps()) {
-            this.emitNodeProp(node, prop);
+            this.emitProp(prop);
         }
     }
 
-    private emitNodeProp(node: NodeView, prop: PropView) {
+    private emitProp(prop: PropView) {
         if (prop.isUsesEntries()) {
             this.emitEntries(prop);
         } else {

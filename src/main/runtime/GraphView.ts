@@ -1,3 +1,4 @@
+import { ModuleSpecSchema } from '../schema/ModuleSpec.js';
 import { GraphSpec } from '../types/model.js';
 import { clone } from '../util/clone.js';
 import { MultiMap } from '../util/multimap.js';
@@ -25,6 +26,17 @@ export class GraphView {
 
     get rootNodeId() {
         return this.graphSpec.rootNodeId;
+    }
+
+    getSubgraphById(id: string): GraphView | null {
+        const subgraphSpec = this.graphSpec.subgraphs[id];
+        return subgraphSpec ? new GraphView(this.loader, {
+            rootNodeId: subgraphSpec.rootNodeId,
+            nodes: subgraphSpec.nodes,
+            metadata: {},
+            moduleSpec: ModuleSpecSchema.create({}),
+            subgraphs: this.graphSpec.subgraphs,
+        }) : null;
     }
 
     isNodeExists(id: string) {

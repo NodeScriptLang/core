@@ -10,8 +10,10 @@ describe.only('Compiler: subgraphs', () => {
     it('compiles and executes a subgraph', async () => {
         const graph = await createGraph();
         const { code } = new GraphCompiler().compileComputeEsm(graph, {
-            introspect: true,
+            // introspect: true,
+            comments: true,
         });
+        console.log(code);
         const ctx = new GraphEvalContext();
         const results: NodeResult[] = [];
         ctx.nodeEvaluated.on(_ => results.push(_));
@@ -19,7 +21,6 @@ describe.only('Compiler: subgraphs', () => {
         const res = await compute({
             incr: 1
         }, ctx);
-        console.log(results);
         assert.deepStrictEqual(res, [
             [2, 3, 4],
             [42, 43],
