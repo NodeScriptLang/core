@@ -141,10 +141,13 @@ export class CompilerJob {
             if (node.ref !== '@system/Subgraph') {
                 continue;
             }
-            const { subgraphId } = node.metadata.subgraphId;
+            const { subgraphId } = node.metadata;
             const subgraph = this.graphView.getSubgraphById(subgraphId);
             if (subgraph) {
-                yield new CompilerScope(subgraphId, this.code, subgraph, this.symbols, this.options);
+                yield new CompilerScope(subgraphId, this.code, subgraph, this.symbols, {
+                    ...this.options,
+                    rootNodeId: subgraph.rootNodeId,
+                });
             }
         }
     }

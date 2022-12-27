@@ -2,29 +2,27 @@ import assert from 'assert';
 
 import { GraphCompiler } from '../../main/compiler/index.js';
 import { GraphEvalContext } from '../../main/runtime/index.js';
-import { NodeResult } from '../../main/types/index.js';
 import { evalEsmModule } from '../../main/util/eval.js';
 import { runtime } from '../runtime.js';
 
-describe.skip('Compiler: subgraphs', () => {
+describe('Compiler: subgraphs', () => {
 
     it('compiles and executes a subgraph', async () => {
         const graph = await createGraph();
         const { code } = new GraphCompiler().compileComputeEsm(graph, {
-            // introspect: true,
             comments: true,
         });
-        console.log(code);
         const ctx = new GraphEvalContext();
-        const results: NodeResult[] = [];
-        ctx.nodeEvaluated.on(_ => results.push(_));
         const { compute } = await evalEsmModule(code);
-        const res = await compute({
-            incr: 1
-        }, ctx);
-        assert.deepStrictEqual(res, [
+        const res1 = compute({ incr: 1 }, ctx);
+        assert.deepStrictEqual(res1, [
             [2, 3, 4],
             [42, 43],
+        ]);
+        const res2 = compute({ incr: 2 }, ctx);
+        assert.deepStrictEqual(res2, [
+            [3, 4, 5],
+            [43, 44],
         ]);
     });
 
@@ -83,11 +81,11 @@ async function createGraph() {
                             key: { value: 'args' },
                         }
                     },
-                    row: {
+                    record: {
                         ref: 'Get',
                         props: {
                             object: { linkId: 'args' },
-                            key: { value: 'row' },
+                            key: { value: 'record' },
                         }
                     },
                     incr: {
@@ -100,7 +98,7 @@ async function createGraph() {
                     res: {
                         ref: 'Math.Add',
                         props: {
-                            a: { linkId: 'row', expand: true },
+                            a: { linkId: 'record', expand: true },
                             b: { linkId: 'incr' },
                         }
                     }
