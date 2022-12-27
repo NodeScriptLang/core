@@ -1,3 +1,4 @@
+import { ModuleSpecSchema } from '../schema/ModuleSpec.js';
 import { GraphSpec } from '../types/model.js';
 import { clone } from '../util/clone.js';
 import { MultiMap } from '../util/multimap.js';
@@ -106,13 +107,36 @@ export class GraphView {
         return result;
     }
 
-    getUniqueRefs() {
-        return new Set(Object.values(this.graphSpec.nodes).map(_ => _.ref));
+    getSubgraphById(id: string): GraphView | null {
+        const subgraphSpec = this.graphSpec.subgraphs[id];
+        return subgraphSpec ? new GraphView(this.loader, {
+            rootNodeId: subgraphSpec.rootNodeId,
+            nodes: subgraphSpec.nodes,
+            metadata: {},
+            moduleSpec: ModuleSpecSchema.create({}),
+            subgraphs: this.graphSpec.subgraphs,
+        }) : null;
+    }
+
+    getUsedSubgraphs(): GraphView[] {
+        return Object.values(this.graphSpec.nodes)
+            .filter(_ => _.ref === '@system/Subgraph')
+            .map(_ => this.getSubgraphById(_.metadata.subgraphId))
+            .filter(Boolean) as GraphView[];
+    }
+
+    private *collectAllRefs(): Iterable<string> {
+        for (const subgraph of [this, ...this.getUsedSubgraphs()]) {
+            for (const nodeSpec of Object.values(subgraph.graphSpec.nodes)) {
+                yield nodeSpec.ref;
+            }
+        }
     }
 
     async loadRefs() {
         const promises = [];
-        for (const moduleId of this.getUniqueRefs()) {
+        const refs = new Set(this.collectAllRefs());
+        for (const moduleId of refs) {
             const promise = this.loader.loadModule(moduleId);
             promises.push(promise);
         }

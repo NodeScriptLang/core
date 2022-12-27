@@ -20,6 +20,7 @@ export class StandardModuleLoader implements ModuleLoader {
         this.addModule(systemNodes.Frame);
         this.addModule(systemNodes.Param);
         this.addModule(systemNodes.Result);
+        this.addModule(systemNodes.Subgraph);
         this.addModule(systemNodes.EvalSync);
         this.addModule(systemNodes.EvalAsync);
         this.addModule(systemNodes.EvalJson);

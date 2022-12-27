@@ -8,6 +8,7 @@
         "./util": "./out/main/util/index.js",
         "./schema": "./out/main/schema/index.js",
         "./runtime": "./out/main/runtime/index.js",
+        "./compiler": "./out/main/compiler/index.js",
         "./system": "./out/main/system/index.js"
     },
     "files": [

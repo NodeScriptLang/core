@@ -1,7 +1,7 @@
 import assert from 'assert';
 
-import { runtime } from '../runtime.js';
-import { TestModuleLoader } from '../test-loader.js';
+import { runtime } from './runtime.js';
+import { TestModuleLoader } from './test-loader.js';
 
 describe('ModuleLoader', () => {
 

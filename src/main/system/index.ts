@@ -6,3 +6,4 @@ export * from './EvalSync.js';
 export * from './Frame.js';
 export * from './Param.js';
 export * from './Result.js';
+export * from './Subgraph.js';

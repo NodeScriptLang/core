@@ -1,6 +1,6 @@
 import assert from 'assert';
 
-import { runtime } from '../runtime.js';
+import { runtime } from './runtime.js';
 
 describe('GraphView', () => {
 
