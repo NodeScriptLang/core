@@ -1,6 +1,6 @@
 import assert from 'assert';
 
-import { GraphCompiler } from '../../main/runtime/GraphCompiler.js';
+import { GraphCompiler } from '../../main/compiler/GraphCompiler.js';
 import { GraphEvalContext } from '../../main/runtime/GraphEvalContext.js';
 import { evalEsmModule } from '../../main/util/eval.js';
 import { runtime } from '../runtime.js';

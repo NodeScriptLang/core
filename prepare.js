@@ -8,6 +8,7 @@ generateIndexes('./src/main/util');
 generateIndexes('./src/main/schema');
 generateIndexes('./src/main/system');
 generateIndexes('./src/main/runtime');
+generateIndexes('./src/main/compiler');
 
 function generateIndexes(dir) {
     dir = path.join(process.cwd(), dir);
