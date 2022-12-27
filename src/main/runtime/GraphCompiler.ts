@@ -34,7 +34,8 @@ export interface GraphCompilerResult {
 export class GraphCompiler {
 
     compileComputeEsm(graphView: GraphView, options: Partial<GraphCompilerOptions> = {}): GraphCompilerResult {
-        const gcc = new GraphCompilerContext(graphView, options);
+        const state = new GraphCompilerState();
+        const gcc = new GraphCompilerContext(graphView, state, options);
         const code = gcc.emitComputeEsm();
         return {
             code,
@@ -46,10 +47,6 @@ export class GraphCompiler {
 
 class GraphCompilerContext {
     options: GraphCompilerOptions;
-    // Counters tracked for each emitted symbol to ensure variable name uniqueness
-    symCounters = new Map<string, number>();
-    // Symtable maps allocated symbols to domain-specific strings (e.g. node:<nodeId> -> r1)
-    symtable = new Map<string, string>();
     // Buffered code
     code = new CodeBuilder();
     // The order in which nodes need to be computed to fulfill the root node
@@ -64,6 +61,7 @@ class GraphCompilerContext {
 
     constructor(
         readonly graphView: GraphView,
+        readonly state: GraphCompilerState,
         options: Partial<GraphCompilerOptions> = {},
     ) {
         this.options = {
@@ -130,8 +128,7 @@ class GraphCompilerContext {
             const module = this.loader.resolveModule(moduleId);
             const computeUrl = module.attributes?.customImportUrl ??
                 this.loader.resolveComputeUrl(moduleId);
-            const sym = this.nextSym('n');
-            this.symtable.set(`def:${moduleId}`, sym);
+            const sym = this.state.createDefSym(moduleId);
             this.code.line(`import { compute as ${sym} } from '${computeUrl}'`);
         }
     }
@@ -146,7 +143,7 @@ class GraphCompilerContext {
         this.emitComment('Node Map');
         this.code.line('export const nodeMap = new Map()');
         for (const node of this.emittedNodes) {
-            const sym = this.getNodeSym(node.nodeId);
+            const sym = this.state.getNodeSym(node.nodeId);
             this.code.line(`nodeMap.set(${JSON.stringify(node.nodeId)}, ${sym})`);
         }
     }
@@ -170,7 +167,7 @@ class GraphCompilerContext {
 
     private emitNode(node: NodeView) {
         this.emitComment(`${node.ref} ${node.nodeId}`);
-        const sym = this.getNodeSym(node.nodeId);
+        const sym = this.state.getNodeSym(node.nodeId);
         this.code.block(`${this.asyncSym}function ${sym}(params, ctx) {`, `}`, () => {
             this.emitNodePreamble(node);
             if (this.isNodeCached(node)) {
@@ -269,8 +266,7 @@ class GraphCompilerContext {
     private emitExpandedPreamble(node: NodeView) {
         const expSyms: string[] = [];
         for (const line of node.expandedLines()) {
-            const propSym = this.nextSym('p');
-            this.symtable.set(`prop:${line.getLineId()}`, propSym);
+            const propSym = this.state.createLineSym(line.getLineId());
             expSyms.push(propSym);
             const linkNode = line.getLinkNode()!;
             const linkExpr = this.nodeResultExpr(linkNode);
@@ -320,10 +316,7 @@ class GraphCompilerContext {
     }
 
     private emitSubgraph(node: NodeView, resSym: string) {
-
         console.log('>>>>>');
-
-
     }
 
     private emitEvalSync(node: NodeView, resSym: string) {
@@ -370,7 +363,7 @@ class GraphCompilerContext {
     }
 
     private emitGenericCompute(node: NodeView, resSym: string) {
-        const defSym = this.getDefSym(node.ref);
+        const defSym = this.state.getDefSym(node.ref);
         this.code.line(`ctx.nodeId = ${JSON.stringify(node.nodeId)};`);
         this.code.block(`${resSym} = ${this.awaitSym}${defSym}({`, `}, ctx.newScope());`, () => {
             this.emitNodeProps(node);
@@ -441,7 +434,7 @@ class GraphCompilerContext {
     private linkLineExpr(line: PropLineView, linkNode: NodeView, targetSchema: DataSchemaSpec) {
         let expr = '';
         const sourceSchema: DataSchemaSpec = linkNode.getModuleSpec().result.schema;
-        const expSym = this.symtable.get(`prop:${line.getLineId()}`);
+        const expSym = this.state.getLineSymIfExists(line.getLineId());
         if (expSym) {
             expr = `${expSym}[$i]`;
         } else {
@@ -473,7 +466,7 @@ class GraphCompilerContext {
         const paramSpec = line.getParamSpec();
         const linkNode = line.getLinkNode()!;
         const targetSchema = linkNode.getModuleSpec().result.schema;
-        const linkSym = this.getNodeSym(linkNode.nodeId);
+        const linkSym = this.state.getNodeSym(linkNode.nodeId);
         const schemaCompatible = isSchemaCompatible(paramSpec.schema, targetSchema);
         return `ctx.deferred(() => ${linkSym}(params, ctx), ${schemaCompatible ? 'undefined' : JSON.stringify(targetSchema)})`;
     }
@@ -483,30 +476,8 @@ class GraphCompilerContext {
     }
 
     private nodeResultExpr(node: NodeView) {
-        const sym = this.getNodeSym(node.nodeId);
+        const sym = this.state.getNodeSym(node.nodeId);
         return `${this.awaitSym}${sym}(params, ctx)`;
-    }
-
-    private getNodeSym(nodeId: string) {
-        return this.getSym(`node:${nodeId}`);
-    }
-
-    private getDefSym(ref: string) {
-        return this.getSym(`def:${ref}`);
-    }
-
-    private getSym(id: string) {
-        const sym = this.symtable.get(id);
-        if (!sym) {
-            throw new CompilerError(`Symbol not found: ${id}`);
-        }
-        return sym;
-    }
-
-    private nextSym(sym: string) {
-        const c = this.symCounters.get(sym) ?? 0;
-        this.symCounters.set(sym, c + 1);
-        return `${sym}${c + 1}`;
     }
 
     private emitComment(str: string) {
@@ -537,8 +508,7 @@ class GraphCompilerContext {
 
     private prepareSymbols() {
         for (const node of this.emittedNodes) {
-            const sym = this.nextSym('r');
-            this.symtable.set(`node:${node.nodeId}`, sym);
+            this.state.createNodeSym(`node:${node.nodeId}`);
         }
     }
 
@@ -572,6 +542,55 @@ class GraphCompilerContext {
         return Object.fromEntries(paramEntries);
     }
 
+}
+
+class GraphCompilerState {
+    private symCounters = new Map<string, number>();
+    private symtable = new Map<string, string>();
+
+    getSym(id: string) {
+        const sym = this.symtable.get(id);
+        if (!sym) {
+            throw new CompilerError(`Symbol not found: ${id}`);
+        }
+        return sym;
+    }
+
+    getNodeSym(nodeId: string) {
+        return this.getSym(`node:${nodeId}`);
+    }
+
+    createNodeSym(nodeId: string) {
+        const sym = this.nextSym('r');
+        this.symtable.set(nodeId, sym);
+        return sym;
+    }
+
+    getDefSym(moduleId: string) {
+        return this.getSym(`def:${moduleId}`);
+    }
+
+    createDefSym(moduleId: string) {
+        const sym = this.nextSym('n');
+        this.symtable.set(`def:${moduleId}`, sym);
+        return sym;
+    }
+
+    getLineSymIfExists(lineId: string) {
+        return this.symtable.get(`prop:${lineId}`) ?? null;
+    }
+
+    createLineSym(lineId: string) {
+        const sym = this.nextSym('p');
+        this.symtable.set(`prop:${lineId}`, sym);
+        return sym;
+    }
+
+    private nextSym(sym: string) {
+        const c = this.symCounters.get(sym) ?? 0;
+        this.symCounters.set(sym, c + 1);
+        return `${sym}${c + 1}`;
+    }
 }
 
 export class CompilerError extends Error {

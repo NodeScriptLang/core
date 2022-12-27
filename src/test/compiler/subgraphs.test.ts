@@ -5,7 +5,7 @@ import { NodeResult } from '../../main/types/index.js';
 import { evalEsmModule } from '../../main/util/eval.js';
 import { runtime } from '../runtime.js';
 
-describe.only('Compiler: subgraphs', () => {
+describe.skip('Compiler: subgraphs', () => {
 
     it('compiles and executes a subgraph', async () => {
         const graph = await createGraph();
