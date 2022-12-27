@@ -35,7 +35,16 @@ export class GraphCompiler {
 
     compileComputeEsm(graphView: GraphView, options: Partial<GraphCompilerOptions> = {}): GraphCompilerResult {
         const state = new CompilerSymbols();
-        const gcc = new GraphCompilerContext(graphView, state, options);
+        const gcc = new GraphCompilerContext(graphView, state, {
+            rootNodeId: options.rootNodeId ?? graphView.rootNodeId,
+            comments: false,
+            introspect: false,
+            emitNodeMap: false,
+            emitAll: false,
+            evalMode: 'auto',
+            cacheErrors: false,
+            ...options
+        });
         const code = gcc.emitComputeEsm();
         return {
             code,
@@ -46,7 +55,6 @@ export class GraphCompiler {
 }
 
 class GraphCompilerContext {
-    options: GraphCompilerOptions;
     // Buffered code
     code = new CodeBuilder();
     // The order in which nodes need to be computed to fulfill the root node
@@ -62,18 +70,8 @@ class GraphCompilerContext {
     constructor(
         readonly graphView: GraphView,
         readonly symbols: CompilerSymbols,
-        options: Partial<GraphCompilerOptions> = {},
+        readonly options: GraphCompilerOptions,
     ) {
-        this.options = {
-            rootNodeId: this.graphView.rootNodeId,
-            comments: false,
-            introspect: false,
-            emitNodeMap: false,
-            emitAll: false,
-            evalMode: 'auto',
-            cacheErrors: false,
-            ...options
-        };
         this.emittedNodes = this.getEmittedNodes();
         this.linkMap = graphView.computeLinkMap();
         this.async = this.emittedNodes.some(_ => _.getModuleSpec().result.async);
