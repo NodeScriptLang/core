@@ -125,7 +125,7 @@ class GraphCompilerContext {
             const module = this.loader.resolveModule(moduleId);
             const computeUrl = module.attributes?.customImportUrl ??
                 this.loader.resolveComputeUrl(moduleId);
-            const sym = this.symbols.createDefSym(moduleId);
+            const sym = this.createDefSym(moduleId);
             this.code.line(`import { compute as ${sym} } from '${computeUrl}'`);
         }
     }
@@ -140,7 +140,7 @@ class GraphCompilerContext {
         this.emitComment('Node Map');
         this.code.line('export const nodeMap = new Map()');
         for (const node of this.emittedNodes) {
-            const sym = this.symbols.getNodeSym(node.nodeId);
+            const sym = this.getNodeSym(node.nodeId);
             this.code.line(`nodeMap.set(${JSON.stringify(node.nodeId)}, ${sym})`);
         }
     }
@@ -164,7 +164,7 @@ class GraphCompilerContext {
 
     private emitNode(node: NodeView) {
         this.emitComment(`${node.ref} ${node.nodeId}`);
-        const sym = this.symbols.getNodeSym(node.nodeId);
+        const sym = this.getNodeSym(node.nodeId);
         this.code.block(`${this.asyncSym}function ${sym}(params, ctx) {`, `}`, () => {
             this.emitNodePreamble(node);
             if (this.isNodeCached(node)) {
@@ -263,7 +263,7 @@ class GraphCompilerContext {
     private emitExpandedPreamble(node: NodeView) {
         const expSyms: string[] = [];
         for (const line of node.expandedLines()) {
-            const propSym = this.symbols.createLineSym(line.getLineId());
+            const propSym = this.createLineSym(line.getLineId());
             expSyms.push(propSym);
             const linkNode = line.getLinkNode()!;
             const linkExpr = this.nodeResultExpr(linkNode);
@@ -360,7 +360,7 @@ class GraphCompilerContext {
     }
 
     private emitGenericCompute(node: NodeView, resSym: string) {
-        const defSym = this.symbols.getDefSym(node.ref);
+        const defSym = this.getDefSym(node.ref);
         this.code.line(`ctx.nodeId = ${JSON.stringify(node.nodeId)};`);
         this.code.block(`${resSym} = ${this.awaitSym}${defSym}({`, `}, ctx.newScope());`, () => {
             this.emitNodeProps(node);
@@ -431,7 +431,7 @@ class GraphCompilerContext {
     private linkLineExpr(line: PropLineView, linkNode: NodeView, targetSchema: DataSchemaSpec) {
         let expr = '';
         const sourceSchema: DataSchemaSpec = linkNode.getModuleSpec().result.schema;
-        const expSym = this.symbols.getLineSymIfExists(line.getLineId());
+        const expSym = this.getLineSymIfExists(line.getLineId());
         if (expSym) {
             expr = `${expSym}[$i]`;
         } else {
@@ -463,7 +463,7 @@ class GraphCompilerContext {
         const paramSpec = line.getParamSpec();
         const linkNode = line.getLinkNode()!;
         const targetSchema = linkNode.getModuleSpec().result.schema;
-        const linkSym = this.symbols.getNodeSym(linkNode.nodeId);
+        const linkSym = this.getNodeSym(linkNode.nodeId);
         const schemaCompatible = isSchemaCompatible(paramSpec.schema, targetSchema);
         return `ctx.deferred(() => ${linkSym}(params, ctx), ${schemaCompatible ? 'undefined' : JSON.stringify(targetSchema)})`;
     }
@@ -473,7 +473,7 @@ class GraphCompilerContext {
     }
 
     private nodeResultExpr(node: NodeView) {
-        const sym = this.symbols.getNodeSym(node.nodeId);
+        const sym = this.getNodeSym(node.nodeId);
         return `${this.awaitSym}${sym}(params, ctx)`;
     }
 
@@ -505,7 +505,7 @@ class GraphCompilerContext {
 
     private prepareSymbols() {
         for (const node of this.emittedNodes) {
-            this.symbols.createNodeSym(`node:${node.nodeId}`);
+            this.createNodeSym(node.nodeId);
         }
     }
 
@@ -537,6 +537,37 @@ class GraphCompilerContext {
             return sortedKeys.indexOf(a[0]) - sortedKeys.indexOf(b[0]);
         });
         return Object.fromEntries(paramEntries);
+    }
+
+
+    private getDefSym(moduleId: string) {
+        return this.symbols.get(`def:${moduleId}`);
+    }
+
+    private createDefSym(moduleId: string) {
+        const sym = this.symbols.nextSym('n');
+        this.symbols.set(`def:${moduleId}`, sym);
+        return sym;
+    }
+
+    private getNodeSym(nodeId: string) {
+        return this.symbols.get(`node:${nodeId}`);
+    }
+
+    private createNodeSym(nodeId: string) {
+        const sym = this.symbols.nextSym('r');
+        this.symbols.set(`node:${nodeId}`, sym);
+        return sym;
+    }
+
+    private getLineSymIfExists(lineId: string) {
+        return this.symbols.get(`prop:${lineId}`, '');
+    }
+
+    private createLineSym(lineId: string) {
+        const sym = this.symbols.nextSym('p');
+        this.symbols.set(`prop:${lineId}`, sym);
+        return sym;
     }
 
 }
