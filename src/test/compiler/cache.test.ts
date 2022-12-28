@@ -27,7 +27,7 @@ describe('Compiler: cache', () => {
                 }
             },
         });
-        const { code } = new GraphCompiler().compileComputeEsm(graph, { introspect: true });
+        const { code } = new GraphCompiler().compileEsm(graph, { introspect: true });
         const { compute } = await evalEsmModule(code);
         const ctx = new GraphEvalContext();
         const results: NodeResult[] = [];
@@ -63,7 +63,7 @@ describe('Compiler: cache', () => {
                 }
             },
         });
-        const { code } = new GraphCompiler().compileComputeEsm(graph, { introspect: true });
+        const { code } = new GraphCompiler().compileEsm(graph, { introspect: true });
         const { compute } = await evalEsmModule(code);
         const ctx = new GraphEvalContext();
         const results: NodeResult[] = [];

@@ -39,7 +39,7 @@ describe('Compiler: nodeMap', () => {
                 },
             },
         });
-        const { code } = new GraphCompiler().compileComputeEsm(graph, {
+        const { code } = new GraphCompiler().compileEsm(graph, {
             rootNodeId: 'plus1',
             emitAll: true,
             emitNodeMap: true,

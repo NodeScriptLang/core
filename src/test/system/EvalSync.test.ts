@@ -36,7 +36,7 @@ describe('EvalSync', () => {
                 }
             },
         });
-        const { code } = new GraphCompiler().compileComputeEsm(graph);
+        const { code } = new GraphCompiler().compileEsm(graph);
         const { compute } = await evalEsmModule(code);
         const ctx = new GraphEvalContext();
         const res = compute({}, ctx);
@@ -75,7 +75,7 @@ describe('EvalSync', () => {
                 }
             },
         });
-        const { code } = new GraphCompiler().compileComputeEsm(graph);
+        const { code } = new GraphCompiler().compileEsm(graph);
         const { compute } = await evalEsmModule(code);
         const ctx = new GraphEvalContext();
         const res = compute({}, ctx);
@@ -126,7 +126,7 @@ describe('EvalSync', () => {
                 }
             }
         });
-        const { code } = new GraphCompiler().compileComputeEsm(graph);
+        const { code } = new GraphCompiler().compileEsm(graph);
         const { compute } = await evalEsmModule(code);
         const ctx = new GraphEvalContext();
         const res = compute({}, ctx);

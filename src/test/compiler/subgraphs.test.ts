@@ -9,7 +9,7 @@ describe('Compiler: subgraphs', () => {
 
     it('compiles and executes a subgraph', async () => {
         const graph = await createGraph();
-        const { code } = new GraphCompiler().compileComputeEsm(graph, {
+        const { code } = new GraphCompiler().compileEsm(graph, {
             comments: true,
         });
         const ctx = new GraphEvalContext();

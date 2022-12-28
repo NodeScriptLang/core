@@ -30,7 +30,7 @@ export interface CompilerResult {
  */
 export class GraphCompiler {
 
-    compileComputeEsm(graphView: GraphView, options: Partial<CompilerOptions> = {}): CompilerResult {
+    compileEsm(graphView: GraphView, options: Partial<CompilerOptions> = {}): CompilerResult {
         const job = new CompilerJob(graphView, {
             rootNodeId: options.rootNodeId ?? graphView.rootNodeId,
             comments: false,

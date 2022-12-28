@@ -33,7 +33,7 @@ describe('Compiler: array expansion', () => {
                 }
             },
         });
-        const { code } = new GraphCompiler().compileComputeEsm(graph);
+        const { code } = new GraphCompiler().compileEsm(graph);
         const { compute } = await evalEsmModule(code);
         const ctx = new GraphEvalContext();
         const res = await compute({}, ctx);
@@ -65,7 +65,7 @@ describe('Compiler: array expansion', () => {
                 }
             },
         });
-        const { code } = new GraphCompiler().compileComputeEsm(graph);
+        const { code } = new GraphCompiler().compileEsm(graph);
         const { compute } = await evalEsmModule(code);
         const ctx = new GraphEvalContext();
         const res = await compute({}, ctx);
@@ -108,7 +108,7 @@ describe('Compiler: array expansion', () => {
                 }
             },
         });
-        const { code } = new GraphCompiler().compileComputeEsm(graph);
+        const { code } = new GraphCompiler().compileEsm(graph);
         const { compute } = await evalEsmModule(code);
         const ctx = new GraphEvalContext();
         const res = await compute({}, ctx);
@@ -156,7 +156,7 @@ describe('Compiler: array expansion', () => {
                 }
             },
         });
-        const { code } = new GraphCompiler().compileComputeEsm(graph);
+        const { code } = new GraphCompiler().compileEsm(graph);
         const { compute } = await evalEsmModule(code);
         const ctx = new GraphEvalContext();
         const res = await compute({}, ctx);
@@ -186,7 +186,7 @@ describe('Compiler: array expansion', () => {
                 }
             },
         });
-        const { code } = new GraphCompiler().compileComputeEsm(graph);
+        const { code } = new GraphCompiler().compileEsm(graph);
         const { compute } = await evalEsmModule(code);
         const ctx = new GraphEvalContext();
         const res = await compute({}, ctx);
@@ -217,7 +217,7 @@ describe('Compiler: array expansion', () => {
                 }
             },
         });
-        const { code } = new GraphCompiler().compileComputeEsm(graph, { introspect: true });
+        const { code } = new GraphCompiler().compileEsm(graph, { introspect: true });
         const { compute } = await evalEsmModule(code);
         const ctx = new GraphEvalContext();
         const results: NodeResult[] = [];

@@ -31,7 +31,7 @@ describe('Compiler: sync/async', () => {
                 }
             },
         });
-        const { code } = new GraphCompiler().compileComputeEsm(graph, { rootNodeId: 'res' });
+        const { code } = new GraphCompiler().compileEsm(graph, { rootNodeId: 'res' });
         const { compute } = await evalEsmModule(code);
         const ctx = new GraphEvalContext();
         const res = await compute({}, ctx);
@@ -65,7 +65,7 @@ describe('Compiler: sync/async', () => {
                 }
             },
         });
-        const { code } = new GraphCompiler().compileComputeEsm(graph, { rootNodeId: 'promise' });
+        const { code } = new GraphCompiler().compileEsm(graph, { rootNodeId: 'promise' });
         const { compute } = await evalEsmModule(code);
         const ctx = new GraphEvalContext();
         const res = await compute({}, ctx);

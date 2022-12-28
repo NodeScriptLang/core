@@ -35,7 +35,7 @@ describe('Compiler: deferred', () => {
                 },
             },
         });
-        const { code } = new GraphCompiler().compileComputeEsm(graph, {
+        const { code } = new GraphCompiler().compileEsm(graph, {
             rootNodeId: 'if',
             introspect: true,
         });
@@ -96,7 +96,7 @@ describe('Compiler: deferred', () => {
                 },
             },
         });
-        const { code } = new GraphCompiler().compileComputeEsm(graph, {
+        const { code } = new GraphCompiler().compileEsm(graph, {
             rootNodeId: 'if',
             introspect: true,
         });
@@ -164,7 +164,7 @@ describe('Compiler: deferred', () => {
                 },
             },
         });
-        const { code } = new GraphCompiler().compileComputeEsm(graph, {
+        const { code } = new GraphCompiler().compileEsm(graph, {
             rootNodeId: 'if',
             introspect: true,
         });
@@ -212,7 +212,7 @@ describe('Compiler: deferred', () => {
                 },
             },
         });
-        const { code } = new GraphCompiler().compileComputeEsm(graph, {
+        const { code } = new GraphCompiler().compileEsm(graph, {
             rootNodeId: 'if',
             introspect: true,
         });
@@ -285,7 +285,7 @@ describe('Compiler: deferred', () => {
                 },
             },
         });
-        const { code } = new GraphCompiler().compileComputeEsm(graph, {
+        const { code } = new GraphCompiler().compileEsm(graph, {
             rootNodeId: 'if',
             introspect: true,
         });
@@ -349,7 +349,7 @@ describe('Compiler: deferred', () => {
                 },
             },
         });
-        const { code } = new GraphCompiler().compileComputeEsm(graph, {
+        const { code } = new GraphCompiler().compileEsm(graph, {
             rootNodeId: 'fallback',
             introspect: true,
         });

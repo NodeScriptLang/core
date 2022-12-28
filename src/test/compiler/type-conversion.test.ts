@@ -25,7 +25,7 @@ describe('Compiler: type conversion', () => {
                 }
             },
         });
-        const { code } = new GraphCompiler().compileComputeEsm(graph);
+        const { code } = new GraphCompiler().compileEsm(graph);
         const { compute } = await evalEsmModule(code);
         const ctx = new GraphEvalContext();
         const res = await compute({}, ctx);
@@ -50,7 +50,7 @@ describe('Compiler: type conversion', () => {
                 }
             },
         });
-        const { code } = new GraphCompiler().compileComputeEsm(graph);
+        const { code } = new GraphCompiler().compileEsm(graph);
         const { compute } = await evalEsmModule(code);
         const ctx = new GraphEvalContext();
         const res1 = await compute({ value: true }, ctx);

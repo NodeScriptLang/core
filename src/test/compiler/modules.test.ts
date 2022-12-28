@@ -43,7 +43,7 @@ describe('Compiler: graphs as modules', () => {
             },
         }));
         await graph1.loadRefs();
-        const { code: code1 } = new GraphCompiler().compileComputeEsm(graph1);
+        const { code: code1 } = new GraphCompiler().compileEsm(graph1);
         graph1.moduleSpec.attributes = {
             customImportUrl: codeToUrl(code1),
         };
@@ -60,7 +60,7 @@ describe('Compiler: graphs as modules', () => {
             },
         }));
         await graph2.loadRefs();
-        const { code: code2 } = new GraphCompiler().compileComputeEsm(graph2);
+        const { code: code2 } = new GraphCompiler().compileEsm(graph2);
         const { compute } = await evalEsmModule(code2);
         const ctx = new GraphEvalContext();
         const res = await compute({}, ctx);

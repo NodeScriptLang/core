@@ -21,7 +21,7 @@ describe('Compiler: basics', () => {
                 }
             },
         });
-        const { code } = new GraphCompiler().compileComputeEsm(graph);
+        const { code } = new GraphCompiler().compileEsm(graph);
         const { compute } = await evalEsmModule(code);
         const ctx = new GraphEvalContext();
         const res = compute({}, ctx);
@@ -47,7 +47,7 @@ describe('Compiler: basics', () => {
                 }
             }
         });
-        const { code } = new GraphCompiler().compileComputeEsm(graph, {
+        const { code } = new GraphCompiler().compileEsm(graph, {
             introspect: true,
         });
         const { compute } = await evalEsmModule(code);
@@ -87,7 +87,7 @@ describe('Compiler: basics', () => {
                     }
                 },
             });
-            const { code } = new GraphCompiler().compileComputeEsm(graph);
+            const { code } = new GraphCompiler().compileEsm(graph);
             const { compute } = await evalEsmModule(code);
             const ctx = new GraphEvalContext();
             const res = await compute({
@@ -134,16 +134,16 @@ describe('Compiler: basics', () => {
                 },
             });
             const graph1 = await createGraph({ x: 4, y: 3 }, { x: 4, y: 4 }); // a above b
-            const res1 = new GraphCompiler().compileComputeEsm(graph1);
+            const res1 = new GraphCompiler().compileEsm(graph1);
             assert.deepStrictEqual(Object.keys(res1.moduleSpec.params), ['a', 'b']);
             const graph2 = await createGraph({ x: 4, y: 5 }, { x: 4, y: 4 }); // a below b
-            const res2 = new GraphCompiler().compileComputeEsm(graph2);
+            const res2 = new GraphCompiler().compileEsm(graph2);
             assert.deepStrictEqual(Object.keys(res2.moduleSpec.params), ['b', 'a']);
             const graph3 = await createGraph({ x: 3, y: 4 }, { x: 4, y: 4 }); // a to the left b
-            const res3 = new GraphCompiler().compileComputeEsm(graph3);
+            const res3 = new GraphCompiler().compileEsm(graph3);
             assert.deepStrictEqual(Object.keys(res3.moduleSpec.params), ['a', 'b']);
             const graph4 = await createGraph({ x: 5, y: 4 }, { x: 4, y: 4 }); // a to the right b
-            const res4 = new GraphCompiler().compileComputeEsm(graph4);
+            const res4 = new GraphCompiler().compileEsm(graph4);
             assert.deepStrictEqual(Object.keys(res4.moduleSpec.params), ['b', 'a']);
         });
 
@@ -169,7 +169,7 @@ describe('Compiler: basics', () => {
                     }
                 },
             });
-            const { code } = new GraphCompiler().compileComputeEsm(graph);
+            const { code } = new GraphCompiler().compileEsm(graph);
             const { compute } = await evalEsmModule(code);
             const ctx = new GraphEvalContext();
             const res = await compute({}, ctx);
@@ -199,7 +199,7 @@ describe('Compiler: basics', () => {
                     }
                 },
             });
-            const { code } = new GraphCompiler().compileComputeEsm(graph);
+            const { code } = new GraphCompiler().compileEsm(graph);
             const { compute } = await evalEsmModule(code);
             const ctx = new GraphEvalContext();
             const res = await compute({}, ctx);
