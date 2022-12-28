@@ -19,7 +19,8 @@ export class TestModuleLoader extends StandardModuleLoader {
         return runtime.makeUrl(`/out/test/modules/${moduleId}.js`);
     }
 
-    protected override async fetchModule(url: string): Promise<ModuleSpec> {
+    override async fetchModule(ref: string): Promise<ModuleSpec> {
+        const url = this.resolveModuleUrl(ref);
         const { module } = await import(url);
         return ModuleSpecSchema.decode(module);
     }

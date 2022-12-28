@@ -3,17 +3,14 @@ import * as systemNodes from '../system/index.js';
 import { ModuleDefinition, ModuleSpec } from '../types/index.js';
 
 export interface ModuleLoader {
-    resolveModuleUrl(moduleId: string): string;
-    resolveComputeUrl(moduleId: string): string;
-    resolveModule(moduleId: string): ModuleSpec;
-    loadModule(moduleId: string): Promise<ModuleSpec>;
-    addModule(module: ModuleSpec): void;
-    removeModule(moduleId: string): void;
+    resolveComputeUrl(ref: string): string;
+    resolveModule(ref: string): ModuleSpec;
+    getModule(ref: string): ModuleSpec | null;
+    loadModule(ref: string): Promise<ModuleSpec>;
 }
 
-export class StandardModuleLoader implements ModuleLoader {
+export abstract class GenericModuleLoader implements ModuleLoader {
     modules = new Map<string, ModuleSpec>();
-    registryUrl = 'https://registry.nodescript.dev';
 
     constructor() {
         this.addModule(systemNodes.Comment);
@@ -26,32 +23,26 @@ export class StandardModuleLoader implements ModuleLoader {
         this.addModule(systemNodes.EvalJson);
     }
 
-    resolveModuleUrl(moduleId: string) {
-        return new URL(moduleId + '.json', this.registryUrl).toString();
+    abstract resolveComputeUrl(ref: string): string;
+    abstract fetchModule(ref: string): Promise<ModuleSpec>;
+
+    resolveModule(ref: string): ModuleSpec {
+        return this.getModule(ref) ?? this.createUnresolved(ref);
     }
 
-    resolveComputeUrl(moduleId: string): string {
-        return new URL(moduleId + '.mjs', this.registryUrl).toString();
+    getModule(ref: string) {
+        return this.modules.get(ref) ?? null;
     }
 
-    resolveModule(moduleId: string): ModuleSpec {
-        return this.getModule(moduleId) ?? this.createUnresolved(moduleId);
-    }
-
-    async loadModule(moduleId: string): Promise<ModuleSpec> {
-        const existing = this.getModule(moduleId);
+    async loadModule(ref: string): Promise<ModuleSpec> {
+        const existing = this.getModule(ref);
         if (existing) {
             // Do not import twice
             return existing;
         }
-        const moduleUrl = this.resolveModuleUrl(moduleId);
-        const module = await this.fetchModule(moduleUrl);
-        this.modules.set(moduleId, module);
+        const module = await this.fetchModule(ref);
+        this.modules.set(ref, module);
         return module;
-    }
-
-    getModule(moduleId: string) {
-        return this.modules.get(moduleId) ?? null;
     }
 
     addModule(def: ModuleDefinition | ModuleSpec): ModuleSpec {
@@ -71,27 +62,18 @@ export class StandardModuleLoader implements ModuleLoader {
         return spec;
     }
 
-    removeModule(moduleId: string): void {
-        this.modules.delete(moduleId);
+    removeModule(ref: string): void {
+        this.modules.delete(ref);
     }
 
-    protected async fetchModule(url: string): Promise<ModuleSpec> {
-        const res = await fetch(url);
-        if (!res.ok) {
-            throw new ModuleLoadFailedError(`Failed to load module ${url}: HTTP ${res.status}`, res.status);
-        }
-        const json = await res.json();
-        return ModuleSpecSchema.decode(json);
-    }
-
-    protected createUnresolved(moduleId: string): ModuleSpec {
+    createUnresolved(ref: string): ModuleSpec {
         return {
             moduleId: 'System.Unresolved',
             version: '0.0.0',
             label: 'Unresolved',
             labelParam: '',
             keywords: [],
-            description: `Module ${moduleId} not found`,
+            description: `Module ${ref} not found`,
             deprecated: '',
             hidden: true,
             params: {},
@@ -102,10 +84,34 @@ export class StandardModuleLoader implements ModuleLoader {
             evalMode: 'auto',
             resizeMode: 'horizontal',
             attributes: {
-                moduleId,
+                ref,
             },
         };
     }
+
+}
+
+export class StandardModuleLoader extends GenericModuleLoader {
+    registryUrl = 'https://registry.nodescript.dev';
+
+    resolveModuleUrl(ref: string) {
+        return new URL(ref + '.json', this.registryUrl).toString();
+    }
+
+    resolveComputeUrl(ref: string): string {
+        return new URL(ref + '.mjs', this.registryUrl).toString();
+    }
+
+    async fetchModule(ref: string): Promise<ModuleSpec> {
+        const url = this.resolveModuleUrl(ref);
+        const res = await fetch(url);
+        if (!res.ok) {
+            throw new ModuleLoadFailedError(`Failed to load module ${ref}: HTTP ${res.status}`, res.status);
+        }
+        const json = await res.json();
+        return ModuleSpecSchema.decode(json);
+    }
+
 }
 
 export class UnresolvedNodeError extends Error {
