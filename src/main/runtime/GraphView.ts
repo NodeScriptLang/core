@@ -133,10 +133,13 @@ export class GraphView {
         }
     }
 
+    uniqueRefs() {
+        return [...new Set(this.collectAllRefs())];
+    }
+
     async loadRefs() {
         const promises = [];
-        const refs = new Set(this.collectAllRefs());
-        for (const moduleId of refs) {
+        for (const moduleId of this.uniqueRefs()) {
             const promise = this.loader.loadModule(moduleId);
             promises.push(promise);
         }
