@@ -125,7 +125,7 @@ export class GraphView {
             .filter(Boolean) as GraphView[];
     }
 
-    private *collectAllRefs(): Iterable<string> {
+    *collectAllRefs(): Iterable<string> {
         for (const subgraph of [this, ...this.getUsedSubgraphs()]) {
             for (const nodeSpec of Object.values(subgraph.graphSpec.nodes)) {
                 yield nodeSpec.ref;
