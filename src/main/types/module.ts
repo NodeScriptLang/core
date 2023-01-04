@@ -30,6 +30,7 @@ export interface ModuleParamSpec {
     hideValue?: boolean;
     renderer?: string;
     attributes: Record<string, any>;
+    hint?: ModuleParamHint;
 }
 
 export interface ModuleResultSpec {
@@ -43,3 +44,8 @@ export type NodeEvalMode = 'auto' | 'manual';
 export type NodeCacheMode = 'auto' | 'always' | 'never';
 
 export type NodeResizeMode = 'horizontal' | 'all' | 'none';
+
+export interface ModuleParamHint {
+    keyof?: string;
+    pathof?: string;
+}

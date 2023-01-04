@@ -2,6 +2,7 @@ import { Schema } from 'airtight';
 
 import { ModuleParamSpec } from '../types/index.js';
 import { DataSchemaSpecSchema } from './DataSchemaSpec.js';
+import { ModuleParamHintSchema } from './ModuleParamHint.js';
 
 export const ModuleParamSpecSchema = new Schema<ModuleParamSpec>({
     id: 'ModuleParamSpec',
@@ -54,6 +55,10 @@ export const ModuleParamSpecSchema = new Schema<ModuleParamSpec>({
             additionalProperties: {
                 type: 'any',
             }
-        }
+        },
+        hint: {
+            ...ModuleParamHintSchema.schema,
+            optional: true,
+        },
     }
 });

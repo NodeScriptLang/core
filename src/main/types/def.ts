@@ -21,7 +21,7 @@ export type ResultDefinition<R> = Partial<ModuleResultSpec> & {
 
 export type ParamDef<T = unknown> = SimpleParamDef<T>;
 
-export type SimpleParamDef<T = unknown> = Omit<Partial<ModuleParamSpec>, 'schema' | 'default'> & {
+export type SimpleParamDef<T = unknown> = Omit<Partial<ModuleParamSpec>, 'schema'> & {
     schema: DataSchema<T>;
 };
 
