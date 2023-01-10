@@ -1,3 +1,4 @@
+import { get, set } from '@nodescript/pointer';
 import { getType, Schema } from 'airtight';
 import { Event } from 'nanoevent';
 
@@ -121,6 +122,15 @@ export class GraphEvalContext implements t.GraphEvalContext {
         this.disposables.clear();
         await Promise.allSettled(promises);
     }
+
+    get(object: unknown, keyish: string): unknown {
+        return get(object, keyish);
+    }
+
+    set(object: unknown, keyish: string, value: unknown): void {
+        set(object, keyish, value);
+    }
+
 }
 
 export class NodePendingError extends Error {
