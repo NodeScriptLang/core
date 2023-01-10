@@ -7,12 +7,6 @@ import { convertAuto } from '../util/convert.js';
 
 export const SYM_DEFERRED = Symbol.for('NodeScript:Deferred');
 
-export type Deferred = {
-    [SYM_DEFERRED]: true;
-    resolve: () => unknown;
-    schema: t.DataSchema<unknown> | undefined;
-};
-
 /**
  * GraphEvalContext provides runtime tools for graph computation,
  * node caching, introspection, etc.
@@ -88,11 +82,7 @@ export class GraphEvalContext implements t.GraphEvalContext {
     }
 
     deferred(fn: () => unknown, schema?: t.DataSchema<unknown> | undefined): Deferred {
-        return {
-            [SYM_DEFERRED]: true,
-            resolve: fn,
-            schema,
-        };
+        return new Deferred(fn, schema);
     }
 
     resolveDeferred(value: unknown): unknown {
@@ -133,4 +123,17 @@ export class GraphEvalContext implements t.GraphEvalContext {
 export class NodePendingError extends Error {
     override name = this.constructor.name;
     code = 'EPENDING';
+}
+
+export class Deferred {
+
+    constructor(
+        readonly resolve: () => unknown,
+        readonly schema: t.DataSchema<unknown> | undefined,
+    ) {}
+
+    get [SYM_DEFERRED]() {
+        return true;
+    }
+
 }
