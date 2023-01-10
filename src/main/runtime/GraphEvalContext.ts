@@ -85,10 +85,13 @@ export class GraphEvalContext implements t.GraphEvalContext {
         return new Deferred(fn, schema);
     }
 
+    isDeferred(value: unknown): value is t.Deferred {
+        return value != null && (value as any)[SYM_DEFERRED];
+    }
+
     resolveDeferred(value: unknown): unknown {
-        if ((value as any)[SYM_DEFERRED]) {
-            const deferred = value as Deferred;
-            const { schema, resolve } = deferred;
+        if (this.isDeferred(value)) {
+            const { schema, resolve } = value;
             const val = resolve();
             if (schema) {
                 if (val instanceof Promise) {
@@ -125,7 +128,7 @@ export class NodePendingError extends Error {
     code = 'EPENDING';
 }
 
-export class Deferred {
+export class Deferred implements t.Deferred {
 
     constructor(
         readonly resolve: () => unknown,

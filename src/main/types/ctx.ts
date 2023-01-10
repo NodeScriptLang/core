@@ -1,6 +1,11 @@
 import { DataSchema, DataType } from './data-schema.js';
 import { Disposable } from './disposable.js';
 
+export interface Deferred {
+    resolve: () => unknown;
+    schema: DataSchema | undefined;
+}
+
 export interface GraphEvalContext {
     nodeId: string;
     cache: Map<string, any>;
@@ -11,6 +16,7 @@ export interface GraphEvalContext {
     convertType<T>(value: unknown, schema: DataSchema<T>): T;
     convertAuto(value: string): any;
     deferred(fn: () => unknown, schema?: DataSchema<unknown>): unknown;
+    isDeferred(value: unknown): value is Deferred;
     resolveDeferred(value: unknown): unknown;
     trackDisposable(key: string, disposable: Disposable): void;
     dispose(key: string): Promise<void>;
