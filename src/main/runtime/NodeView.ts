@@ -174,7 +174,7 @@ export class NodeView {
     }
 
     getEvalMode() {
-        return this.metadata.evalMode ?? this.getModuleSpec().evalMode;
+        return this.getModuleSpec().evalMode;
     }
 
 }
