@@ -17,17 +17,16 @@ export const ModuleSpecSchema = new Schema<ModuleSpec>({
         version: ModuleVersionSchema.schema,
         label: {
             type: 'string',
+            default: 'Untitled',
         },
         labelParam: {
             type: 'string',
         },
         namespace: {
             type: 'string',
-            optional: true,
         },
         icon: {
             type: 'string',
-            optional: true,
         },
         description: {
             type: 'string',
