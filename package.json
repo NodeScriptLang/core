@@ -41,6 +41,7 @@
         "nanoid": "^3.3.4"
     },
     "devDependencies": {
+        "@nodescript/cli": "^0.7.2",
         "@nodescript/eslint-config": "^1.0.3",
         "@types/glob": "^7.2.0",
         "@types/mocha": "^9.1.1",
