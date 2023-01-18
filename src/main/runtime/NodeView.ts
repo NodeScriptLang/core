@@ -44,20 +44,6 @@ export class NodeView {
         return this._moduleSpec;
     }
 
-    getEffectiveLabel() {
-        if (this.metadata.label) {
-            return this.metadata.label;
-        }
-        const { label, labelParam } = this.getModuleSpec();
-        if (labelParam) {
-            const prop = this.getProp(labelParam);
-            if (prop && !prop.isLinked() && prop.value) {
-                return prop.value;
-            }
-        }
-        return label;
-    }
-
     isRoot() {
         return this.graph.rootNodeId === this.nodeId;
     }

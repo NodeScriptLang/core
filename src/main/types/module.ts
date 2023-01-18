@@ -5,8 +5,6 @@ export interface ModuleSpec {
     version: string;
     label: string;
     labelParam: string;
-    namespace: string;
-    icon: string;
     description: string;
     keywords: string[];
     deprecated?: string;

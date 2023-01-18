@@ -13,8 +13,6 @@ describe('ModuleLoader', () => {
             version: '1.0.0',
             label: 'Math.Add',
             labelParam: '',
-            namespace: '',
-            icon: '',
             description: 'Computes a sum of two numbers.',
             keywords: ['math', 'add', 'plus', 'sum'],
             params: {

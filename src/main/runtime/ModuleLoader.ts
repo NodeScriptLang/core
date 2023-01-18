@@ -48,8 +48,6 @@ export abstract class GenericModuleLoader implements ModuleLoader {
     addModule(def: ModuleDefinition | ModuleSpec): ModuleSpec {
         const spec: ModuleSpec = {
             labelParam: '',
-            namespace: '',
-            icon: '',
             description: '',
             keywords: [],
             deprecated: '',
@@ -74,8 +72,6 @@ export abstract class GenericModuleLoader implements ModuleLoader {
             version: '0.0.0',
             label: 'Unresolved',
             labelParam: '',
-            namespace: '',
-            icon: '',
             keywords: [],
             description: `Module ${ref} not found`,
             deprecated: '',

@@ -22,12 +22,6 @@ export const ModuleSpecSchema = new Schema<ModuleSpec>({
         labelParam: {
             type: 'string',
         },
-        namespace: {
-            type: 'string',
-        },
-        icon: {
-            type: 'string',
-        },
         description: {
             type: 'string',
         },
