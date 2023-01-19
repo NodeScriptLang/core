@@ -4,13 +4,13 @@ export class CompilerSymbols {
     private symCounters = new Map<string, number>();
     private symtable = new Map<string, string>();
 
-    getDefSym(moduleId: string) {
-        return this.get(`def:${moduleId}`);
+    getDefSym(moduleRef: string) {
+        return this.get(`def:${moduleRef}`);
     }
 
-    createDefSym(moduleId: string) {
+    createDefSym(moduleRef: string) {
         const sym = this.nextSym('d');
-        this.set(`def:${moduleId}`, sym);
+        this.set(`def:${moduleRef}`, sym);
         return sym;
     }
 

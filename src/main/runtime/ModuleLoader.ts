@@ -13,13 +13,13 @@ export abstract class GenericModuleLoader implements ModuleLoader {
     modules = new Map<string, ModuleSpec>();
 
     constructor() {
-        this.addModule(systemNodes.Comment);
-        this.addModule(systemNodes.Frame);
-        this.addModule(systemNodes.Param);
-        this.addModule(systemNodes.Result);
-        this.addModule(systemNodes.EvalSync);
-        this.addModule(systemNodes.EvalAsync);
-        this.addModule(systemNodes.EvalJson);
+        this.addModule('@system/Comment', systemNodes.Comment);
+        this.addModule('@system/Frame', systemNodes.Frame);
+        this.addModule('@system/Param', systemNodes.Param);
+        this.addModule('@system/Result', systemNodes.Result);
+        this.addModule('@system/EvalSync', systemNodes.EvalSync);
+        this.addModule('@system/EvalAsync', systemNodes.EvalAsync);
+        this.addModule('@system/EvalJson', systemNodes.EvalJson);
     }
 
     abstract resolveComputeUrl(ref: string): string;
@@ -44,9 +44,9 @@ export abstract class GenericModuleLoader implements ModuleLoader {
         return module;
     }
 
-    addModule(def: ModuleSpec): ModuleSpec {
-        this.modules.set(def.moduleId, def);
-        return def;
+    addModule(moduleRef: string, moduleSpec: ModuleSpec): ModuleSpec {
+        this.modules.set(moduleRef, moduleSpec);
+        return moduleSpec;
     }
 
     removeModule(ref: string): void {
@@ -55,7 +55,6 @@ export abstract class GenericModuleLoader implements ModuleLoader {
 
     createUnresolved(ref: string): ModuleSpec {
         return {
-            moduleId: 'System.Unresolved',
             moduleName: 'Unresolved',
             version: '0.0.0',
             labelParam: '',

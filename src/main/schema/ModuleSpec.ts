@@ -1,7 +1,6 @@
 import { Schema } from 'airtight';
 
 import { ModuleSpec } from '../types/index.js';
-import { ModuleIdSchema } from './ModuleId.js';
 import { ModuleNameSchema } from './ModuleName.js';
 import { ModuleParamSpecSchema } from './ModuleParamSpec.js';
 import { ModuleResultSpecSchema } from './ModuleResultSpec.js';
@@ -14,7 +13,6 @@ export const ModuleSpecSchema = new Schema<ModuleSpec>({
     id: 'ModuleSpec',
     type: 'object',
     properties: {
-        moduleId: ModuleIdSchema.schema,
         moduleName: ModuleNameSchema.schema,
         version: ModuleVersionSchema.schema,
         labelParam: {

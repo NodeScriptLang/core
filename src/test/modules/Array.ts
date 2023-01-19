@@ -7,7 +7,6 @@ type P = {
 type R = any[];
 
 export const module: ModuleDefinition<P, R> = {
-    moduleId: 'Array',
     moduleName: 'Array',
     version: '1.0.0',
     description: 'Creates an array.',

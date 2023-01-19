@@ -12,7 +12,6 @@ describe('Compiler: graphs as modules', () => {
         const loader = new TestModuleLoader();
         const graph1 = new GraphView(loader, GraphSpecSchema.create({
             moduleSpec: {
-                moduleId: 'graph1',
                 version: '1.0.0',
                 params: {
                     val: {
@@ -47,7 +46,7 @@ describe('Compiler: graphs as modules', () => {
         graph1.moduleSpec.attributes = {
             customImportUrl: codeToUrl(code1),
         };
-        loader.addModule(graph1.moduleSpec);
+        loader.addModule('graph1', graph1.moduleSpec);
         const graph2 = new GraphView(loader, GraphSpecSchema.create({
             rootNodeId: 'res',
             nodes: {

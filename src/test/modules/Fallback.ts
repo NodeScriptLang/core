@@ -6,7 +6,6 @@ type P = {
 type R = Promise<any>;
 
 export const module: ModuleDefinition<P, R> = {
-    moduleId: 'Fallback',
     moduleName: 'Fallback',
     version: '1.0.0',
     params: {

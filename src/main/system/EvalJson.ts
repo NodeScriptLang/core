@@ -1,7 +1,6 @@
 import { ModuleSpecSchema } from '../schema/ModuleSpec.js';
 
 export const EvalJson = ModuleSpecSchema.create({
-    moduleId: '@system/EvalJson',
     moduleName: 'Eval.Json',
     version: '0.0.0',
     description: 'Returns a JSON value.',

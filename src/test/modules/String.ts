@@ -7,7 +7,6 @@ type P = {
 type R = string;
 
 export const module: ModuleDefinition<P, R> = {
-    moduleId: 'String',
     moduleName: 'String',
     version: '1.0.0',
     description: 'Converts the value into a string.',

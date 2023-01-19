@@ -4,7 +4,6 @@ type P = { value: unknown };
 type R = unknown;
 
 export const module: ModuleDefinition<P, R> = {
-    moduleId: 'Any',
     moduleName: 'Any',
     version: '1.0.0',
     description: 'Just returns the value as is, without type conversion.',

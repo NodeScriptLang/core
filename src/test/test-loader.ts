@@ -11,12 +11,12 @@ import { runtime } from './runtime.js';
  */
 export class TestModuleLoader extends StandardModuleLoader {
 
-    override resolveModuleUrl(moduleId: string): string {
-        return runtime.makeUrl(`/out/test/modules/${moduleId}.js`);
+    override resolveModuleUrl(moduleRef: string): string {
+        return runtime.makeUrl(`/out/test/modules/${moduleRef}.js`);
     }
 
-    override resolveComputeUrl(moduleId: string): string {
-        return runtime.makeUrl(`/out/test/modules/${moduleId}.js`);
+    override resolveComputeUrl(moduleRef: string): string {
+        return runtime.makeUrl(`/out/test/modules/${moduleRef}.js`);
     }
 
     override async fetchModule(ref: string): Promise<ModuleSpec> {

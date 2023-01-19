@@ -4,7 +4,6 @@ type P = { object: any; key: string };
 type R = unknown;
 
 export const module: ModuleDefinition<P, R> = {
-    moduleId: 'Get',
     moduleName: 'Get',
     version: '1.0.0',
     params: {

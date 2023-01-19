@@ -68,15 +68,15 @@ export class CompilerJob {
         const allRefs = this.allScopes()
             .flatMap(_ => _.getEmittedNodes())
             .map(_ => _.ref);
-        const moduleIds = new Set(allRefs);
-        for (const moduleId of moduleIds) {
-            if (moduleId.startsWith('@system/')) {
+        const moduleRefs = new Set(allRefs);
+        for (const moduleRef of moduleRefs) {
+            if (moduleRef.startsWith('@system/')) {
                 continue;
             }
-            const module = loader.resolveModule(moduleId);
+            const module = loader.resolveModule(moduleRef);
             const computeUrl = module.attributes?.customImportUrl ??
-                loader.resolveComputeUrl(moduleId);
-            const sym = this.symbols.createDefSym(moduleId);
+                loader.resolveComputeUrl(moduleRef);
+            const sym = this.symbols.createDefSym(moduleRef);
             this.code.line(`import { compute as ${sym} } from '${computeUrl}'`);
         }
     }

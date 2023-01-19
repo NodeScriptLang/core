@@ -7,7 +7,6 @@ type P = {
 type R = any;
 
 export const module: ModuleDefinition<P, R> = {
-    moduleId: 'Object',
     moduleName: 'Object',
     version: '1.0.0',
     description: 'Creates an object.',
