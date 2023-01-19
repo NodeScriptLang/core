@@ -4,9 +4,8 @@ import { DataSchema } from './data-schema.js';
 import { ModuleParamSpec, ModuleResultSpec, ModuleSpec } from './module.js';
 
 export type ModuleDefinition<P = unknown, R = unknown> = Omit<Partial<ModuleSpec>, 'params' | 'result'> & {
-    moduleId: string;
+    moduleName: string;
     version: ModuleVersion;
-    label: string;
     params: ParamsDefinition<P>;
     result: ResultDefinition<R>;
 };

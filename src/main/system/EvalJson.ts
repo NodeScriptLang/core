@@ -1,15 +1,9 @@
-import { ModuleDefinition } from '../types/index.js';
+import { ModuleSpecSchema } from '../schema/ModuleSpec.js';
 
-type P = {
-    code: string;
-};
-
-type R = unknown;
-
-export const EvalJson: ModuleDefinition<P, R> = {
+export const EvalJson = ModuleSpecSchema.create({
     moduleId: '@system/EvalJson',
+    moduleName: 'Eval.Json',
     version: '0.0.0',
-    label: 'Json',
     description: 'Returns a JSON value.',
     keywords: ['eval', 'json', 'data'],
     resizeMode: 'all',
@@ -27,4 +21,4 @@ export const EvalJson: ModuleDefinition<P, R> = {
             type: 'any',
         }
     }
-};
+});

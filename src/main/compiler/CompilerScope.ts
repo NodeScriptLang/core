@@ -187,7 +187,6 @@ export class CompilerScope {
             case '@system/Comment':
             case '@system/Frame':
                 return;
-            case '@system/Subgraph': return this.emitSubgraph(node, resSym);
             case '@system/EvalSync': return this.emitEvalSync(node, resSym);
             case '@system/EvalAsync': return this.emitEvalAsync(node, resSym);
             case '@system/EvalJson': return this.emitEvalJson(node, resSym);
@@ -209,22 +208,6 @@ export class CompilerScope {
         const prop = node.getProp('value')!;
         const expr = this.singleLineExpr(prop, this.graphView.moduleSpec.result.schema);
         this.code.line(`${resSym} = ${expr};`);
-    }
-
-    private emitSubgraph(node: NodeView, resSym: string) {
-        const { subgraphId } = node.metadata;
-        const subgraph = subgraphId ? this.graphView.getSubgraphById(subgraphId) : null;
-        if (!subgraph) {
-            return;
-        }
-        const subgraphResultSym = this.symbols.getNodeSym(subgraphId, subgraph.rootNodeId, '');
-        if (!subgraphResultSym) {
-            return;
-        }
-        this.code.line(`ctx.nodeId = ${JSON.stringify(`${subgraphId}:${node.nodeId}`)};`);
-        this.code.block(`${resSym} = ${this.awaitSym}${subgraphResultSym}({`, `}, ctx.newScope());`, () => {
-            this.emitNodeProps(node);
-        });
     }
 
     private emitEvalSync(node: NodeView, resSym: string) {

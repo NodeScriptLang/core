@@ -2,8 +2,8 @@ import { DataSchemaSpec } from './data-schema.js';
 
 export interface ModuleSpec {
     moduleId: string;
+    moduleName: string;
     version: string;
-    label: string;
     labelParam: string;
     description: string;
     keywords: string[];

@@ -1,11 +1,10 @@
-import { ModuleDefinition } from '../types/def.js';
+import { ModuleSpecSchema } from '../schema/ModuleSpec.js';
+import { ModuleSpec } from '../types/module.js';
 
-export const Comment: ModuleDefinition<{
-    comment: string;
-}, any> = {
+export const Comment: ModuleSpec = ModuleSpecSchema.create({
     moduleId: '@system/Comment',
+    moduleName: 'Comment',
     version: '0.0.0',
-    label: 'Comment',
     resizeMode: 'all',
     params: {
         comment: {
@@ -15,4 +14,4 @@ export const Comment: ModuleDefinition<{
     result: {
         schema: { type: 'any' },
     },
-};
+});

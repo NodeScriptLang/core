@@ -1,11 +1,9 @@
-import { ModuleDefinition } from '../types/index.js';
+import { ModuleSpecSchema } from '../schema/ModuleSpec.js';
 
-export const Param: ModuleDefinition<{
-    key: string;
-}, any> = {
+export const Param = ModuleSpecSchema.create({
     moduleId: '@system/Param',
+    moduleName: 'Param',
     version: '0.0.0',
-    label: 'Param',
     resizeMode: 'none',
     hidden: true,
     params: {
@@ -19,4 +17,4 @@ export const Param: ModuleDefinition<{
         schema: { type: 'any' },
     },
     cacheMode: 'never',
-};
+});

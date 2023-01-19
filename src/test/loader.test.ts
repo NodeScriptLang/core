@@ -10,8 +10,8 @@ describe('ModuleLoader', () => {
         const def = await loader.loadModule('Math.Add');
         assert.deepStrictEqual(def, {
             moduleId: 'Math.Add',
+            moduleName: 'Math.Add',
             version: '1.0.0',
-            label: 'Math.Add',
             labelParam: '',
             description: 'Computes a sum of two numbers.',
             keywords: ['math', 'add', 'plus', 'sum'],
@@ -42,8 +42,8 @@ describe('ModuleLoader', () => {
                 b: { ref: 'String' },
             },
         });
-        assert.strictEqual(graph.loader.resolveModule('Math.Add').label, 'Math.Add');
-        assert.strictEqual(graph.loader.resolveModule('String').label, 'String');
+        assert.strictEqual(graph.loader.resolveModule('Math.Add').moduleName, 'Math.Add');
+        assert.strictEqual(graph.loader.resolveModule('String').moduleName, 'String');
     });
 
     it('allows graph node to resolve module definitions synchronously', async () => {
@@ -60,7 +60,7 @@ describe('ModuleLoader', () => {
         });
         const node = graph.getNodeById('node1');
         const def = node!.getModuleSpec();
-        assert.strictEqual(def.label, 'Math.Add');
+        assert.strictEqual(def.moduleName, 'Math.Add');
     });
 
 });

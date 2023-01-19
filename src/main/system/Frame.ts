@@ -1,12 +1,12 @@
-import { ModuleDefinition } from '../types/index.js';
+import { ModuleSpecSchema } from '../schema/ModuleSpec.js';
 
-export const Frame: ModuleDefinition<{}, any> = {
+export const Frame = ModuleSpecSchema.create({
     moduleId: '@system/Frame',
+    moduleName: 'Frame',
     version: '0.0.0',
-    label: 'Frame',
     resizeMode: 'all',
     params: {},
     result: {
         schema: { type: 'any' },
     },
-};
+});

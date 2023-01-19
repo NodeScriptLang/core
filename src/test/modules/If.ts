@@ -9,8 +9,8 @@ type R = any;
 
 export const module: ModuleDefinition<P, R> = {
     moduleId: 'If',
+    moduleName: 'If',
     version: '1.0.0',
-    label: 'If',
     params: {
         condition: {
             schema: { type: 'boolean' }

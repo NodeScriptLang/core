@@ -1,16 +1,9 @@
-import { ModuleDefinition } from '../types/index.js';
+import { ModuleSpecSchema } from '../schema/ModuleSpec.js';
 
-type P = {
-    args: Record<string, unknown>;
-    code: string;
-};
-
-type R = Promise<unknown>;
-
-export const EvalAsync: ModuleDefinition<P, R> = {
+export const EvalAsync = ModuleSpecSchema.create({
     moduleId: '@system/EvalAsync',
+    moduleName: 'Eval.Async',
     version: '0.0.0',
-    label: 'Eval Async',
     description: 'Evaluates asynchronous JavaScript code with provided arguments.',
     keywords: ['eval', 'compute', 'js', 'javascript', 'function', 'execute', 'expression', 'async'],
     resizeMode: 'all',
@@ -36,4 +29,4 @@ export const EvalAsync: ModuleDefinition<P, R> = {
             type: 'any',
         }
     },
-};
+});

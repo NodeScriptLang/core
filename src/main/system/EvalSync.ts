@@ -1,16 +1,9 @@
-import { ModuleDefinition } from '../types/index.js';
+import { ModuleSpecSchema } from '../schema/ModuleSpec.js';
 
-type P = {
-    args: Record<string, unknown>;
-    code: string;
-};
-
-type R = unknown;
-
-export const EvalSync: ModuleDefinition<P, R> = {
+export const EvalSync = ModuleSpecSchema.create({
     moduleId: '@system/EvalSync',
+    moduleName: 'Eval',
     version: '0.0.0',
-    label: 'Eval',
     description: 'Evaluates synchronous JavaScript code with provided arguments.',
     keywords: ['eval', 'compute', 'js', 'javascript', 'function', 'execute', 'expression', 'sync'],
     resizeMode: 'all',
@@ -35,4 +28,4 @@ export const EvalSync: ModuleDefinition<P, R> = {
             type: 'any',
         }
     },
-};
+});

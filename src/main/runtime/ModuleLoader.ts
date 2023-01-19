@@ -1,6 +1,6 @@
 import { ModuleSpecSchema } from '../schema/ModuleSpec.js';
 import * as systemNodes from '../system/index.js';
-import { ModuleDefinition, ModuleSpec } from '../types/index.js';
+import { ModuleSpec } from '../types/index.js';
 
 export interface ModuleLoader {
     resolveComputeUrl(ref: string): string;
@@ -17,7 +17,6 @@ export abstract class GenericModuleLoader implements ModuleLoader {
         this.addModule(systemNodes.Frame);
         this.addModule(systemNodes.Param);
         this.addModule(systemNodes.Result);
-        this.addModule(systemNodes.Subgraph);
         this.addModule(systemNodes.EvalSync);
         this.addModule(systemNodes.EvalAsync);
         this.addModule(systemNodes.EvalJson);
@@ -45,21 +44,9 @@ export abstract class GenericModuleLoader implements ModuleLoader {
         return module;
     }
 
-    addModule(def: ModuleDefinition | ModuleSpec): ModuleSpec {
-        const spec: ModuleSpec = {
-            labelParam: '',
-            description: '',
-            keywords: [],
-            deprecated: '',
-            hidden: false,
-            cacheMode: 'auto',
-            evalMode: 'auto',
-            resizeMode: 'horizontal',
-            attributes: {},
-            ...def
-        };
-        this.modules.set(spec.moduleId, spec);
-        return spec;
+    addModule(def: ModuleSpec): ModuleSpec {
+        this.modules.set(def.moduleId, def);
+        return def;
     }
 
     removeModule(ref: string): void {
@@ -69,8 +56,8 @@ export abstract class GenericModuleLoader implements ModuleLoader {
     createUnresolved(ref: string): ModuleSpec {
         return {
             moduleId: 'System.Unresolved',
+            moduleName: 'Unresolved',
             version: '0.0.0',
-            label: 'Unresolved',
             labelParam: '',
             keywords: [],
             description: `Module ${ref} not found`,

@@ -1,11 +1,9 @@
-import { ModuleDefinition } from '../types/index.js';
+import { ModuleSpecSchema } from '../schema/ModuleSpec.js';
 
-export const Result: ModuleDefinition<{
-    value: unknown;
-}, any> = {
+export const Result = ModuleSpecSchema.create({
     moduleId: '@system/Result',
+    moduleName: 'Result',
     version: '0.0.0',
-    label: 'Result',
     resizeMode: 'none',
     hidden: true,
     params: {
@@ -19,4 +17,4 @@ export const Result: ModuleDefinition<{
         schema: { type: 'any' },
         hideSocket: true,
     },
-};
+});

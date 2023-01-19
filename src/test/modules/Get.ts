@@ -5,8 +5,8 @@ type R = unknown;
 
 export const module: ModuleDefinition<P, R> = {
     moduleId: 'Get',
+    moduleName: 'Get',
     version: '1.0.0',
-    label: 'Get',
     params: {
         object: {
             schema: {

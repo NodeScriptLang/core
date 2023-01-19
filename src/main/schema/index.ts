@@ -2,6 +2,7 @@
 export * from './DataSchemaSpec.js';
 export * from './GraphSpec.js';
 export * from './ModuleId.js';
+export * from './ModuleName.js';
 export * from './ModuleParamHint.js';
 export * from './ModuleParamSpec.js';
 export * from './ModuleResultSpec.js';
