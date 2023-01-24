@@ -1,6 +1,7 @@
-import { DataType, SchemaDef } from 'airtight';
+import { SchemaDef } from 'airtight';
 
 import { Disposable } from './disposable.js';
+import { RuntimeLib } from './runtime-lib.js';
 
 export interface Deferred {
     resolve: () => unknown;
@@ -8,6 +9,9 @@ export interface Deferred {
 }
 
 export interface GraphEvalContext {
+
+    readonly lib: RuntimeLib;
+
     nodeId: string;
     cache: Map<string, any>;
 
@@ -16,7 +20,6 @@ export interface GraphEvalContext {
     getLocal<T>(key: string, defaultValue?: T): T | undefined;
     setLocal(key: string, value: unknown): void;
 
-    getType(value: unknown): DataType;
     convertType<T>(value: unknown, schema: SchemaDef<T>): T;
     convertAuto(value: string): any;
 
@@ -28,6 +31,7 @@ export interface GraphEvalContext {
     dispose(key: string): Promise<void>;
     disposeAll(): Promise<void>;
 
+    // For compatibility:
     get(object: unknown, keyish: string): unknown;
     set(object: unknown, keyish: string, value: unknown): void;
 }

@@ -1,6 +1,8 @@
-import { DataType } from 'airtight';
+import { getType } from 'airtight';
 
 import { SchemaSpec } from '../types/schema.js';
+
+export { getType };
 
 export function parseAny(str: string) {
     const s = String(str ?? '').trim();
@@ -26,20 +28,6 @@ export function parseAny(str: string) {
             return str;
         }
     }
-}
-
-export function getType(data: unknown): DataType {
-    if (data == null) {
-        return 'null';
-    }
-    if (Array.isArray(data)) {
-        return 'array';
-    }
-    const type = typeof data;
-    if (type === 'object' || type === 'number' || type === 'string' || type === 'boolean') {
-        return type;
-    }
-    return 'any';
 }
 
 export function isSchemaCompatible(desiredSchema: SchemaSpec, actualSchema: SchemaSpec): boolean {

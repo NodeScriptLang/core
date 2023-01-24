@@ -1,10 +1,10 @@
-import { get, set } from '@nodescript/pointer';
-import { DataType, getType, Schema, SchemaDef } from 'airtight';
+import { Schema, SchemaDef } from 'airtight';
 import { Event } from 'nanoevent';
 
 import * as t from '../types/index.js';
 import { Disposable } from '../types/index.js';
 import { convertAuto } from '../util/convert.js';
+import { runtimeLib } from '../util/runtime-lib.js';
 
 export const SYM_DEFERRED = Symbol.for('NodeScript:Deferred');
 
@@ -13,6 +13,7 @@ export const SYM_DEFERRED = Symbol.for('NodeScript:Deferred');
  * node caching, introspection, etc.
  */
 export class GraphEvalContext implements t.GraphEvalContext {
+    readonly lib = runtimeLib;
 
     nodeId: string = '';
     pendingNodeIds: Set<string>;
@@ -64,9 +65,6 @@ export class GraphEvalContext implements t.GraphEvalContext {
         return Array.isArray(value) ? value : [value];
     }
 
-    getType(value: unknown): DataType {
-        return getType(value);
-    }
 
     convertType<T>(value: unknown, schema: SchemaDef<T>): T {
         return new Schema<T>(schema as any).decode(value);
@@ -123,14 +121,9 @@ export class GraphEvalContext implements t.GraphEvalContext {
         await Promise.allSettled(promises);
     }
 
-    get(object: unknown, keyish: string): unknown {
-        return get(object, keyish);
-    }
-
-    set(object: unknown, keyish: string, value: unknown): void {
-        set(object, keyish, value);
-    }
-
+    // For compatibility:
+    readonly get = runtimeLib.get;
+    readonly set = runtimeLib.set;
 }
 
 export class NodePendingError extends Error {
