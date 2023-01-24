@@ -10,7 +10,31 @@ export const SchemaSpecSchema = new Schema<SchemaSpec>({
             type: 'string',
             default: 'any',
         },
+        optional: {
+            type: 'boolean',
+            optional: true,
+        },
+        nullable: {
+            type: 'boolean',
+            optional: true,
+        },
+        id: {
+            type: 'string',
+            optional: true,
+        },
+        title: {
+            type: 'string',
+            optional: true,
+        },
+        description: {
+            type: 'string',
+            optional: true,
+        },
         default: {
+            type: 'any',
+            optional: true,
+        },
+        metadata: {
             type: 'any',
             optional: true,
         },
@@ -32,6 +56,18 @@ export const SchemaSpecSchema = new Schema<SchemaSpec>({
             type: 'ref',
             optional: true,
             schemaId: 'SchemaSpec',
+        },
+        refs: {
+            type: 'array',
+            optional: true,
+            items: {
+                type: 'ref',
+                schemaId: 'SchemaSpec',
+            }
+        },
+        schemaId: {
+            type: 'string',
+            optional: true,
         },
         enum: {
             type: 'array',

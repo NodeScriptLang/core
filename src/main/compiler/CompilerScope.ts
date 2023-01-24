@@ -343,14 +343,7 @@ export class CompilerScope {
      */
     private constantLineExpr(line: PropLineView, targetSchema: SchemaSpec) {
         const valueExpr = JSON.stringify(line.value);
-        switch (targetSchema.type) {
-            case 'any':
-                return `ctx.convertAuto(${valueExpr})`;
-            case 'string':
-                return valueExpr;
-            default:
-                return this.convertTypeExpr(valueExpr, targetSchema);
-        }
+        return `ctx.convertAuto(${valueExpr}, ${JSON.stringify(targetSchema)})`;
     }
 
     private deferredLineExpr(line: PropLineView, targetSchema: SchemaSpec) {

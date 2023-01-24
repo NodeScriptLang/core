@@ -2,6 +2,7 @@ import { SchemaDef } from 'airtight';
 
 import { Disposable } from './disposable.js';
 import { RuntimeLib } from './runtime-lib.js';
+import { SchemaSpec } from './schema.js';
 
 export interface Deferred {
     resolve: () => unknown;
@@ -19,8 +20,8 @@ export interface GraphEvalContext {
     getLocal<T>(key: string, defaultValue?: T): T | undefined;
     setLocal(key: string, value: unknown): void;
 
-    convertType<T>(value: unknown, schema: SchemaDef<T>): T;
-    convertAuto(value: string): any;
+    convertType(value: unknown, schema: SchemaSpec): unknown;
+    convertAuto(value: string, schema?: SchemaSpec): unknown;
 
     deferred(fn: () => unknown, schema?: SchemaDef<unknown>): unknown;
     isDeferred(value: unknown): value is Deferred;

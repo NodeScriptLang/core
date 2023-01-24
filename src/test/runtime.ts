@@ -1,6 +1,7 @@
 import { DeepPartial } from 'airtight';
 
 import { GraphView } from '../main/runtime/GraphView.js';
+import { ModuleLoader } from '../main/runtime/ModuleLoader.js';
 import { GraphSpecSchema } from '../main/schema/GraphSpec.js';
 import { GraphSpec } from '../main/types/index.js';
 import { TestModuleLoader } from './test-loader.js';
@@ -25,6 +26,10 @@ export class TestRuntime {
 
     async loadGraph(spec: DeepPartial<GraphSpec>): Promise<GraphView> {
         const loader = await this.createLoader();
+        return this.loadGraphWithLoader(loader, spec);
+    }
+
+    async loadGraphWithLoader(loader: ModuleLoader, spec: DeepPartial<GraphSpec>) {
         const graphSpec = GraphSpecSchema.decode(spec);
         const graph = new GraphView(loader, graphSpec);
         await graph.loadRefs();

@@ -2,8 +2,7 @@ import { Schema, SchemaDef } from 'airtight';
 import { Event } from 'nanoevent';
 
 import * as t from '../types/index.js';
-import { Disposable } from '../types/index.js';
-import { convertAuto } from '../util/convert.js';
+import { Disposable, SchemaSpec } from '../types/index.js';
 import { runtimeLib } from '../util/runtime-lib.js';
 
 export const SYM_DEFERRED = Symbol.for('NodeScript:Deferred');
@@ -66,12 +65,49 @@ export class GraphEvalContext implements t.GraphEvalContext {
     }
 
 
-    convertType<T>(value: unknown, schema: SchemaDef<T>): T {
-        return new Schema<T>(schema as any).decode(value);
+    convertType(value: unknown, schema: SchemaSpec) {
+        return new Schema(schema as any).decode(value);
     }
 
-    convertAuto(value: string) {
-        return convertAuto(value);
+    convertAuto(value: string, targetSchema: SchemaSpec = { type: 'any' }) {
+        if (value === '') {
+            if (targetSchema.optional) {
+                return undefined;
+            }
+            if (targetSchema.nullable) {
+                return null;
+            }
+        }
+        if (targetSchema.type === 'any') {
+            return this.convertAnyVal(value);
+        }
+        return this.convertType(value, targetSchema);
+    }
+
+    private convertAnyVal(value: string) {
+        switch (value) {
+            case '':
+                return '';
+            case 'undefined':
+                return undefined;
+            case 'null':
+                return null;
+            case 'true':
+                return true;
+            case 'false':
+                return false;
+            case '{}':
+                return {};
+            case '[]':
+                return [];
+            default: {
+                const num = Number(value);
+                if (!isNaN(num)) {
+                    return num;
+                }
+                return value;
+            }
+        }
     }
 
     checkPendingNode(nodeId: string) {
