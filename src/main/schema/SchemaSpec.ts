@@ -38,11 +38,11 @@ export const SchemaSpecSchema = new Schema<SchemaSpec>({
             items: { type: 'string' },
             optional: true,
         },
-        regexp: {
+        regex: {
             type: 'string',
             optional: true,
         },
-        regexpFlags: {
+        regexFlags: {
             type: 'string',
             optional: true,
         },

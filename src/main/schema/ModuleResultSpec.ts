@@ -1,7 +1,7 @@
 import { Schema } from 'airtight';
 
 import { ModuleResultSpec } from '../types/index.js';
-import { SchemaSpecSchema } from './DataSchemaSpec.js';
+import { SchemaSpecSchema } from './SchemaSpec.js';
 
 export const ModuleResultSpecSchema = new Schema<ModuleResultSpec>({
     id: 'ModuleResultSpec',

@@ -1,5 +1,4 @@
 // This file is auto-generated
-export * from './DataSchemaSpec.js';
 export * from './GraphSpec.js';
 export * from './ModuleName.js';
 export * from './ModuleParamHint.js';
@@ -16,4 +15,5 @@ export * from './NodeSpec.js';
 export * from './Point.js';
 export * from './PropEntrySpec.js';
 export * from './PropSpec.js';
+export * from './SchemaSpec.js';
 export * from './SubgraphSpec.js';
