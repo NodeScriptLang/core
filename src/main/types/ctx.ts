@@ -9,7 +9,6 @@ export interface Deferred {
 }
 
 export interface GraphEvalContext {
-
     readonly lib: RuntimeLib;
 
     nodeId: string;
@@ -30,8 +29,4 @@ export interface GraphEvalContext {
     trackDisposable(key: string, disposable: Disposable): void;
     dispose(key: string): Promise<void>;
     disposeAll(): Promise<void>;
-
-    // For compatibility:
-    get(object: unknown, keyish: string): unknown;
-    set(object: unknown, keyish: string, value: unknown): void;
 }

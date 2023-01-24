@@ -121,8 +121,14 @@ export class GraphEvalContext implements t.GraphEvalContext {
         await Promise.allSettled(promises);
     }
 
-    // For compatibility:
+    /**
+     * @deprecated This is kept for compatibility with earlier versions of stdlib node.
+     */
     readonly get = runtimeLib.get;
+
+    /**
+     * @deprecated This is kept for compatibility with earlier versions of stdlib node.
+     */
     readonly set = runtimeLib.set;
 }
 
