@@ -38,6 +38,14 @@ export const SchemaSpecSchema = new Schema<SchemaSpec>({
             items: { type: 'string' },
             optional: true,
         },
+        regexp: {
+            type: 'string',
+            optional: true,
+        },
+        regexpFlags: {
+            type: 'string',
+            optional: true,
+        },
         minimum: {
             type: 'number',
             optional: true,
@@ -45,6 +53,6 @@ export const SchemaSpecSchema = new Schema<SchemaSpec>({
         maximum: {
             type: 'number',
             optional: true,
-        }
+        },
     }
 });

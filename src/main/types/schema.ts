@@ -9,6 +9,8 @@ export type SchemaSpec = {
     additionalProperties?: SchemaSpec;
     items?: SchemaSpec;
     enum?: string[];
+    regexp?: string;
+    regexpFlags?: string;
     minimum?: number;
     maximum?: number;
 };
