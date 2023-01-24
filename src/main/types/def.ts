@@ -1,6 +1,7 @@
+import { SchemaDef } from 'airtight';
+
 import { ModuleVersion } from '../schema/ModuleVersion.js';
 import { GraphEvalContext } from './ctx.js';
-import { DataSchema } from './data-schema.js';
 import { ModuleParamSpec, ModuleResultSpec, ModuleSpec } from './module.js';
 
 export type ModuleDefinition<P = unknown, R = unknown> = Omit<Partial<ModuleSpec>, 'params' | 'result'> & {
@@ -15,13 +16,13 @@ export type ParamsDefinition<P> = {
 };
 
 export type ResultDefinition<R> = Partial<ModuleResultSpec> & {
-    schema: R extends Promise<infer T> ? DataSchema<T> : DataSchema<R>;
+    schema: R extends Promise<infer T> ? SchemaDef<T> : SchemaDef<R>;
 } & (R extends Promise<any> ? { async: true } : {});
 
 export type ParamDef<T = unknown> = SimpleParamDef<T>;
 
 export type SimpleParamDef<T = unknown> = Omit<Partial<ModuleParamSpec>, 'schema'> & {
-    schema: DataSchema<T>;
+    schema: SchemaDef<T>;
 };
 
 export type ModuleCompute<P, R> = (this: void, params: P, ctx: GraphEvalContext) => R;

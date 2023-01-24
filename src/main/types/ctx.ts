@@ -1,9 +1,10 @@
-import { DataSchema, DataType } from './data-schema.js';
+import { DataType, SchemaDef } from 'airtight';
+
 import { Disposable } from './disposable.js';
 
 export interface Deferred {
     resolve: () => unknown;
-    schema: DataSchema | undefined;
+    schema: SchemaDef | undefined;
 }
 
 export interface GraphEvalContext {
@@ -16,10 +17,10 @@ export interface GraphEvalContext {
     setLocal(key: string, value: unknown): void;
 
     getType(value: unknown): DataType;
-    convertType<T>(value: unknown, schema: DataSchema<T>): T;
+    convertType<T>(value: unknown, schema: SchemaDef<T>): T;
     convertAuto(value: string): any;
 
-    deferred(fn: () => unknown, schema?: DataSchema<unknown>): unknown;
+    deferred(fn: () => unknown, schema?: SchemaDef<unknown>): unknown;
     isDeferred(value: unknown): value is Deferred;
     resolveDeferred(value: unknown): unknown;
 

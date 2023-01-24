@@ -1,4 +1,4 @@
-import { DataSchemaSpec } from './data-schema.js';
+import { SchemaSpec } from './schema.js';
 
 export interface ModuleSpec {
     moduleName: string;
@@ -17,7 +17,7 @@ export interface ModuleSpec {
 }
 
 export interface ModuleParamSpec {
-    schema: DataSchemaSpec;
+    schema: SchemaSpec;
     label?: string;
     deferred?: boolean;
     addItemLabel?: string;
@@ -33,7 +33,7 @@ export interface ModuleParamSpec {
 }
 
 export interface ModuleResultSpec {
-    schema: DataSchemaSpec;
+    schema: SchemaSpec;
     async?: boolean;
     hideSocket?: boolean;
 }

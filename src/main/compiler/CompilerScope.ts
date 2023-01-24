@@ -1,5 +1,5 @@
 import { GraphView, NodeLink, NodeView, PropLineView, PropView } from '../runtime/index.js';
-import { DataSchemaSpec } from '../types/index.js';
+import { SchemaSpec } from '../types/schema.js';
 import { isSchemaCompatible, MultiMap } from '../util/index.js';
 import { CodeBuilder } from './CodeBuilder.js';
 import { CompilerSymbols } from './CompilerSymbols.js';
@@ -308,7 +308,7 @@ export class CompilerScope {
         this.code.line(`${JSON.stringify(prop.propKey)}: ${expr},`);
     }
 
-    private singleLineExpr(line: PropLineView, targetSchema: DataSchemaSpec = line.getSchema()) {
+    private singleLineExpr(line: PropLineView, targetSchema: SchemaSpec = line.getSchema()) {
         if (line.isDeferred()) {
             return this.deferredLineExpr(line, targetSchema);
         }
@@ -322,9 +322,9 @@ export class CompilerScope {
     /**
      * Returns line expression when the line is linked.
      */
-    private linkLineExpr(line: PropLineView, linkNode: NodeView, targetSchema: DataSchemaSpec) {
+    private linkLineExpr(line: PropLineView, linkNode: NodeView, targetSchema: SchemaSpec) {
         let expr = '';
-        const sourceSchema: DataSchemaSpec = linkNode.getModuleSpec().result.schema;
+        const sourceSchema: SchemaSpec = linkNode.getModuleSpec().result.schema;
         const expSym = this.symbols.getLineSymIfExists(this.scopeId, line.getLineId());
         if (expSym) {
             expr = `${expSym}[$i]`;
@@ -341,7 +341,7 @@ export class CompilerScope {
     /**
      * Returns line expression when the line is not linked.
      */
-    private constantLineExpr(line: PropLineView, targetSchema: DataSchemaSpec) {
+    private constantLineExpr(line: PropLineView, targetSchema: SchemaSpec) {
         const valueExpr = JSON.stringify(line.value);
         switch (targetSchema.type) {
             case 'any':
@@ -353,7 +353,7 @@ export class CompilerScope {
         }
     }
 
-    private deferredLineExpr(line: PropLineView, targetSchema: DataSchemaSpec) {
+    private deferredLineExpr(line: PropLineView, targetSchema: SchemaSpec) {
         const linkNode = line.getLinkNode()!;
         const sourceSchema = linkNode.getModuleSpec().result.schema;
         const linkSym = this.getNodeSym(linkNode.nodeId);
@@ -361,7 +361,7 @@ export class CompilerScope {
         return `ctx.deferred(() => ${linkSym}(params, ctx), ${schemaCompatible ? 'undefined' : JSON.stringify(targetSchema)})`;
     }
 
-    private convertTypeExpr(expr: string, targetSchema: DataSchemaSpec) {
+    private convertTypeExpr(expr: string, targetSchema: SchemaSpec) {
         return `ctx.convertType(${expr}, ${JSON.stringify(targetSchema)})`;
     }
 

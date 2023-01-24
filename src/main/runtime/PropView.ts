@@ -1,6 +1,6 @@
-import { DataSchemaSpec } from '../types/data-schema.js';
 import { PropEntrySpec, PropSpec } from '../types/model.js';
 import { ModuleParamSpec } from '../types/module.js';
+import { SchemaSpec } from '../types/schema.js';
 import { clone } from '../util/clone.js';
 import { humanize } from '../util/string.js';
 import { NodeView } from './NodeView.js';
@@ -30,7 +30,7 @@ export abstract class PropLineView {
     }
 
     abstract getLineId(): string;
-    abstract getSchema(): DataSchemaSpec;
+    abstract getSchema(): SchemaSpec;
 
     get graph() {
         return this.node.graph;
@@ -89,7 +89,7 @@ export class PropView extends PropLineView {
         return this.node.nodeId + ':' + this.propKey;
     }
 
-    getSchema(): DataSchemaSpec {
+    getSchema(): SchemaSpec {
         return this.getParamSpec().schema;
     }
 
@@ -133,7 +133,7 @@ export class PropEntryView extends PropLineView {
         return this.parentProp.getLineId() + ':' + this.propEntrySpec.id;
     }
 
-    getSchema(): DataSchemaSpec {
+    getSchema(): SchemaSpec {
         const baseSchema = this.parentProp.getSchema();
         switch (baseSchema.type) {
             case 'array':

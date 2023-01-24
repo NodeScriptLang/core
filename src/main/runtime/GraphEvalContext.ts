@@ -1,5 +1,5 @@
 import { get, set } from '@nodescript/pointer';
-import { getType, Schema } from 'airtight';
+import { DataType, getType, Schema, SchemaDef } from 'airtight';
 import { Event } from 'nanoevent';
 
 import * as t from '../types/index.js';
@@ -64,11 +64,11 @@ export class GraphEvalContext implements t.GraphEvalContext {
         return Array.isArray(value) ? value : [value];
     }
 
-    getType(value: unknown): t.DataType {
+    getType(value: unknown): DataType {
         return getType(value);
     }
 
-    convertType<T>(value: unknown, schema: t.DataSchema<T>): T {
+    convertType<T>(value: unknown, schema: SchemaDef<T>): T {
         return new Schema<T>(schema as any).decode(value);
     }
 
@@ -82,7 +82,7 @@ export class GraphEvalContext implements t.GraphEvalContext {
         }
     }
 
-    deferred(fn: () => unknown, schema?: t.DataSchema<unknown> | undefined): Deferred {
+    deferred(fn: () => unknown, schema?: SchemaDef<unknown> | undefined): Deferred {
         return new Deferred(fn, schema);
     }
 
@@ -142,7 +142,7 @@ export class Deferred implements t.Deferred {
 
     constructor(
         readonly resolve: () => unknown,
-        readonly schema: t.DataSchema<unknown> | undefined,
+        readonly schema: SchemaDef<unknown> | undefined,
     ) {}
 
     get [SYM_DEFERRED]() {

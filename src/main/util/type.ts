@@ -1,4 +1,6 @@
-import { DataSchemaSpec, DataType } from '../types/data-schema.js';
+import { DataType } from 'airtight';
+
+import { SchemaSpec } from '../types/schema.js';
 
 export function parseAny(str: string) {
     const s = String(str ?? '').trim();
@@ -40,7 +42,7 @@ export function getType(data: unknown): DataType {
     return 'any';
 }
 
-export function isSchemaCompatible(desiredSchema: DataSchemaSpec, actualSchema: DataSchemaSpec): boolean {
+export function isSchemaCompatible(desiredSchema: SchemaSpec, actualSchema: SchemaSpec): boolean {
     switch (desiredSchema.type) {
         case 'any':
             return true;

@@ -1,7 +1,7 @@
 import { Schema } from 'airtight';
 
 import { ModuleParamSpec } from '../types/index.js';
-import { DataSchemaSpecSchema } from './DataSchemaSpec.js';
+import { SchemaSpecSchema } from './DataSchemaSpec.js';
 import { ModuleParamHintSchema } from './ModuleParamHint.js';
 
 export const ModuleParamSpecSchema = new Schema<ModuleParamSpec>({
@@ -12,7 +12,7 @@ export const ModuleParamSpecSchema = new Schema<ModuleParamSpec>({
             type: 'string',
             optional: true,
         },
-        schema: DataSchemaSpecSchema.schema as any,
+        schema: SchemaSpecSchema.schema as any,
         deferred: {
             type: 'boolean',
             optional: true,

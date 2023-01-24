@@ -36,7 +36,7 @@
     ],
     "dependencies": {
         "@nodescript/pointer": "^1.0.3",
-        "airtight": "^5.3.1",
+        "airtight": "^5.3.2",
         "nanoevent": "^1.0.0",
         "nanoid": "^3.3.4"
     },

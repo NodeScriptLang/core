@@ -1,19 +1,14 @@
 import { Schema } from 'airtight';
 
-import { DataSchemaSpec } from '../types/data-schema.js';
+import { SchemaSpec } from '../types/schema.js';
 
-export const DataSchemaSpecSchema = new Schema<DataSchemaSpec>({
-    id: 'DataSchemaSpec',
+export const SchemaSpecSchema = new Schema<SchemaSpec>({
+    id: 'SchemaSpec',
     type: 'object',
     properties: {
         type: {
             type: 'string',
             default: 'any',
-        },
-        enum: {
-            type: 'array',
-            items: { type: 'string' },
-            optional: true,
         },
         default: {
             type: 'any',
@@ -25,18 +20,31 @@ export const DataSchemaSpecSchema = new Schema<DataSchemaSpec>({
             properties: {},
             additionalProperties: {
                 type: 'ref',
-                schemaId: 'DataSchemaSpec',
+                schemaId: 'SchemaSpec',
             },
         },
         additionalProperties: {
             type: 'ref',
             optional: true,
-            schemaId: 'DataSchemaSpec',
+            schemaId: 'SchemaSpec',
         },
         items: {
             type: 'ref',
             optional: true,
-            schemaId: 'DataSchemaSpec',
+            schemaId: 'SchemaSpec',
+        },
+        enum: {
+            type: 'array',
+            items: { type: 'string' },
+            optional: true,
+        },
+        minimum: {
+            type: 'number',
+            optional: true,
+        },
+        maximum: {
+            type: 'number',
+            optional: true,
         }
     }
 });

@@ -14,12 +14,16 @@ export const module: ModuleDefinition<P, R> = {
         properties: {
             schema: {
                 type: 'object',
+                properties: {},
+                additionalProperties: { type: 'any' },
             }
         },
     },
     result: {
         schema: {
             type: 'object',
+            properties: {},
+            additionalProperties: { type: 'any' },
         }
     },
 };
