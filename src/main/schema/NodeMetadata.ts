@@ -1,7 +1,6 @@
 import { Schema } from 'airtight';
 
 import { NodeMetadata } from '../types/model.js';
-import { NodeEvalModeSchema } from './NodeEvalMode.js';
 import { PointSchema } from './Point.js';
 
 export const NodeMetadataSchema = new Schema<NodeMetadata>({
@@ -13,10 +12,11 @@ export const NodeMetadataSchema = new Schema<NodeMetadata>({
         h: { type: 'number', default: 5 },
         label: { type: 'string' },
         collapsed: { type: 'boolean' },
-        evalMode: {
-            ...NodeEvalModeSchema.schema,
-            optional: true,
-        },
+        listedProps: {
+            type: 'object',
+            properties: {},
+            additionalProperties: { type: 'boolean' },
+        }
     },
     additionalProperties: {
         type: 'any'

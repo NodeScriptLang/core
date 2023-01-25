@@ -1,4 +1,4 @@
-import { ModuleSpec, NodeEvalMode } from './module.js';
+import { ModuleSpec } from './module.js';
 import { Point } from './point.js';
 
 export interface GraphSpec {
@@ -41,6 +41,6 @@ export interface NodeMetadata {
     h: number;
     label: string;
     collapsed: boolean;
-    evalMode?: NodeEvalMode;
+    listedProps: Record<string, boolean>;
     [key: string]: any;
 }

@@ -12,7 +12,7 @@ export type ModuleDefinition<P = unknown, R = unknown> = Omit<Partial<ModuleSpec
 };
 
 export type ParamsDefinition<P> = {
-    [K in keyof P]: ParamDef<P[K]>;
+    [K in keyof P]-?: ParamDef<P[K]>;
 };
 
 export type ResultDefinition<R> = Partial<ModuleResultSpec> & {

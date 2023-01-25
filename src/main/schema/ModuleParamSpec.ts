@@ -17,6 +17,10 @@ export const ModuleParamSpecSchema = new Schema<ModuleParamSpec>({
             type: 'boolean',
             optional: true,
         },
+        advanced: {
+            type: 'boolean',
+            optional: true,
+        },
         addItemLabel: {
             type: 'string',
             optional: true,

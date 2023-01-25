@@ -20,6 +20,7 @@ export interface ModuleParamSpec {
     schema: SchemaSpec;
     label?: string;
     deferred?: boolean;
+    advanced?: boolean;
     addItemLabel?: string;
     removeItemLabel?: string;
     keyPlaceholder?: string;

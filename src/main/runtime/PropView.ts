@@ -1,3 +1,5 @@
+import { coerce, getDefaultValue } from 'airtight';
+
 import { PropEntrySpec, PropSpec } from '../types/model.js';
 import { ModuleParamSpec } from '../types/module.js';
 import { SchemaSpec } from '../types/schema.js';
@@ -46,6 +48,21 @@ export abstract class PropLineView {
 
     getParamSpec() {
         return this._paramSpec;
+    }
+
+    getStaticValue(): string {
+        if (this.value === '') {
+            return coerce('string', this.getDefaultValue());
+        }
+        return this.value;
+    }
+
+    getDefaultValue() {
+        return getDefaultValue(this.getSchema());
+    }
+
+    isUsingDefaultValue() {
+        return this.getStaticValue() === this.getDefaultValue();
     }
 
     /**
@@ -108,6 +125,29 @@ export class PropView extends PropLineView {
 
     isUsesEntries() {
         return this.isSupportsEntries() && !this.isLinked();
+    }
+
+    hasEntries() {
+        return (this.propSpec.entries?.length ?? 0) > 0;
+    }
+
+    isAdvanced() {
+        return this.getParamSpec().advanced;
+    }
+
+    isListed() {
+        if (!this.isAdvanced()) {
+            return true;
+        }
+        // Advanced props are rendered when either:
+        // - value is specified and non-default
+        // - prop is linked
+        // - prop key is explicitly added to node metadata
+        // - prop has entries
+        return !!this.node.metadata.listedProps[this.propKey] ||
+            !this.isUsingDefaultValue() ||
+            this.isLinked() ||
+            this.hasEntries();
     }
 
 }
