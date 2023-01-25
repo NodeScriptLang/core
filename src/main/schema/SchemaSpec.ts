@@ -31,7 +31,7 @@ export const SchemaSpecSchema = new Schema<SchemaSpec>({
             optional: true,
         },
         default: {
-            type: 'any',
+            type: 'string',
             optional: true,
         },
         metadata: {

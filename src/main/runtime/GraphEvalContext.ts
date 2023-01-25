@@ -1,4 +1,4 @@
-import { Schema, SchemaDef } from 'airtight';
+import { Schema } from 'airtight';
 import { Event } from 'nanoevent';
 
 import * as t from '../types/index.js';
@@ -116,7 +116,7 @@ export class GraphEvalContext implements t.GraphEvalContext {
         }
     }
 
-    deferred(fn: () => unknown, schema?: SchemaDef<unknown> | undefined): Deferred {
+    deferred(fn: () => unknown, schema?: SchemaSpec): Deferred {
         return new Deferred(fn, schema);
     }
 
@@ -177,7 +177,7 @@ export class Deferred implements t.Deferred {
 
     constructor(
         readonly resolve: () => unknown,
-        readonly schema: SchemaDef<unknown> | undefined,
+        readonly schema: SchemaSpec | undefined,
     ) {}
 
     get [SYM_DEFERRED]() {

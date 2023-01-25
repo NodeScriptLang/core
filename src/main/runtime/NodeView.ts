@@ -1,3 +1,5 @@
+import { coerce } from 'airtight';
+
 import { PropSpecSchema } from '../schema/PropSpec.js';
 import { NodeSpec } from '../types/model.js';
 import { ModuleSpec } from '../types/module.js';
@@ -65,7 +67,7 @@ export class NodeView {
             return null;
         }
         const propSpec = this.nodeSpec.props[key] ?? PropSpecSchema.create({
-            value: paramSpec.schema.default ?? '',
+            value: coerce('string', paramSpec.schema.default) ?? '',
         });
         return new PropView(this, key, propSpec);
     }

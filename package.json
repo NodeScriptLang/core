@@ -16,8 +16,8 @@
     ],
     "scripts": {
         "clean": "rm -rf out *.tsbuildinfo",
-        "prepare": "node ./prepare.js",
-        "dev": "run-s clean prepare dev:ts",
+        "dev": "run-s clean dev:prepare dev:ts",
+        "dev:prepare": "node ./prepare.js",
         "dev:ts": "tsc -b -w",
         "compile": "run-s compile:*",
         "compile:ts": "tsc -b",

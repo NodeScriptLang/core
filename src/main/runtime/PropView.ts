@@ -57,8 +57,8 @@ export abstract class PropLineView {
         return this.value;
     }
 
-    getDefaultValue() {
-        return getDefaultValue(this.getSchema());
+    getDefaultValue(): string {
+        return coerce('string', getDefaultValue(this.getSchema()));
     }
 
     isUsingDefaultValue() {
@@ -132,7 +132,7 @@ export class PropView extends PropLineView {
     }
 
     isAdvanced() {
-        return this.getParamSpec().advanced;
+        return !!this.getParamSpec().advanced;
     }
 
     isListed() {

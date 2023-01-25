@@ -7,7 +7,7 @@ export type SchemaSpec = {
     id?: string;
     title?: string;
     description?: string;
-    default?: any;
+    default?: string;
     metadata?: any;
     properties?: {
         [key: string]: SchemaSpec;
