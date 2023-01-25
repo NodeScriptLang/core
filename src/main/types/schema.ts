@@ -2,8 +2,8 @@ import { SchemaDefType } from 'airtight';
 
 export type SchemaSpec = {
     type: SchemaDefType;
-    optional?: true;
-    nullable?: true;
+    optional?: boolean;
+    nullable?: boolean;
     id?: string;
     title?: string;
     description?: string;
