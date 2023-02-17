@@ -10,11 +10,11 @@ import { CompilerOptions } from './GraphCompiler.js';
  * Compiler's unit of work.
  */
 export class CompilerJob {
-    done = false;
-    symbols = new CompilerSymbols();
-    code = new CodeBuilder();
-    mainScope: CompilerScope;
-    subgraphScopes: CompilerScope[];
+    private done = false;
+    private symbols = new CompilerSymbols();
+    private code = new CodeBuilder();
+    private mainScope: CompilerScope;
+    private subgraphScopes: CompilerScope[];
 
     constructor(
         readonly graphView: GraphView,

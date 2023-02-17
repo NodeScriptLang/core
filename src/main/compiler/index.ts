@@ -5,3 +5,4 @@ export * from './CompilerJob.js';
 export * from './CompilerScope.js';
 export * from './CompilerSymbols.js';
 export * from './GraphCompiler.js';
+export * from './SymTable.js';
