@@ -4,12 +4,12 @@ import { GraphCompiler } from '../../main/compiler/index.js';
 import { GraphEvalContext, GraphView } from '../../main/runtime/index.js';
 import { GraphSpecSchema } from '../../main/schema/index.js';
 import { codeToUrl, evalEsmModule } from '../../main/util/eval.js';
-import { TestModuleLoader } from '../test-loader.js';
+import { runtime } from '../runtime.js';
 
 describe('Compiler: graphs as modules', () => {
 
     it('can compile graph and use it as a node', async () => {
-        const loader = new TestModuleLoader();
+        const loader = runtime.createLoader();
         const graph1 = new GraphView(loader, GraphSpecSchema.create({
             moduleSpec: {
                 version: '1.0.0',

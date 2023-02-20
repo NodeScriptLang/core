@@ -1,12 +1,11 @@
 import assert from 'assert';
 
 import { runtime } from './runtime.js';
-import { TestModuleLoader } from './test-loader.js';
 
 describe('ModuleLoader', () => {
 
     it('loads modules by ref', async () => {
-        const loader = new TestModuleLoader();
+        const loader = runtime.createLoader();
         const def = await loader.loadModule('Math.Add');
         assert.deepStrictEqual(def, {
             moduleName: 'Math.Add',

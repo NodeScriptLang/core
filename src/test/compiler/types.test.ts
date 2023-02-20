@@ -235,7 +235,7 @@ async function testStaticConversion(paramSpec: Partial<ModuleParamSpec>, input: 
 }
 
 async function createLoaderWithModule(paramSpec: Partial<ModuleParamSpec>) {
-    const loader = await runtime.createLoader();
+    const loader = runtime.createLoader();
     loader.addModule('Echo', ModuleSpecSchema.create({
         moduleName: 'Echo',
         params: {

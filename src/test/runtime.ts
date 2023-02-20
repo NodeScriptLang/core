@@ -1,10 +1,10 @@
 import { DeepPartial } from 'airtight';
 
+import { FsModuleLoader } from '../main/fs/index.js';
 import { GraphView } from '../main/runtime/GraphView.js';
 import { ModuleLoader } from '../main/runtime/ModuleLoader.js';
 import { GraphSpecSchema } from '../main/schema/GraphSpec.js';
 import { GraphSpec } from '../main/types/index.js';
-import { TestModuleLoader } from './test-loader.js';
 
 /**
  * Test runtime utilities.
@@ -19,13 +19,13 @@ export class TestRuntime {
         return `http://127.0.0.1:${this.httpPort}${path}`;
     }
 
-    async createLoader() {
-        const loader = new TestModuleLoader();
+    createLoader() {
+        const loader = new FsModuleLoader('./out/test/modules');
         return loader;
     }
 
     async loadGraph(spec: DeepPartial<GraphSpec>): Promise<GraphView> {
-        const loader = await this.createLoader();
+        const loader = this.createLoader();
         return this.loadGraphWithLoader(loader, spec);
     }
 
