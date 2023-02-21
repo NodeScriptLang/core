@@ -64,7 +64,6 @@ export class GraphEvalContext implements t.GraphEvalContext {
         return Array.isArray(value) ? value : [value];
     }
 
-
     convertType(value: unknown, schema: SchemaSpec) {
         return new Schema(schema as any).decode(value);
     }

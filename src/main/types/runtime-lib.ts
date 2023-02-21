@@ -1,3 +1,4 @@
+import { PathParams } from '@nodescript/pathmatcher';
 import { DataType, SchemaDef, SchemaLike } from 'airtight';
 
 export interface ComparisonOptions {
@@ -19,6 +20,7 @@ export interface RuntimeLib {
     set(object: unknown, keyish: string, value: unknown): void;
     merge(a: unknown, b: unknown): unknown;
 
+    matchPath(path: string, value: string, prefix?: boolean): PathParams | null;
     parseJson(str: string, defaultValue?: any): unknown;
     toRegExp(value: unknown): RegExp;
 }

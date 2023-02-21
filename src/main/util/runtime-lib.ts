@@ -1,3 +1,4 @@
+import { matchPath } from '@nodescript/pathmatcher';
 import { get, set } from '@nodescript/pointer';
 import { getType, Schema, SchemaDef } from 'airtight';
 
@@ -19,4 +20,5 @@ export const runtimeLib: RuntimeLib = {
     merge,
     parseJson,
     toRegExp,
+    matchPath,
 };

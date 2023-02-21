@@ -36,6 +36,7 @@
         "lint"
     ],
     "dependencies": {
+        "@nodescript/pathmatcher": "^1.2.0",
         "@nodescript/pointer": "^1.0.3",
         "airtight": "^5.5.1",
         "nanoevent": "^1.0.0",
