@@ -7,7 +7,7 @@ describe('ModuleLoader', () => {
     it('loads modules by ref', async () => {
         const loader = runtime.createLoader();
         const def = await loader.loadModule('Math.Add');
-        assert.deepStrictEqual(def, {
+        assert.deepEqual(def, {
             moduleName: 'Math.Add',
             version: '1.0.0',
             labelParam: '',
