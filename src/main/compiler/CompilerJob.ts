@@ -31,6 +31,7 @@ export class CompilerJob {
         this.prepareNodeSymbols();
         this.emitImports();
         this.emitNodeFunctions();
+        this.emitExportModule();
         this.emitExportCompute();
         if (this.options.emitNodeMap) {
             this.emitNodeMap();
@@ -76,8 +77,8 @@ export class CompilerJob {
             const module = loader.resolveModule(moduleRef);
             const computeUrl = module.attributes?.customImportUrl ??
                 loader.resolveComputeUrl(moduleRef);
-            const sym = this.symbols.createDefSym(moduleRef);
-            this.code.line(`import { compute as ${sym} } from '${computeUrl}'`);
+            const computeSym = this.symbols.createComputeSym(moduleRef);
+            this.code.line(`import { compute as ${computeSym}} from '${computeUrl}'`);
         }
     }
 
@@ -98,8 +99,11 @@ export class CompilerJob {
         }
     }
 
+    private emitExportModule() {
+        this.code.line(`export const module = ${JSON.stringify(this.getModuleSpec())}`);
+    }
+
     private emitExportCompute() {
-        this.emitComment('Exports');
         const rootNode = this.graphView.getNodeById(this.options.rootNodeId);
         if (!rootNode) {
             this.code.line(`export const compute = () => undefined;`);
@@ -118,6 +122,8 @@ export class CompilerJob {
     /**
      * Computes `moduleSpec.params` by sorting the parameters in the order they appear in the graph,
      * top-to-bottom, left-to-right.
+     *
+     * @deprecated This behaviour is going to be removed in the next major release.
      */
     private computeParamSpecs() {
         const paramEntries = Object.entries(this.graphView.moduleSpec.params);

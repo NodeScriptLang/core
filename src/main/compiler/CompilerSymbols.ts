@@ -4,13 +4,23 @@ export class CompilerSymbols {
 
     private symtable = new SymTable();
 
-    getDefSym(moduleRef: string) {
-        return this.symtable.get(`def:${moduleRef}`);
+    getComputeSym(moduleRef: string) {
+        return this.symtable.get(`compute:${moduleRef}`);
     }
 
-    createDefSym(moduleRef: string) {
+    createComputeSym(moduleRef: string) {
         const sym = this.symtable.nextSym('d');
-        this.symtable.set(`def:${moduleRef}`, sym);
+        this.symtable.set(`compute:${moduleRef}`, sym);
+        return sym;
+    }
+
+    getModuleSym(moduleRef: string) {
+        return this.symtable.get(`module:${moduleRef}`);
+    }
+
+    createModuleSym(moduleRef: string) {
+        const sym = this.symtable.nextSym('d');
+        this.symtable.set(`module:${moduleRef}`, sym);
         return sym;
     }
 
