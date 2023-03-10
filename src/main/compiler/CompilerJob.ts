@@ -31,7 +31,7 @@ export class CompilerJob {
         this.prepareNodeSymbols();
         this.emitImports();
         this.emitNodeFunctions();
-        this.emitExportModule();
+        // this.emitExportModule();
         this.emitExportCompute();
         if (this.options.emitNodeMap) {
             this.emitNodeMap();
