@@ -4,6 +4,7 @@ import { PropEntrySpec, PropSpec } from '../types/model.js';
 import { ModuleParamSpec } from '../types/module.js';
 import { SchemaSpec } from '../types/schema.js';
 import { clone } from '../util/clone.js';
+import { evaluateEscapes } from '../util/escape.js';
 import { humanize } from '../util/string.js';
 import { NodeView } from './NodeView.js';
 
@@ -52,13 +53,13 @@ export abstract class PropLineView {
 
     getStaticValue(): string {
         if (this.value === '') {
-            return coerce('string', this.getDefaultValue());
+            return this.getDefaultValue();
         }
-        return this.value;
+        return evaluateEscapes(this.value);
     }
 
     getDefaultValue(): string {
-        return coerce('string', getDefaultValue(this.getSchema()));
+        return evaluateEscapes(coerce('string', getDefaultValue(this.getSchema())));
     }
 
     isUsingDefaultValue() {

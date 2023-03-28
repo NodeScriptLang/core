@@ -1,6 +1,7 @@
 // This file is auto-generated
 export * from './clone.js';
 export * from './compare.js';
+export * from './escape.js';
 export * from './eval.js';
 export * from './id.js';
 export * from './json.js';
