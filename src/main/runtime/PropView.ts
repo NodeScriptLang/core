@@ -59,7 +59,8 @@ export abstract class PropLineView {
     }
 
     getDefaultValue(): string {
-        return evaluateEscapes(coerce('string', getDefaultValue(this.getSchema())));
+        const str = coerce('string', getDefaultValue(this.getSchema())) ?? '';
+        return evaluateEscapes(str);
     }
 
     isUsingDefaultValue() {
