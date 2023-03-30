@@ -52,7 +52,7 @@ export abstract class PropLineView {
     }
 
     getStaticValue(): string {
-        if (this.value === '') {
+        if (!this.value) {
             return this.getDefaultValue();
         }
         return evaluateEscapes(this.value);
