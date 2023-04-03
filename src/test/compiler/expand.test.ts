@@ -4,6 +4,7 @@ import { GraphCompiler } from '../../main/compiler/index.js';
 import { GraphEvalContext } from '../../main/runtime/index.js';
 import { NodeResult } from '../../main/types/index.js';
 import { evalEsmModule } from '../../main/util/eval.js';
+import { omit } from '../helpers.js';
 import { runtime } from '../runtime.js';
 
 describe('Compiler: array expansion', () => {
@@ -221,7 +222,7 @@ describe('Compiler: array expansion', () => {
         const { compute } = await evalEsmModule(code);
         const ctx = new GraphEvalContext();
         const results: NodeResult[] = [];
-        ctx.nodeEvaluated.on(_ => results.push(_));
+        ctx.nodeEvaluated.on(_ => results.push(omit(_, 'took')));
         const res = await compute({}, ctx);
         assert.deepStrictEqual(res, [1, 2, 42]);
         assert.deepStrictEqual(results, [

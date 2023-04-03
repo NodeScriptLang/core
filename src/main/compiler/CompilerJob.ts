@@ -99,10 +99,6 @@ export class CompilerJob {
         }
     }
 
-    private emitExportModule() {
-        this.code.line(`export const module = ${JSON.stringify(this.getModuleSpec())}`);
-    }
-
     private emitExportCompute() {
         const rootNode = this.graphView.getNodeById(this.options.rootNodeId);
         if (!rootNode) {

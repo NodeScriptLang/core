@@ -10,5 +10,6 @@ export const NodeResultSchema = new Schema<NodeResult>({
         result: { type: 'any', optional: true },
         error: { type: 'any', optional: true },
         progress: { type: 'number', optional: true },
+        took: { type: 'number', optional: true },
     }
 });

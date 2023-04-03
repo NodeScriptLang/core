@@ -92,6 +92,7 @@ export class CompilerScope {
         const resSym = '$r';
         this.code.line(`let ${resSym};`);
         if (this.options.introspect) {
+            this.code.line('const $startedAt = Date.now();');
             this.code.block('try {', '}', () => {
                 if (this.options.evalMode === 'manual') {
                     this.code.line(`ctx.checkPendingNode(${JSON.stringify(node.nodeId)});`);
@@ -104,7 +105,8 @@ export class CompilerScope {
                 if (this.options.introspect) {
                     this.code.line(`ctx.nodeEvaluated.emit({` +
                         `nodeId: ${JSON.stringify(node.nodeId)},` +
-                        `result: ${resSym}` +
+                        `result: ${resSym},` +
+                        `took: Date.now() - $startedAt,` +
                         `});`);
                 }
                 this.code.line(`return ${resSym};`);
@@ -112,7 +114,8 @@ export class CompilerScope {
             this.code.block('catch (error) {', '}', () => {
                 this.code.line(`ctx.nodeEvaluated.emit({` +
                     `nodeId: ${JSON.stringify(node.nodeId)},` +
-                    `error` +
+                    `error,` +
+                    `took: Date.now() - $startedAt,` +
                     `});`);
                 this.code.line('throw error;');
             });
