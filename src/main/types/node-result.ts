@@ -3,5 +3,5 @@ export interface NodeResult {
     result?: any;
     error?: any;
     progress?: number;
-    took?: number;
+    timestamp?: number;
 }

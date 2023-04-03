@@ -42,7 +42,7 @@ describe('Compiler: deferred', () => {
         });
         const ctx = new GraphEvalContext();
         const results: NodeResult[] = [];
-        ctx.nodeEvaluated.on(_ => results.push(omit(_, 'took')));
+        ctx.nodeEvaluated.on(_ => results.push(omit(_, 'timestamp')));
         const { compute } = await evalEsmModule(code);
         const res = await compute({}, ctx);
         assert.deepStrictEqual(res, 7);
@@ -103,7 +103,7 @@ describe('Compiler: deferred', () => {
         });
         const ctx = new GraphEvalContext();
         const results: NodeResult[] = [];
-        ctx.nodeEvaluated.on(_ => results.push(omit(_, 'took')));
+        ctx.nodeEvaluated.on(_ => results.push(omit(_, 'timestamp')));
         const { compute } = await evalEsmModule(code);
         const res = await compute({}, ctx);
         assert.deepStrictEqual(res, ['one', 'Hello', 'three']);
@@ -171,7 +171,7 @@ describe('Compiler: deferred', () => {
         });
         const ctx = new GraphEvalContext();
         const results: NodeResult[] = [];
-        ctx.nodeEvaluated.on(_ => results.push(omit(_, 'took')));
+        ctx.nodeEvaluated.on(_ => results.push(omit(_, 'timestamp')));
         const { compute } = await evalEsmModule(code);
         const res = await compute({}, ctx);
         assert.deepStrictEqual(res, ['one', 'two', 'three']);
@@ -219,7 +219,7 @@ describe('Compiler: deferred', () => {
         });
         const ctx = new GraphEvalContext();
         const results: NodeResult[] = [];
-        ctx.nodeEvaluated.on(_ => results.push(omit(_, 'took')));
+        ctx.nodeEvaluated.on(_ => results.push(omit(_, 'timestamp')));
         const { compute } = await evalEsmModule(code);
         const res = await compute({}, ctx);
         assert.deepStrictEqual(res, 'World');
@@ -292,7 +292,7 @@ describe('Compiler: deferred', () => {
         });
         const ctx = new GraphEvalContext();
         const results: NodeResult[] = [];
-        ctx.nodeEvaluated.on(_ => results.push(omit(_, 'took')));
+        ctx.nodeEvaluated.on(_ => results.push(omit(_, 'timestamp')));
         const { compute } = await evalEsmModule(code);
         const res = await compute({}, ctx);
         assert.deepStrictEqual(res, ['one', 'Hello', 'three']);
@@ -356,7 +356,7 @@ describe('Compiler: deferred', () => {
         });
         const ctx = new GraphEvalContext();
         const results: NodeResult[] = [];
-        ctx.nodeEvaluated.on(_ => results.push(omit(_, 'took')));
+        ctx.nodeEvaluated.on(_ => results.push(omit(_, 'timestamp')));
         const { compute } = await evalEsmModule(code);
         const res = await compute({}, ctx);
         assert.deepStrictEqual(res, 'Hello');

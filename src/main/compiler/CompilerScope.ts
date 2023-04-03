@@ -92,7 +92,6 @@ export class CompilerScope {
         const resSym = '$r';
         this.code.line(`let ${resSym};`);
         if (this.options.introspect) {
-            this.code.line('const $startedAt = Date.now();');
             this.code.block('try {', '}', () => {
                 if (this.options.evalMode === 'manual') {
                     this.code.line(`ctx.checkPendingNode(${JSON.stringify(node.nodeId)});`);
@@ -106,7 +105,7 @@ export class CompilerScope {
                     this.code.line(`ctx.nodeEvaluated.emit({` +
                         `nodeId: ${JSON.stringify(node.nodeId)},` +
                         `result: ${resSym},` +
-                        `took: Date.now() - $startedAt,` +
+                        `timestamp: Date.now(),` +
                         `});`);
                 }
                 this.code.line(`return ${resSym};`);
@@ -115,7 +114,7 @@ export class CompilerScope {
                 this.code.line(`ctx.nodeEvaluated.emit({` +
                     `nodeId: ${JSON.stringify(node.nodeId)},` +
                     `error,` +
-                    `took: Date.now() - $startedAt,` +
+                    `timestamp: Date.now(),` +
                     `});`);
                 this.code.line('throw error;');
             });
