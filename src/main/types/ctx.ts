@@ -12,6 +12,7 @@ export interface GraphEvalContext {
 
     nodeId: string;
     cache: Map<string, any>;
+    locals: Map<string, any>;
 
     clear(): void;
 
