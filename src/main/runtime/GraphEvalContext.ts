@@ -2,7 +2,7 @@ import { Schema } from 'airtight';
 import { Event } from 'nanoevent';
 
 import * as t from '../types/index.js';
-import { Disposable, SchemaSpec } from '../types/index.js';
+import { SchemaSpec } from '../types/index.js';
 import { runtimeLib } from '../util/runtime-lib.js';
 
 export const SYM_DEFERRED = Symbol.for('NodeScript:Deferred');
@@ -17,7 +17,6 @@ export class GraphEvalContext implements t.GraphEvalContext {
     nodeId: string = '';
     pendingNodeIds: Set<string>;
     nodeEvaluated: Event<t.NodeResult>;
-    disposables: Map<string, Disposable>;
     // Each context maintains its own cache. Subscopes have separate caches
     // and do not delegate to parent contexts.
     cache = new Map<string, any>();
@@ -27,15 +26,15 @@ export class GraphEvalContext implements t.GraphEvalContext {
     constructor(readonly parent: GraphEvalContext | null = null) {
         this.nodeEvaluated = parent ? parent.nodeEvaluated : new Event();
         this.pendingNodeIds = parent ? parent.pendingNodeIds : new Set();
-        this.disposables = parent ? parent.disposables : new Map();
     }
 
     clear() {
         this.cache.clear();
         this.locals.clear();
-        this.disposables.clear();
         this.pendingNodeIds.clear();
     }
+
+    async finalize() {}
 
     getLocal<T>(key: string, defaultValue?: T): T | undefined {
         const val = this.locals.get(key);
@@ -136,24 +135,6 @@ export class GraphEvalContext implements t.GraphEvalContext {
             return val;
         }
         return value;
-    }
-
-    trackDisposable(key: string, disposable: t.Disposable): void {
-        this.disposables.set(key, disposable);
-    }
-
-    async dispose(key: string) {
-        const disposable = this.disposables.get(key);
-        this.disposables.delete(key);
-        if (disposable) {
-            await disposable.dispose();
-        }
-    }
-
-    async disposeAll(): Promise<void> {
-        const promises = [...this.disposables.values()].map(_ => _.dispose());
-        this.disposables.clear();
-        await Promise.allSettled(promises);
     }
 
     /**
