@@ -75,15 +75,15 @@ describe('Compiler: types', () => {
                     type: 'any'
                 }
             };
-            await testStaticConversion(paramSpec, '', '');
-            // await testStaticConversion(paramSpec, 'undefined', undefined);
-            // await testStaticConversion(paramSpec, 'null', null);
-            // await testStaticConversion(paramSpec, '42', 42);
-            // await testStaticConversion(paramSpec, 'false', false);
-            // await testStaticConversion(paramSpec, 'true', true);
-            // await testStaticConversion(paramSpec, '{}', {});
-            // await testStaticConversion(paramSpec, '[]', []);
-            // await testStaticConversion(paramSpec, 'hello', 'hello');
+            await testStaticConversion(paramSpec, '', undefined);
+            await testStaticConversion(paramSpec, 'undefined', undefined);
+            await testStaticConversion(paramSpec, 'null', null);
+            await testStaticConversion(paramSpec, '42', 42);
+            await testStaticConversion(paramSpec, 'false', false);
+            await testStaticConversion(paramSpec, 'true', true);
+            await testStaticConversion(paramSpec, '{}', {});
+            await testStaticConversion(paramSpec, '[]', []);
+            await testStaticConversion(paramSpec, 'hello', 'hello');
         });
 
         it('type: any, optional: true', async () => {
@@ -111,7 +111,7 @@ describe('Compiler: types', () => {
                     nullable: true,
                 }
             };
-            await testStaticConversion(paramSpec, '', null);
+            await testStaticConversion(paramSpec, '', undefined);
             await testStaticConversion(paramSpec, 'undefined', undefined);
             await testStaticConversion(paramSpec, 'null', null);
             await testStaticConversion(paramSpec, '42', 42);

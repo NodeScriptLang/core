@@ -68,6 +68,9 @@ export class GraphEvalContext implements t.GraphEvalContext {
     }
 
     convertAuto(value: string, targetSchema: SchemaSpec = { type: 'any' }) {
+        if (targetSchema.type === 'any') {
+            return this.convertAnyVal(value);
+        }
         if (value === '') {
             if (targetSchema.optional) {
                 return undefined;
@@ -76,16 +79,12 @@ export class GraphEvalContext implements t.GraphEvalContext {
                 return null;
             }
         }
-        if (targetSchema.type === 'any') {
-            return this.convertAnyVal(value);
-        }
         return this.convertType(value, targetSchema);
     }
 
     private convertAnyVal(value: string) {
         switch (value) {
             case '':
-                return '';
             case 'undefined':
                 return undefined;
             case 'null':
