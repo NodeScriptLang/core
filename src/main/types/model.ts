@@ -23,7 +23,6 @@ export interface NodeSpec {
 export interface PropSpec {
     value: string;
     linkId?: string;
-    linkKey?: string;
     expand: boolean;
     entries?: PropEntrySpec[];
 }
@@ -33,7 +32,6 @@ export interface PropEntrySpec {
     key: string;
     value: string;
     linkId?: string;
-    linkKey?: string;
     expand: boolean;
 }
 

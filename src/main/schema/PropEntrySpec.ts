@@ -14,10 +14,6 @@ export const PropEntrySpecSchema = new Schema<PropEntrySpec>({
             type: 'string',
             optional: true,
         },
-        linkKey: {
-            type: 'string',
-            optional: true,
-        },
         expand: { type: 'boolean' },
     },
 });

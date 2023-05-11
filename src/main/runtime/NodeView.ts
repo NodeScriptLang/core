@@ -12,7 +12,6 @@ export type NodeLink = {
     linkNode: NodeView;
     prop: PropView;
     entry?: PropEntryView;
-    linkKey?: string;
 };
 
 export class NodeView {
@@ -118,7 +117,6 @@ export class NodeView {
                     node: this,
                     linkNode,
                     prop,
-                    linkKey: prop.linkKey,
                 };
             }
             if (prop.isSupportsEntries()) {
@@ -130,7 +128,6 @@ export class NodeView {
                             linkNode,
                             prop,
                             entry,
-                            linkKey: entry.linkKey,
                         };
                     }
                 }

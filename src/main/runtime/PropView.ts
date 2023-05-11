@@ -11,7 +11,6 @@ import { NodeView } from './NodeView.js';
 export type PropLine = {
     value: string;
     linkId?: string;
-    linkKey?: string;
     expand: boolean;
 };
 
@@ -46,10 +45,6 @@ export abstract class PropLineView {
 
     get linkId() {
         return this.propLine.linkId;
-    }
-
-    get linkKey() {
-        return this.propLine.linkKey;
     }
 
     getParamSpec() {
