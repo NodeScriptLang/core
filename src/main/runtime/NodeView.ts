@@ -171,4 +171,16 @@ export class NodeView {
         return this.getModuleSpec().evalMode;
     }
 
+    isAsync() {
+        if (this.getModuleSpec().result.async) {
+            return true;
+        }
+        for (const link of this.inboundLinks()) {
+            if (link.linkNode.isAsync()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

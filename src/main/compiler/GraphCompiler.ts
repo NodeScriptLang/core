@@ -9,7 +9,6 @@ export interface CompilerOptions {
     emitNodeMap: boolean;
     emitAll: boolean;
     evalMode: NodeEvalMode;
-    cacheErrors: boolean;
 }
 
 export interface CompilerResult {
@@ -38,7 +37,6 @@ export class GraphCompiler {
             emitNodeMap: false,
             emitAll: false,
             evalMode: 'auto',
-            cacheErrors: false,
             ...options
         });
         job.run();

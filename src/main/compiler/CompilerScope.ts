@@ -11,8 +11,6 @@ export class CompilerScope {
     private emittedNodes: NodeView[] = [];
     private linkMap: MultiMap<string, NodeLink>;
     private async: boolean;
-    private asyncSym: string;
-    private awaitSym: string;
     private lineExprMap = new Map<string, string>();
 
     constructor(
@@ -25,8 +23,6 @@ export class CompilerScope {
         this.emittedNodes = this.computeEmittedNodes();
         this.linkMap = graphView.computeLinkMap();
         this.async = this.emittedNodes.some(_ => _.getModuleSpec().result.async);
-        this.asyncSym = this.async ? 'async ' : '';
-        this.awaitSym = this.async ? 'await ' : '';
     }
 
     getEmittedNodes() {
@@ -66,21 +62,15 @@ export class CompilerScope {
     private emitNode(node: NodeView) {
         this.emitComment(`${node.ref} ${node.nodeId}`);
         const sym = this.getNodeSym(node.nodeId);
-        this.code.block(`${this.asyncSym}function ${sym}(params, ctx) {`, `}`, () => {
+        this.code.block(`${this.asyncSym(node)}function ${sym}(params, ctx) {`, `}`, () => {
             if (this.isNodeCached(node)) {
-                this.code.line(`const $c = ctx.cache.get("${node.nodeId}");`);
-                this.code.line('if ($c) { if ($c.error) { throw $c.error } return $c.result }');
-                if (this.options.cacheErrors) {
-                    this.code.block('try {', '}', () => {
-                        this.emitNodeBodyIntrospect(node);
-                    });
-                    this.code.block('catch (error) {', '}', () => {
-                        this.code.line(`ctx.cache.set("${node.nodeId}", { error });`);
-                        this.code.line(`throw error;`);
-                    });
-                } else {
+                this.code.line(`let $c = ctx.cache.get("${node.nodeId}");`);
+                this.code.line(`if ($c) { return $c.res; }`);
+                this.code.block(`$c = (${this.asyncSym(node)}() => {`, `})();`, () => {
                     this.emitNodeBodyIntrospect(node);
-                }
+                });
+                this.code.line(`ctx.cache.set("${node.nodeId}", { res: $c });`);
+                this.code.line(`return $c;`);
             } else {
                 this.emitNodeBodyIntrospect(node);
             }
@@ -124,7 +114,7 @@ export class CompilerScope {
     }
 
     private emitNodeBodyRaw(node: NodeView, resSym: string) {
-        this.emitPropLines(node);
+        this.emitNodePreamble(node);
         if (node.isExpanded()) {
             this.emitExpandedNode(node, resSym);
         } else {
@@ -134,9 +124,6 @@ export class CompilerScope {
 
     private emitRegularNode(node: NodeView, resSym: string) {
         this.emitNodeCompute(node, resSym);
-        if (this.isNodeCached(node)) {
-            this.code.line(`ctx.cache.set("${node.nodeId}", { result: ${resSym} });`);
-        }
     }
 
     private emitExpandedNode(node: NodeView, resSym: string) {
@@ -156,20 +143,24 @@ export class CompilerScope {
             this.emitNodeCompute(node, tempSym);
             this.code.line(`${resSym}.push(${tempSym});`);
         });
-        if (this.isNodeCached(node)) {
-            this.code.line(`ctx.cache.set("${node.nodeId}", { result: ${resSym} });`);
-        }
     }
 
-    private emitPropLines(node: NodeView) {
+    private emitNodePreamble(node: NodeView) {
+        const syms: string[] = [];
         for (const line of node.allLines()) {
             const lineId = line.getLineId();
             const sym = this.symbols.createLineSym(this.scopeId, lineId);
             const { decl, expr } = this.createLineDecl(line, sym);
             if (decl) {
                 this.code.line(`const ${sym} = ${decl}`);
+                syms.push(sym);
             }
             this.lineExprMap.set(lineId, expr);
+        }
+        if (node.isAsync()) {
+            // Note: leaving dangled promises makes JS report "Uncaught (in promise)",
+            // despite the fact they are `await`ed further down the line.
+            this.code.line(`await Promise.all([${syms.join(',')}]);`);
         }
     }
 
@@ -192,12 +183,12 @@ export class CompilerScope {
                 // Expanded
                 const expr = `${sym}[$i]`;
                 return {
-                    decl: `ctx.toArray(${this.awaitSym}${callExpr})`,
+                    decl: `ctx.toArray(${this.awaitSym(line.node)}${callExpr})`,
                     expr: schemaCompatible ? expr : this.convertTypeExpr(expr, targetSchema),
                 };
             }
             // Regular linked
-            const expr = `${this.awaitSym}${sym}`;
+            const expr = `${this.awaitSym(line.node)}${sym}`;
             return {
                 decl: callExpr,
                 expr: schemaCompatible ? expr : this.convertTypeExpr(expr, targetSchema)
@@ -297,7 +288,7 @@ export class CompilerScope {
     private emitGenericCompute(node: NodeView, resSym: string) {
         const computeSym = this.symbols.getComputeSym(node.ref);
         this.code.line(`ctx.nodeId = ${JSON.stringify(node.nodeId)};`);
-        this.code.block(`${resSym} = ${this.awaitSym}${computeSym}({`, `}, ctx.newScope());`, () => {
+        this.code.block(`${resSym} = ${this.awaitSym(node)}${computeSym}({`, `}, ctx.newScope());`, () => {
             this.emitNodeProps(node);
         });
     }
@@ -401,6 +392,14 @@ export class CompilerScope {
             return 'undefined';
         }
         return JSON.stringify(value);
+    }
+
+    private asyncSym(node: NodeView) {
+        return node.isAsync() ? 'async ' : '';
+    }
+
+    private awaitSym(node: NodeView) {
+        return node.isAsync() ? `await ` : '';
     }
 
 }
