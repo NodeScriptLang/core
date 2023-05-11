@@ -171,7 +171,7 @@ export class CompilerScope {
             // Linked
             const linkSym = this.getNodeSym(linkNode.nodeId);
             const sourceSchema = linkNode.getModuleSpec().result.schema;
-            const schemaCompatible = isSchemaCompatible(sourceSchema, targetSchema);
+            const schemaCompatible = isSchemaCompatible(targetSchema, sourceSchema);
             const callExpr = `${linkSym}(params, ctx)`;
             if (line.isDeferred()) {
                 // Deferred
