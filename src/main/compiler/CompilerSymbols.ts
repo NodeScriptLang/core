@@ -34,8 +34,8 @@ export class CompilerSymbols {
         return sym;
     }
 
-    getLineSymIfExists(scopeId: string, lineId: string) {
-        return this.symtable.get(`prop:${scopeId}:${lineId}`, '');
+    getLineSym(scopeId: string, lineId: string) {
+        return this.symtable.get(`prop:${scopeId}:${lineId}`);
     }
 
     createLineSym(scopeId: string, lineId: string) {

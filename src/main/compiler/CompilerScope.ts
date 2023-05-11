@@ -2,6 +2,7 @@ import { GraphView, NodeLink, NodeView, PropLineView, PropView } from '../runtim
 import { SchemaSpec } from '../types/schema.js';
 import { convertAuto, isSchemaCompatible, MultiMap } from '../util/index.js';
 import { CodeBuilder } from './CodeBuilder.js';
+import { CompilerError } from './CompilerError.js';
 import { CompilerSymbols } from './CompilerSymbols.js';
 import { CompilerOptions } from './GraphCompiler.js';
 
@@ -12,6 +13,7 @@ export class CompilerScope {
     private async: boolean;
     private asyncSym: string;
     private awaitSym: string;
+    private lineExprMap = new Map<string, string>();
 
     constructor(
         readonly scopeId: string,
@@ -65,7 +67,6 @@ export class CompilerScope {
         this.emitComment(`${node.ref} ${node.nodeId}`);
         const sym = this.getNodeSym(node.nodeId);
         this.code.block(`${this.asyncSym}function ${sym}(params, ctx) {`, `}`, () => {
-            this.emitNodePreamble(node);
             if (this.isNodeCached(node)) {
                 this.code.line(`const $c = ctx.cache.get("${node.nodeId}");`);
                 this.code.line('if ($c) { if ($c.error) { throw $c.error } return $c.result }');
@@ -85,8 +86,6 @@ export class CompilerScope {
             }
         });
     }
-
-    private emitNodePreamble(_node: NodeView) { }
 
     private emitNodeBodyIntrospect(node: NodeView) {
         const resSym = '$r';
@@ -125,6 +124,7 @@ export class CompilerScope {
     }
 
     private emitNodeBodyRaw(node: NodeView, resSym: string) {
+        this.emitPropLines(node);
         if (node.isExpanded()) {
             this.emitExpandedNode(node, resSym);
         } else {
@@ -161,23 +161,61 @@ export class CompilerScope {
         }
     }
 
+    private emitPropLines(node: NodeView) {
+        for (const line of node.allLines()) {
+            const lineId = line.getLineId();
+            const sym = this.symbols.createLineSym(this.scopeId, lineId);
+            const { decl, expr } = this.createLineDecl(line, sym);
+            if (decl) {
+                this.code.line(`const ${sym} = ${decl}`);
+            }
+            this.lineExprMap.set(lineId, expr);
+        }
+    }
+
+    private createLineDecl(line: PropLineView, sym: string): { decl?: string; expr: string } {
+        const targetSchema = line.getSchema();
+        const linkNode = line.getLinkNode();
+        if (linkNode) {
+            // Linked
+            const linkSym = this.getNodeSym(linkNode.nodeId);
+            const sourceSchema = linkNode.getModuleSpec().result.schema;
+            const schemaCompatible = isSchemaCompatible(sourceSchema, targetSchema);
+            const callExpr = `${linkSym}(params, ctx)`;
+            if (line.isDeferred()) {
+                // Deferred
+                return {
+                    decl: `ctx.deferred(() => ${callExpr}, ${schemaCompatible ? 'undefined' : JSON.stringify(targetSchema)})`,
+                    expr: sym,
+                };
+            } else if (line.isExpanded()) {
+                // Expanded
+                const expr = `${sym}[$i]`;
+                return {
+                    decl: `ctx.toArray(${this.awaitSym}${callExpr})`,
+                    expr: schemaCompatible ? expr : this.convertTypeExpr(expr, targetSchema),
+                };
+            }
+            // Regular linked
+            const expr = `${this.awaitSym}${sym}`;
+            return {
+                decl: callExpr,
+                expr: schemaCompatible ? expr : this.convertTypeExpr(expr, targetSchema)
+            };
+        }
+        // Static value
+        const value = convertAuto(line.getStaticValue(), targetSchema);
+        return {
+            expr: this.escapeValue(value),
+        };
+    }
+
     private emitExpandedPreamble(node: NodeView) {
         const expSyms: string[] = [];
         for (const line of node.expandedLines()) {
-            const propSym = this.symbols.createLineSym(this.scopeId, line.getLineId());
-            expSyms.push(propSym);
-            const linkNode = line.getLinkNode()!;
-            const linkExpr = this.nodeResultExpr(linkNode);
-            const linkExpanded = linkNode.isExpanded();
-            // Each expanded property needs to be awaited and converted into an array
-            let expr;
-            if (linkExpanded) {
-                // The linked result is already an array, no need to convert
-                expr = `${linkExpr}`;
-            } else {
-                expr = `ctx.toArray(${linkExpr})`;
-            }
-            this.code.line(`const ${propSym} = ${expr}`);
+            const lineId = line.getLineId();
+            const sym = this.getLineSym(lineId);
+            expSyms.push(sym);
         }
         this.code.line(`const $l = Math.min(${expSyms.map(s => `${s}.length`).join(',')});`);
     }
@@ -208,7 +246,8 @@ export class CompilerScope {
 
     private emitResultNode(node: NodeView, resSym: string) {
         const prop = node.getProp('value')!;
-        const expr = this.singleLineExpr(prop, this.graphView.moduleSpec.result.schema);
+        let expr = this.getLineExpr(prop);
+        expr = this.convertTypeExpr(expr, this.graphView.moduleSpec.result.schema);
         this.code.line(`${resSym} = ${expr};`);
     }
 
@@ -290,7 +329,7 @@ export class CompilerScope {
     private emitArrayEntries(prop: PropView) {
         this.code.block(`${JSON.stringify(prop.propKey)}: [`, '],', () => {
             for (const p of prop.getEntries()) {
-                const expr = this.singleLineExpr(p);
+                const expr = this.getLineExpr(p);
                 this.code.line(`${expr},`);
             }
         });
@@ -299,70 +338,28 @@ export class CompilerScope {
     private emitObjectEntries(prop: PropView) {
         this.code.block(`${JSON.stringify(prop.propKey)}: {`, '},', () => {
             for (const p of prop.getEntries()) {
-                const expr = this.singleLineExpr(p);
+                const expr = this.getLineExpr(p);
                 this.code.line(`${JSON.stringify(p.key)}: ${expr},`);
             }
         });
     }
 
     private emitSingleProp(prop: PropView) {
-        const expr = this.singleLineExpr(prop);
+        const expr = this.getLineExpr(prop);
         this.code.line(`${JSON.stringify(prop.propKey)}: ${expr},`);
     }
 
-    private singleLineExpr(line: PropLineView, targetSchema: SchemaSpec = line.getSchema()) {
-        if (line.isDeferred()) {
-            return this.deferredLineExpr(line, targetSchema);
-        }
-        const linkNode = line.getLinkNode();
-        if (linkNode) {
-            return this.linkLineExpr(line, linkNode, targetSchema);
-        }
-        return this.constantLineExpr(line, targetSchema);
-    }
-
-    /**
-     * Returns line expression when the line is linked.
-     */
-    private linkLineExpr(line: PropLineView, linkNode: NodeView, targetSchema: SchemaSpec) {
-        let expr = '';
-        const sourceSchema: SchemaSpec = linkNode.getModuleSpec().result.schema;
-        const expSym = this.symbols.getLineSymIfExists(this.scopeId, line.getLineId());
-        if (expSym) {
-            expr = `${expSym}[$i]`;
-        } else {
-            expr = this.nodeResultExpr(linkNode);
-        }
-        const needsTypeConversion = !isSchemaCompatible(targetSchema, sourceSchema);
-        if (needsTypeConversion) {
-            expr = this.convertTypeExpr(expr, targetSchema);
+    private getLineExpr(line: PropLineView) {
+        const lineId = line.getLineId();
+        const expr = this.lineExprMap.get(lineId);
+        if (!expr) {
+            throw new CompilerError(`Line expression not found: ${lineId}`);
         }
         return expr;
     }
 
-    /**
-     * Returns line expression when the line is not linked.
-     */
-    private constantLineExpr(line: PropLineView, targetSchema: SchemaSpec) {
-        const value = convertAuto(line.getStaticValue(), targetSchema);
-        return this.escapeValue(value);
-    }
-
-    private deferredLineExpr(line: PropLineView, targetSchema: SchemaSpec) {
-        const linkNode = line.getLinkNode()!;
-        const sourceSchema = linkNode.getModuleSpec().result.schema;
-        const linkSym = this.getNodeSym(linkNode.nodeId);
-        const schemaCompatible = isSchemaCompatible(sourceSchema, targetSchema);
-        return `ctx.deferred(() => ${linkSym}(params, ctx), ${schemaCompatible ? 'undefined' : JSON.stringify(targetSchema)})`;
-    }
-
     private convertTypeExpr(expr: string, targetSchema: SchemaSpec) {
         return `ctx.convertType(${expr}, ${JSON.stringify(targetSchema)})`;
-    }
-
-    private nodeResultExpr(node: NodeView) {
-        const sym = this.getNodeSym(node.nodeId);
-        return `${this.awaitSym}${sym}(params, ctx)`;
     }
 
     private emitComment(str: string) {
@@ -393,6 +390,10 @@ export class CompilerScope {
 
     private getNodeSym(nodeId: string) {
         return this.symbols.getNodeSym(this.scopeId, nodeId);
+    }
+
+    private getLineSym(lineId: string) {
+        return this.symbols.getLineSym(this.scopeId, lineId);
     }
 
     private escapeValue(value: any) {
