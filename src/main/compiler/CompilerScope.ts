@@ -165,33 +165,45 @@ export class CompilerScope {
     }
 
     private createLineDecl(line: PropLineView, sym: string): { decl?: string; expr: string } {
+        const node = line.node;
+        const async = node.isAsync();
         const targetSchema = line.getSchema();
         const linkNode = line.getLinkNode();
+        const linkKey = line.linkKey;
+        // Linked
         if (linkNode) {
-            // Linked
+            // 1. figure if type conversion is necessary
+            let sourceSchema = linkNode.getModuleSpec().result.schema;
+            if (linkKey) {
+                sourceSchema = targetSchema.properties?.[linkKey] ?? { type: 'any' };
+            }
+            // 2. create a base expression for calling the linked function, i.e. r1(params, ctx)
             const linkSym = this.getNodeSym(linkNode.nodeId);
-            const sourceSchema = linkNode.getModuleSpec().result.schema;
-            const schemaCompatible = isSchemaCompatible(targetSchema, sourceSchema);
-            const callExpr = `${linkSym}(params, ctx)`;
+            let callExpr = `${linkSym}(params, ctx)`;
+            // 3. compose in linkKey operation
+            if (linkKey) {
+                callExpr = this.code.compose(async, callExpr, _ => `${_}[${JSON.stringify(linkKey)}]`);
+            }
             if (line.isDeferred()) {
-                // Deferred
+                // Deferred:
                 return {
-                    decl: `ctx.deferred(() => ${callExpr}, ${schemaCompatible ? 'undefined' : JSON.stringify(targetSchema)})`,
+                    decl: `ctx.deferred(() => ${this.convertTypeExpr(async, callExpr, sourceSchema, targetSchema)})`,
                     expr: sym,
                 };
             } else if (line.isExpanded()) {
-                // Expanded
+                // Expanded:
+                // the linked call is awaited, then wrapped into ctx.toArray;
+                // type conversion happens inside the loop, synchronously
                 const expr = `${sym}[$i]`;
                 return {
-                    decl: `ctx.toArray(${this.awaitSym(line.node)}${callExpr})`,
-                    expr: schemaCompatible ? expr : this.convertTypeExpr(expr, targetSchema),
+                    decl: `ctx.toArray(${this.awaitSym(node)}${callExpr})`,
+                    expr: this.convertTypeExpr(false, expr, sourceSchema, targetSchema),
                 };
             }
             // Regular linked
-            const expr = `${this.awaitSym(line.node)}${sym}`;
             return {
-                decl: callExpr,
-                expr: schemaCompatible ? expr : this.convertTypeExpr(expr, targetSchema)
+                decl: this.convertTypeExpr(async, callExpr, sourceSchema, targetSchema),
+                expr: `${this.awaitSym(node)}${sym}`,
             };
         }
         // Static value
@@ -238,7 +250,8 @@ export class CompilerScope {
     private emitResultNode(node: NodeView, resSym: string) {
         const prop = node.getProp('value')!;
         let expr = this.getLineExpr(prop);
-        expr = this.convertTypeExpr(expr, this.graphView.moduleSpec.result.schema);
+        const targetSchema = this.graphView.moduleSpec.result.schema;
+        expr = this.code.compose(node.isAsync(), expr, _ => `ctx.convertType(${_}, ${JSON.stringify(targetSchema)})`);
         this.code.line(`${resSym} = ${expr};`);
     }
 
@@ -349,8 +362,10 @@ export class CompilerScope {
         return expr;
     }
 
-    private convertTypeExpr(expr: string, targetSchema: SchemaSpec) {
-        return `ctx.convertType(${expr}, ${JSON.stringify(targetSchema)})`;
+    private convertTypeExpr(async = false, expr: string, sourceSchema: SchemaSpec, targetSchema: SchemaSpec) {
+        const schemaCompatible = isSchemaCompatible(targetSchema, sourceSchema);
+        return schemaCompatible ? expr :
+            this.code.compose(async, expr, _ => `ctx.convertType(${_}, ${JSON.stringify(targetSchema)})`);
     }
 
     private emitComment(str: string) {

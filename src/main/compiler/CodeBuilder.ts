@@ -40,4 +40,16 @@ export class CodeBuilder {
         this.line(end);
     }
 
+    compose(async: boolean, expr: string, wrap: (str: string) => string) {
+        return async ? this.composeAsync(expr, wrap) : this.composeSync(expr, wrap);
+    }
+
+    composeSync(expr: string, wrap: (str: string) => string) {
+        return wrap(expr);
+    }
+
+    composeAsync(expr: string, wrap: (str: string) => string) {
+        return `${expr}.then(_ => ${wrap('_')})`;
+    }
+
 }

@@ -3,6 +3,7 @@ import { SchemaSpec } from './schema.js';
 
 export interface Deferred {
     resolve: () => unknown;
+    // TODO drop schema (left for compatibility)
     schema: SchemaSpec | undefined;
 }
 
@@ -22,6 +23,7 @@ export interface GraphEvalContext {
     convertType(value: unknown, schema: SchemaSpec): unknown;
     convertAuto(value: string, schema?: SchemaSpec): unknown;
 
+    // TODO drop schema (left for compatibility)
     deferred(fn: () => unknown, schema?: SchemaSpec): unknown;
     isDeferred(value: unknown): value is Deferred;
     resolveDeferred(value: unknown): unknown;
