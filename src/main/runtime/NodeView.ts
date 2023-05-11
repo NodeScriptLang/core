@@ -85,16 +85,22 @@ export class NodeView {
         return false;
     }
 
-    *expandedLines(): Iterable<PropLineView> {
+    *allLines(): Iterable<PropLineView> {
         for (const prop of this.getProps()) {
             if (prop.isUsesEntries()) {
                 for (const entry of prop.getEntries()) {
-                    if (entry.isExpanded()) {
-                        yield entry;
-                    }
+                    yield entry;
                 }
-            } else if (prop.isExpanded()) {
+            } else {
                 yield prop;
+            }
+        }
+    }
+
+    *expandedLines(): Iterable<PropLineView> {
+        for (const line of this.allLines()) {
+            if (line.isExpanded()) {
+                yield line;
             }
         }
     }

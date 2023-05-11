@@ -1,31 +1,48 @@
-import { getType } from 'airtight';
+import { getType, Schema } from 'airtight';
 
 import { SchemaSpec } from '../types/schema.js';
 
 export { getType };
 
-export function parseAny(str: string) {
-    const s = String(str ?? '').trim();
-    switch (s) {
-        case 'false':
-            return false;
-        case 'true':
-            return true;
+export function convertAuto(value: string, targetSchema: SchemaSpec = { type: 'any' }) {
+    if (targetSchema.type === 'any') {
+        return convertAnyVal(value);
+    }
+    if (value === '') {
+        if (targetSchema.optional) {
+            return undefined;
+        }
+        if (targetSchema.nullable) {
+            return null;
+        }
+    }
+    return new Schema(targetSchema as any).decode(value);
+}
+
+export function convertAnyVal(value: string) {
+    switch (value) {
+        case '':
+        case 'undefined':
+            return undefined;
+        case `''`:
+        case `""`:
+            return '';
         case 'null':
             return null;
-        case '':
-            return '';
+        case 'true':
+            return true;
+        case 'false':
+            return false;
+        case '{}':
+            return {};
+        case '[]':
+            return [];
         default: {
-            const num = Number(str);
+            const num = Number(value);
             if (!isNaN(num)) {
                 return num;
             }
-            if (str.startsWith('[') || str.startsWith('{')) {
-                try {
-                    return JSON.parse(str);
-                } catch (_err) {}
-            }
-            return str;
+            return value;
         }
     }
 }

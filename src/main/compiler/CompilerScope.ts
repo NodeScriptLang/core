@@ -1,6 +1,6 @@
 import { GraphView, NodeLink, NodeView, PropLineView, PropView } from '../runtime/index.js';
 import { SchemaSpec } from '../types/schema.js';
-import { isSchemaCompatible, MultiMap } from '../util/index.js';
+import { convertAuto, isSchemaCompatible, MultiMap } from '../util/index.js';
 import { CodeBuilder } from './CodeBuilder.js';
 import { CompilerSymbols } from './CompilerSymbols.js';
 import { CompilerOptions } from './GraphCompiler.js';
@@ -344,8 +344,8 @@ export class CompilerScope {
      * Returns line expression when the line is not linked.
      */
     private constantLineExpr(line: PropLineView, targetSchema: SchemaSpec) {
-        const valueExpr = JSON.stringify(line.getStaticValue());
-        return `ctx.convertAuto(${valueExpr}, ${JSON.stringify(targetSchema)})`;
+        const value = convertAuto(line.getStaticValue(), targetSchema);
+        return this.escapeValue(value);
     }
 
     private deferredLineExpr(line: PropLineView, targetSchema: SchemaSpec) {
@@ -395,5 +395,11 @@ export class CompilerScope {
         return this.symbols.getNodeSym(this.scopeId, nodeId);
     }
 
+    private escapeValue(value: any) {
+        if (value === undefined) {
+            return 'undefined';
+        }
+        return JSON.stringify(value);
+    }
 
 }

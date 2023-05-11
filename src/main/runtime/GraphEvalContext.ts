@@ -3,7 +3,7 @@ import { Event } from 'nanoevent';
 
 import * as t from '../types/index.js';
 import { SchemaSpec } from '../types/index.js';
-import { runtimeLib } from '../util/runtime-lib.js';
+import { convertAuto, runtimeLib } from '../util/index.js';
 
 export const SYM_DEFERRED = Symbol.for('NodeScript:Deferred');
 
@@ -68,43 +68,7 @@ export class GraphEvalContext implements t.GraphEvalContext {
     }
 
     convertAuto(value: string, targetSchema: SchemaSpec = { type: 'any' }) {
-        if (targetSchema.type === 'any') {
-            return this.convertAnyVal(value);
-        }
-        if (value === '') {
-            if (targetSchema.optional) {
-                return undefined;
-            }
-            if (targetSchema.nullable) {
-                return null;
-            }
-        }
-        return this.convertType(value, targetSchema);
-    }
-
-    private convertAnyVal(value: string) {
-        switch (value) {
-            case '':
-            case 'undefined':
-                return undefined;
-            case 'null':
-                return null;
-            case 'true':
-                return true;
-            case 'false':
-                return false;
-            case '{}':
-                return {};
-            case '[]':
-                return [];
-            default: {
-                const num = Number(value);
-                if (!isNaN(num)) {
-                    return num;
-                }
-                return value;
-            }
-        }
+        return convertAuto(value, targetSchema);
     }
 
     checkPendingNode(nodeId: string) {
@@ -118,7 +82,7 @@ export class GraphEvalContext implements t.GraphEvalContext {
     }
 
     isDeferred(value: unknown): value is t.Deferred {
-        return value != null && (value as any)[SYM_DEFERRED];
+        return (value as any)?.[SYM_DEFERRED];
     }
 
     resolveDeferred(value: unknown): unknown {
