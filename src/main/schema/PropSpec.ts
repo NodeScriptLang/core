@@ -12,6 +12,10 @@ export const PropSpecSchema = new Schema<PropSpec>({
             type: 'string',
             optional: true,
         },
+        linkKey: {
+            type: 'string',
+            optional: true,
+        },
         expand: { type: 'boolean' },
         entries: {
             type: 'array',
