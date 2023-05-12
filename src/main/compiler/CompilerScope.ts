@@ -169,13 +169,24 @@ export class CompilerScope {
         const async = node.isAsync();
         const targetSchema = line.getSchema();
         const linkNode = line.getLinkNode();
+        const linkKey = line.linkKey;
         // Linked
         if (linkNode) {
             // 1. figure if type conversion is necessary
-            const sourceSchema = linkNode.getModuleSpec().result.schema;
+            let sourceSchema = linkNode.getModuleSpec().result.schema;
+            if (linkKey) {
+                sourceSchema = { type: 'any' };
+            }
             // 2. create a base expression for calling the linked function, i.e. r1(params, ctx)
             const linkSym = this.getNodeSym(linkNode.nodeId);
-            const callExpr = `${linkSym}(params, ctx)`;
+            let callExpr = `${linkSym}(params, ctx)`;
+            // 3. compose in linkKey operation
+            if (linkKey) {
+                callExpr = this.code.compose(async, callExpr, _ => {
+                    const components = linkKey.split(/\./g).map(_ => _.trim()).filter(Boolean);
+                    return _ + components.map(comp => `?.[${JSON.stringify(comp)}]`).join('');
+                });
+            }
             if (line.isDeferred()) {
                 // Deferred:
                 return {
