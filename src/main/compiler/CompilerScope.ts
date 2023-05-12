@@ -175,14 +175,17 @@ export class CompilerScope {
             // 1. figure if type conversion is necessary
             let sourceSchema = linkNode.getModuleSpec().result.schema;
             if (linkKey) {
-                sourceSchema = targetSchema.properties?.[linkKey] ?? { type: 'any' };
+                sourceSchema = { type: 'any' };
             }
             // 2. create a base expression for calling the linked function, i.e. r1(params, ctx)
             const linkSym = this.getNodeSym(linkNode.nodeId);
             let callExpr = `${linkSym}(params, ctx)`;
             // 3. compose in linkKey operation
             if (linkKey) {
-                callExpr = this.code.compose(async, callExpr, _ => `${_}[${JSON.stringify(linkKey)}]`);
+                callExpr = this.code.compose(async, callExpr, _ => {
+                    const components = linkKey.split(/\./g).map(_ => _.trim()).filter(Boolean);
+                    return _ + components.map(comp => `?.[${JSON.stringify(comp)}]`).join('');
+                });
             }
             if (line.isDeferred()) {
                 // Deferred:
