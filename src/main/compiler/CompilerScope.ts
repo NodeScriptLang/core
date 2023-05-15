@@ -165,13 +165,12 @@ export class CompilerScope {
     }
 
     private createLineDecl(line: PropLineView, sym: string): { decl?: string; expr: string } {
-        const node = line.node;
-        const async = node.isAsync();
         const targetSchema = line.getSchema();
         const linkNode = line.getLinkNode();
         const linkKey = line.linkKey;
         // Linked
         if (linkNode) {
+            const async = linkNode.isAsync();
             // 1. figure if type conversion is necessary
             let sourceSchema = linkNode.getModuleSpec().result.schema;
             if (linkKey) {
@@ -199,14 +198,14 @@ export class CompilerScope {
                 // type conversion happens inside the loop, synchronously
                 const expr = `${sym}[$i]`;
                 return {
-                    decl: `ctx.toArray(${this.awaitSym(node)}${callExpr})`,
+                    decl: `ctx.toArray(${this.awaitSym(linkNode)}${callExpr})`,
                     expr: this.convertTypeExpr(false, expr, sourceSchema, targetSchema),
                 };
             }
             // Regular linked
             return {
                 decl: this.convertTypeExpr(async, callExpr, sourceSchema, targetSchema),
-                expr: `${this.awaitSym(node)}${sym}`,
+                expr: `${this.awaitSym(linkNode)}${sym}`,
             };
         }
         // Static value

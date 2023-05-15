@@ -74,4 +74,29 @@ describe('Compiler: sync/async', () => {
         assert.strictEqual(/await\s+/.test(code), true);
     });
 
+    it('(regression) type conversion chaining works from sync to async', async () => {
+        const graph = await runtime.loadGraph({
+            rootNodeId: 'res',
+            nodes: {
+                p1: {
+                    ref: 'Number',
+                    props: {
+                        value: { value: '42' },
+                    }
+                },
+                promise: {
+                    ref: 'PromiseString',
+                    props: {
+                        value: { linkId: 'p1' },
+                    }
+                }
+            },
+        });
+        const { code } = new GraphCompiler().compileEsm(graph, { rootNodeId: 'promise' });
+        const { compute } = await evalEsmModule(code);
+        const ctx = new GraphEvalContext();
+        const res = await compute({}, ctx);
+        assert.strictEqual(res, '42');
+    });
+
 });
