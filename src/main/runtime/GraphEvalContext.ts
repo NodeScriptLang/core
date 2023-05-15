@@ -59,12 +59,21 @@ export class GraphEvalContext implements t.GraphEvalContext {
         return new GraphEvalContext(this);
     }
 
-    toArray(value: unknown): unknown[] {
-        return Array.isArray(value) ? value : [value];
-    }
-
     convertType(value: unknown, schema: SchemaSpec) {
         return new Schema(schema as any).decode(value);
+    }
+
+
+    get(object: unknown, keyish: string) {
+        return this.lib.get(object, keyish);
+    }
+
+    set(object: unknown, keyish: string, value: unknown) {
+        return this.lib.set(object, keyish, value);
+    }
+
+    toArray(value: unknown): unknown[] {
+        return Array.isArray(value) ? value : [value];
     }
 
     convertAuto(value: string, targetSchema: SchemaSpec = { type: 'any' }) {
@@ -102,15 +111,6 @@ export class GraphEvalContext implements t.GraphEvalContext {
         return value;
     }
 
-    /**
-     * @deprecated This is kept for compatibility with earlier versions of stdlib node.
-     */
-    readonly get = runtimeLib.get;
-
-    /**
-     * @deprecated This is kept for compatibility with earlier versions of stdlib node.
-     */
-    readonly set = runtimeLib.set;
 }
 
 export class NodePendingError extends Error {

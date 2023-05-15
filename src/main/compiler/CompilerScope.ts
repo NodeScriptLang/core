@@ -182,8 +182,7 @@ export class CompilerScope {
             // 3. compose in linkKey operation
             if (linkKey) {
                 callExpr = this.code.compose(async, callExpr, _ => {
-                    const components = linkKey.split(/\./g).map(_ => _.trim()).filter(Boolean);
-                    return _ + components.map(comp => `?.[${JSON.stringify(comp)}]`).join('');
+                    return `ctx.lib.get(${_}, ${JSON.stringify(linkKey)})`;
                 });
             }
             if (line.isDeferred()) {
