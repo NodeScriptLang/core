@@ -250,9 +250,7 @@ export class CompilerScope {
 
     private emitResultNode(node: NodeView, resSym: string) {
         const prop = node.getProp('value')!;
-        let expr = this.getLineExpr(prop);
-        const targetSchema = this.graphView.moduleSpec.result.schema;
-        expr = this.code.compose(node.isAsync(), expr, _ => `ctx.convertType(${_}, ${JSON.stringify(targetSchema)})`);
+        const expr = this.getLineExpr(prop);
         this.code.line(`${resSym} = ${expr};`);
     }
 

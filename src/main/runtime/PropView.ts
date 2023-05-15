@@ -114,6 +114,9 @@ export class PropView extends PropLineView {
     }
 
     getSchema(): SchemaSpec {
+        if (this.node.ref === '@system/Result') {
+            return this.graph.moduleSpec.result.schema;
+        }
         return this.getParamSpec().schema;
     }
 
