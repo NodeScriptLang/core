@@ -47,7 +47,6 @@ export class CompilerJob {
         const moduleSpec = clone(this.graphView.moduleSpec);
         moduleSpec.evalMode = this.mainScope.computeEvalMode();
         moduleSpec.result.async = this.mainScope.isAsync();
-        moduleSpec.params = this.computeParamSpecs();
         return moduleSpec;
     }
 
@@ -113,29 +112,6 @@ export class CompilerJob {
         if (this.options.comments) {
             this.code.line(`// ${str}`);
         }
-    }
-
-    /**
-     * Computes `moduleSpec.params` by sorting the parameters in the order they appear in the graph,
-     * top-to-bottom, left-to-right.
-     *
-     * @deprecated This behaviour is going to be removed in the next major release.
-     */
-    private computeParamSpecs() {
-        const paramEntries = Object.entries(this.graphView.moduleSpec.params);
-        const paramNodes = this.graphView.getNodesByRef('@system/Param');
-        paramNodes.sort((a, b) => {
-            const ax = a.metadata.pos?.x ?? 0;
-            const ay = a.metadata.pos?.y ?? 0;
-            const bx = b.metadata.pos?.x ?? 0;
-            const by = b.metadata.pos?.y ?? 0;
-            return ay === by ? ax - bx : ay - by;
-        });
-        const sortedKeys = paramNodes.map(_ => _.getProp('key')?.value);
-        paramEntries.sort((a, b) => {
-            return sortedKeys.indexOf(a[0]) - sortedKeys.indexOf(b[0]);
-        });
-        return Object.fromEntries(paramEntries);
     }
 
     private *collectSubgraphScopes(): Iterable<CompilerScope> {
