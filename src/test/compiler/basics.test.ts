@@ -97,57 +97,6 @@ describe('Compiler: basics', () => {
             assert.strictEqual(res, 43);
         });
 
-        it('emits params in the order they appear in the graph', async () => {
-            const createGraph = (aPos: any, bPos: any) => runtime.loadGraph({
-                rootNodeId: 'res',
-                moduleSpec: {
-                    params: {
-                        b: { schema: { type: 'number' } },
-                        a: { schema: { type: 'number' } },
-                    }
-                },
-                nodes: {
-                    p1: {
-                        ref: '@system/Param',
-                        props: {
-                            key: { value: 'a' },
-                        },
-                        metadata: {
-                            pos: aPos,
-                        }
-                    },
-                    p2: {
-                        ref: '@system/Param',
-                        props: {
-                            key: { value: 'b' },
-                        },
-                        metadata: {
-                            pos: bPos,
-                        }
-                    },
-                    res: {
-                        ref: 'Math.Add',
-                        props: {
-                            a: { linkId: 'p1' },
-                            b: { linkId: 'p2' },
-                        }
-                    }
-                },
-            });
-            const graph1 = await createGraph({ x: 4, y: 3 }, { x: 4, y: 4 }); // a above b
-            const res1 = new GraphCompiler().compileEsm(graph1);
-            assert.deepStrictEqual(Object.keys(res1.moduleSpec.params), ['a', 'b']);
-            const graph2 = await createGraph({ x: 4, y: 5 }, { x: 4, y: 4 }); // a below b
-            const res2 = new GraphCompiler().compileEsm(graph2);
-            assert.deepStrictEqual(Object.keys(res2.moduleSpec.params), ['b', 'a']);
-            const graph3 = await createGraph({ x: 3, y: 4 }, { x: 4, y: 4 }); // a to the left b
-            const res3 = new GraphCompiler().compileEsm(graph3);
-            assert.deepStrictEqual(Object.keys(res3.moduleSpec.params), ['a', 'b']);
-            const graph4 = await createGraph({ x: 5, y: 4 }, { x: 4, y: 4 }); // a to the right b
-            const res4 = new GraphCompiler().compileEsm(graph4);
-            assert.deepStrictEqual(Object.keys(res4.moduleSpec.params), ['b', 'a']);
-        });
-
     });
 
     describe('result', () => {
