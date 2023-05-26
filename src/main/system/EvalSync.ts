@@ -19,7 +19,9 @@ export const EvalSync = ModuleSpecSchema.create({
                 type: 'string',
             },
             hideSocket: true,
-            renderer: 'javascript',
+            attributes: {
+                renderer: 'javascript',
+            },
         }
     },
     result: {

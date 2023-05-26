@@ -2,7 +2,6 @@
 export * from './GraphSpec.js';
 export * from './HttpDict.js';
 export * from './ModuleName.js';
-export * from './ModuleParamHint.js';
 export * from './ModuleParamSpec.js';
 export * from './ModuleResultSpec.js';
 export * from './ModuleSpec.js';

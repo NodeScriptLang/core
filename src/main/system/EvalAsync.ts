@@ -19,7 +19,9 @@ export const EvalAsync = ModuleSpecSchema.create({
                 type: 'string',
             },
             hideSocket: true,
-            renderer: 'javascript',
+            attributes: {
+                renderer: 'javascript',
+            },
         }
     },
     result: {

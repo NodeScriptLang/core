@@ -12,7 +12,9 @@ export const EvalJson = ModuleSpecSchema.create({
                 type: 'string',
             },
             hideSocket: true,
-            renderer: 'json',
+            attributes: {
+                renderer: 'json',
+            },
         }
     },
     result: {

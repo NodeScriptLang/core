@@ -1,7 +1,6 @@
 import { Schema } from 'airtight';
 
 import { ModuleParamSpec } from '../types/index.js';
-import { ModuleParamHintSchema } from './ModuleParamHint.js';
 import { SchemaSpecSchema } from './SchemaSpec.js';
 
 export const ModuleParamSpecSchema = new Schema<ModuleParamSpec>({
@@ -49,20 +48,12 @@ export const ModuleParamSpecSchema = new Schema<ModuleParamSpec>({
             type: 'boolean',
             optional: true,
         },
-        renderer: {
-            type: 'string',
-            optional: true,
-        },
         attributes: {
             type: 'object',
             properties: {},
             additionalProperties: {
                 type: 'any',
             }
-        },
-        hint: {
-            ...ModuleParamHintSchema.schema,
-            optional: true,
         },
     }
 });
