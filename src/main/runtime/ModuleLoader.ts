@@ -23,7 +23,6 @@ export abstract class GenericModuleLoader implements ModuleLoader {
     }
 
     abstract resolveComputeUrl(ref: string): string;
-    abstract fetchModule(ref: string): Promise<ModuleSpec>;
 
     resolveModule(ref: string): ModuleSpec {
         return this.getModule(ref) ?? this.createUnresolved(ref);
@@ -42,6 +41,12 @@ export abstract class GenericModuleLoader implements ModuleLoader {
         const module = await this.fetchModule(ref);
         this.modules.set(ref, module);
         return module;
+    }
+
+    async fetchModule(ref: string): Promise<ModuleSpec> {
+        const url = this.resolveComputeUrl(ref);
+        const { module } = await import(url);
+        return ModuleSpecSchema.decode(module);
     }
 
     addModule(moduleRef: string, moduleSpec: ModuleSpec): ModuleSpec {
@@ -86,16 +91,6 @@ export class StandardModuleLoader extends GenericModuleLoader {
 
     resolveComputeUrl(ref: string): string {
         return new URL(ref + '.mjs', this.registryUrl).toString();
-    }
-
-    async fetchModule(ref: string): Promise<ModuleSpec> {
-        const url = this.resolveModuleUrl(ref);
-        const res = await fetch(url);
-        if (!res.ok) {
-            throw new ModuleLoadFailedError(`Failed to load module ${ref}: HTTP ${res.status}`, res.status);
-        }
-        const json = await res.json();
-        return ModuleSpecSchema.decode(json);
     }
 
 }
