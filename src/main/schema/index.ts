@@ -4,6 +4,7 @@ export * from './HttpDict.js';
 export * from './ModuleName.js';
 export * from './ModuleParamSpec.js';
 export * from './ModuleResultSpec.js';
+export * from './ModuleSubgraphSpec.js';
 export * from './ModuleSpec.js';
 export * from './ModuleVersion.js';
 export * from './NodeCacheMode.js';
