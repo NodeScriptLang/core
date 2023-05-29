@@ -1,4 +1,3 @@
-import { ModuleSpecSchema } from '../schema/ModuleSpec.js';
 import { GraphSpec } from '../types/model.js';
 import { clone } from '../util/clone.js';
 import { MultiMap } from '../util/multimap.js';
@@ -88,53 +87,14 @@ export class GraphView {
         return map;
     }
 
-    /**
-     * Returns nodes in right-to-left order based on topology.
-     */
-    orderNodes(nodes: Iterable<NodeView>): NodeView[] {
-        const result = [...nodes];
-        for (let i = 0; i < result.length; i++) {
-            const node = result[i];
-            for (const link of node.inboundLinks()) {
-                const index = result.findIndex(_ => _.nodeId === link.linkNode.nodeId);
-                if (index > -1 && index < i) {
-                    result.splice(i, 1);
-                    result.splice(index, 0, node);
-                    i = index;
-                }
-            }
-        }
-        return result;
-    }
-
-    getSubgraphById(id: string): GraphView | null {
-        const subgraphSpec = this.graphSpec.subgraphs[id];
-        return subgraphSpec ? new GraphView(this.loader, {
-            rootNodeId: subgraphSpec.rootNodeId,
-            nodes: subgraphSpec.nodes,
-            metadata: {},
-            moduleSpec: ModuleSpecSchema.create({}),
-            subgraphs: this.graphSpec.subgraphs,
-        }) : null;
-    }
-
-    getUsedSubgraphs(): GraphView[] {
-        return Object.values(this.graphSpec.nodes)
-            .filter(_ => _.ref === '@system/Subgraph')
-            .map(_ => this.getSubgraphById(_.metadata.subgraphId))
-            .filter(Boolean) as GraphView[];
-    }
-
-    *collectAllRefs(): Iterable<string> {
-        for (const subgraph of [this, ...this.getUsedSubgraphs()]) {
-            for (const nodeSpec of Object.values(subgraph.graphSpec.nodes)) {
-                yield nodeSpec.ref;
-            }
+    *collectRefs(): Iterable<string> {
+        for (const node of this.getNodes()) {
+            yield* node.collectRefs();
         }
     }
 
     uniqueRefs() {
-        return [...new Set(this.collectAllRefs())];
+        return [...new Set(this.collectRefs())];
     }
 
     async loadRefs() {

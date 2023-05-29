@@ -14,14 +14,12 @@ export class CompilerJob {
     private symbols = new CompilerSymbols();
     private code = new CodeBuilder();
     private mainScope: CompilerScope;
-    private subgraphScopes: CompilerScope[];
 
     constructor(
         readonly graphView: GraphView,
         readonly options: CompilerOptions,
     ) {
         this.mainScope = new CompilerScope('root', this.code, this.graphView, this.symbols, this.options);
-        this.subgraphScopes = [...this.collectSubgraphScopes()];
     }
 
     run() {
@@ -40,7 +38,8 @@ export class CompilerJob {
     }
 
     allScopes() {
-        return [this.mainScope, ...this.subgraphScopes];
+        // TODO add all subgraphs recursively
+        return [this.mainScope];
     }
 
     getModuleSpec(): ModuleSpec {
@@ -65,11 +64,9 @@ export class CompilerJob {
     private emitImports() {
         this.emitComment('Imports');
         const loader = this.graphView.loader;
-        const allRefs = this.allScopes()
-            .flatMap(_ => _.getEmittedNodes())
-            .map(_ => _.ref);
-        const moduleRefs = new Set(allRefs);
-        for (const moduleRef of moduleRefs) {
+        const allRefs = [...this.collectEmittedNodes()].map(_ => _.ref);
+        const uniqueRefs = new Set(allRefs);
+        for (const moduleRef of uniqueRefs) {
             if (moduleRef.startsWith('@system/')) {
                 continue;
             }
@@ -91,10 +88,16 @@ export class CompilerJob {
         this.emitComment('Node Map');
         this.code.line('export const nodeMap = new Map()');
         for (const scope of this.allScopes()) {
-            for (const node of scope.getEmittedNodes()) {
+            for (const node of this.collectEmittedNodes()) {
                 const sym = this.symbols.getNodeSym(scope.scopeId, node.nodeId);
                 this.code.line(`nodeMap.set(${JSON.stringify(node.nodeId)}, ${sym})`);
             }
+        }
+    }
+
+    private *collectEmittedNodes() {
+        for (const scope of this.allScopes()) {
+            yield* scope.getEmittedNodes();
         }
     }
 
@@ -111,22 +114,6 @@ export class CompilerJob {
     private emitComment(str: string) {
         if (this.options.comments) {
             this.code.line(`// ${str}`);
-        }
-    }
-
-    private *collectSubgraphScopes(): Iterable<CompilerScope> {
-        for (const node of this.mainScope.getEmittedNodes()) {
-            if (node.ref !== '@system/Subgraph') {
-                continue;
-            }
-            const { subgraphId } = node.metadata;
-            const subgraph = this.graphView.getSubgraphById(subgraphId);
-            if (subgraph) {
-                yield new CompilerScope(subgraphId, this.code, subgraph, this.symbols, {
-                    ...this.options,
-                    rootNodeId: subgraph.rootNodeId,
-                });
-            }
         }
     }
 

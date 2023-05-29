@@ -186,4 +186,9 @@ export class NodeView {
         return false;
     }
 
+    *collectRefs(): Iterable<string> {
+        yield this.ref;
+        // TODO yield* this.subgraph.collectRefs();
+    }
+
 }

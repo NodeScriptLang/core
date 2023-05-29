@@ -5,7 +5,6 @@ export interface GraphSpec {
     moduleSpec: ModuleSpec;
     rootNodeId: string;
     nodes: Record<string, NodeSpec>;
-    subgraphs: Record<string, SubgraphSpec>;
     metadata: Record<string, any>;
 }
 

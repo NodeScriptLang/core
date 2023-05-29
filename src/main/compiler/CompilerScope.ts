@@ -54,7 +54,7 @@ export class CompilerScope {
         }
         const rootNode = this.graphView.getNodeById(this.options.rootNodeId);
         if (rootNode) {
-            return this.graphView.orderNodes([...rootNode.leftNodes()]);
+            return [...rootNode.leftNodes()];
         }
         return [];
     }
