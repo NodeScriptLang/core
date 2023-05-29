@@ -97,6 +97,16 @@ export class GraphView {
         return [...new Set(this.collectRefs())];
     }
 
+    *collectSubgraphs(): Iterable<GraphView> {
+        for (const node of this.getNodes()) {
+            const subgraph = node.getSubgraph();
+            if (subgraph) {
+                yield subgraph;
+                yield* subgraph.collectSubgraphs();
+            }
+        }
+    }
+
     async loadRefs() {
         const promises = [];
         for (const moduleRef of this.uniqueRefs()) {

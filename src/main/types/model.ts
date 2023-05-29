@@ -11,12 +11,14 @@ export interface GraphSpec {
 export interface SubgraphSpec {
     rootNodeId: string;
     nodes: Record<string, NodeSpec>;
+    metadata: Record<string, any>;
 }
 
 export interface NodeSpec {
     ref: string;
     props: Record<string, PropSpec>;
     metadata: NodeMetadata;
+    subgraph?: SubgraphSpec;
 }
 
 export interface PropSpec {

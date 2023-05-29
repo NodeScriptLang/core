@@ -1,6 +1,6 @@
 import { GraphView } from '../runtime/index.js';
 import { ModuleSpec } from '../types/index.js';
-import { clone } from '../util/index.js';
+import { clone, shortId } from '../util/index.js';
 import { CodeBuilder } from './CodeBuilder.js';
 import { CompilerScope } from './CompilerScope.js';
 import { CompilerSymbols } from './CompilerSymbols.js';
@@ -14,12 +14,18 @@ export class CompilerJob {
     private symbols = new CompilerSymbols();
     private code = new CodeBuilder();
     private mainScope: CompilerScope;
+    private subgraphScopes: CompilerScope[];
 
     constructor(
         readonly graphView: GraphView,
         readonly options: CompilerOptions,
     ) {
         this.mainScope = new CompilerScope('root', this.code, this.graphView, this.symbols, this.options);
+        this.subgraphScopes = [...this.graphView.collectSubgraphs()]
+            .map(subgraph => {
+                const scopeId = shortId();
+                return new CompilerScope(scopeId, this.code, subgraph, this.symbols, this.options);
+            });
     }
 
     run() {
@@ -29,7 +35,6 @@ export class CompilerJob {
         this.prepareNodeSymbols();
         this.emitImports();
         this.emitNodeFunctions();
-        // this.emitExportModule();
         this.emitExportCompute();
         if (this.options.emitNodeMap) {
             this.emitNodeMap();
@@ -38,8 +43,7 @@ export class CompilerJob {
     }
 
     allScopes() {
-        // TODO add all subgraphs recursively
-        return [this.mainScope];
+        return [this.mainScope, ...this.subgraphScopes];
     }
 
     getModuleSpec(): ModuleSpec {

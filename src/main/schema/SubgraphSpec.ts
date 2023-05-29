@@ -1,7 +1,6 @@
 import { Schema } from 'airtight';
 
 import { SubgraphSpec } from '../types/model.js';
-import { NodeSpecSchema } from './NodeSpec.js';
 
 export const SubgraphSpecSchema = new Schema<SubgraphSpec>({
     id: 'SubgraphSpec',
@@ -11,7 +10,15 @@ export const SubgraphSpecSchema = new Schema<SubgraphSpec>({
         nodes: {
             type: 'object',
             properties: {},
-            additionalProperties: NodeSpecSchema.schema,
+            additionalProperties: {
+                type: 'ref',
+                schemaId: 'NodeSpec',
+            },
+        },
+        metadata: {
+            type: 'object',
+            properties: {},
+            additionalProperties: { type: 'any' },
         },
     }
 });

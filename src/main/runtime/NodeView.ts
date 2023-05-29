@@ -1,5 +1,6 @@
 import { coerce } from 'airtight';
 
+import { ModuleSpecSchema } from '../schema/ModuleSpec.js';
 import { PropSpecSchema } from '../schema/PropSpec.js';
 import { NodeSpec } from '../types/model.js';
 import { ModuleSpec } from '../types/module.js';
@@ -49,6 +50,22 @@ export class NodeView {
 
     isRoot() {
         return this.graph.rootNodeId === this.nodeId;
+    }
+
+    getSubgraph(): GraphView | null {
+        const { subgraph } = this.getModuleSpec();
+        if (!subgraph) {
+            return null;
+        }
+        const { nodes = {}, rootNodeId = '', metadata = {} } = this.nodeSpec.subgraph ?? {};
+        // TODO r1 add params and result if needed
+        const moduleSpec = ModuleSpecSchema.create({});
+        return new GraphView(this.loader, {
+            moduleSpec,
+            nodes,
+            rootNodeId,
+            metadata,
+        });
     }
 
     getProps(): PropView[] {
@@ -188,7 +205,10 @@ export class NodeView {
 
     *collectRefs(): Iterable<string> {
         yield this.ref;
-        // TODO yield* this.subgraph.collectRefs();
+        const subgraph = this.getSubgraph();
+        if (subgraph) {
+            yield* subgraph.collectRefs();
+        }
     }
 
 }
