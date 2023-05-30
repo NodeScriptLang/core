@@ -9,12 +9,12 @@ describe('Compiler: subgraphs', () => {
 
     describe('Flow / Step', () => {
 
-        it.skip('returns the value from subgraph', async () => {
+        it('returns the value from subgraph', async () => {
             const graph = await runtime.loadGraph({
                 rootNodeId: 'res',
                 nodes: {
                     res: {
-                        ref: 'Flow.Step',
+                        ref: 'Flow.Subgraph',
                         subgraph: {
                             rootNodeId: 'out',
                             nodes: {
@@ -32,7 +32,6 @@ describe('Compiler: subgraphs', () => {
                 },
             });
             const { code } = new GraphCompiler().compileEsm(graph);
-            // console.log(code);
             const { compute } = await evalEsmModule(code);
             const ctx = new GraphEvalContext();
             const res = await compute({}, ctx);

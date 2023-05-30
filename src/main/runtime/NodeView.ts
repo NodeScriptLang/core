@@ -57,6 +57,7 @@ export class NodeView {
         if (!subgraph) {
             return null;
         }
+        const scopeId = [this.graph.scopeId, this.nodeId].join('/');
         const { nodes = {}, rootNodeId = '', metadata = {} } = this.nodeSpec.subgraph ?? {};
         // TODO r1 add params and result if needed
         const moduleSpec = ModuleSpecSchema.create({});
@@ -65,7 +66,7 @@ export class NodeView {
             nodes,
             rootNodeId,
             metadata,
-        });
+        }, scopeId);
     }
 
     getProps(): PropView[] {
@@ -201,14 +202,6 @@ export class NodeView {
             }
         }
         return false;
-    }
-
-    *collectRefs(): Iterable<string> {
-        yield this.ref;
-        const subgraph = this.getSubgraph();
-        if (subgraph) {
-            yield* subgraph.collectRefs();
-        }
     }
 
 }

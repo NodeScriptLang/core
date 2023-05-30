@@ -1,10 +1,8 @@
 import { GraphView, NodeLink, NodeView, PropLineView, PropView } from '../runtime/index.js';
 import { SchemaSpec } from '../types/schema.js';
 import { convertAuto, isSchemaCompatible, MultiMap } from '../util/index.js';
-import { CodeBuilder } from './CodeBuilder.js';
 import { CompilerError } from './CompilerError.js';
-import { CompilerSymbols } from './CompilerSymbols.js';
-import { CompilerOptions } from './GraphCompiler.js';
+import { CompilerJob } from './CompilerJob.js';
 
 export class CompilerScope {
 
@@ -14,15 +12,28 @@ export class CompilerScope {
     private lineExprMap = new Map<string, string>();
 
     constructor(
-        readonly scopeId: string,
-        readonly code: CodeBuilder,
-        readonly graphView: GraphView,
-        readonly symbols: CompilerSymbols,
-        readonly options: CompilerOptions,
+        readonly job: CompilerJob,
+        readonly graph: GraphView,
     ) {
         this.emittedNodes = this.computeEmittedNodes();
-        this.linkMap = graphView.computeLinkMap();
+        this.linkMap = graph.computeLinkMap();
         this.async = this.emittedNodes.some(_ => _.getModuleSpec().result.async);
+    }
+
+    get scopeId() {
+        return this.graph.scopeId;
+    }
+
+    get code() {
+        return this.job.code;
+    }
+
+    get symbols() {
+        return this.job.symbols;
+    }
+
+    get options() {
+        return this.job.options;
     }
 
     getEmittedNodes() {
@@ -50,9 +61,9 @@ export class CompilerScope {
 
     private computeEmittedNodes() {
         if (this.options.emitAll) {
-            return this.graphView.getNodes();
+            return this.graph.getNodes();
         }
-        const rootNode = this.graphView.getRootNode();
+        const rootNode = this.graph.getRootNode();
         if (rootNode) {
             return [...rootNode.leftNodes()];
         }
@@ -298,9 +309,20 @@ export class CompilerScope {
     }
 
     private emitGenericCompute(node: NodeView, resSym: string) {
-        const computeSym = this.symbols.getComputeSym(node.ref);
         this.code.line(`ctx.nodeId = ${JSON.stringify(node.nodeId)};`);
-        this.code.block(`${resSym} = ${this.awaitSym(node)}${computeSym}({`, `}, ctx.newScope());`, () => {
+        this.code.line(`const $ctx = ctx.newScope();`);
+        const subgraph = node.getSubgraph();
+        if (subgraph) {
+            const rootNode = subgraph.getRootNode();
+            if (rootNode) {
+                const subgraphSym = this.symbols.getNodeSym(subgraph.scopeId, rootNode.nodeId);
+                this.code.line(`$ctx.subgraph = ${subgraphSym};`);
+            } else {
+                this.code.line(`$ctx.subgraph = () => undefined;`);
+            }
+        }
+        const computeSym = this.symbols.getComputeSym(node.ref);
+        this.code.block(`${resSym} = ${this.awaitSym(node)}${computeSym}({`, `}, $ctx);`, () => {
             this.emitNodeProps(node);
         });
     }

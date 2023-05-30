@@ -1,6 +1,6 @@
 import { GraphView } from '../runtime/index.js';
 import { ModuleSpec } from '../types/index.js';
-import { clone, shortId } from '../util/index.js';
+import { clone } from '../util/index.js';
 import { CodeBuilder } from './CodeBuilder.js';
 import { CompilerScope } from './CompilerScope.js';
 import { CompilerSymbols } from './CompilerSymbols.js';
@@ -10,22 +10,25 @@ import { CompilerOptions } from './GraphCompiler.js';
  * Compiler's unit of work.
  */
 export class CompilerJob {
-    private done = false;
-    private symbols = new CompilerSymbols();
-    private code = new CodeBuilder();
-    private mainScope: CompilerScope;
-    private subgraphScopes: CompilerScope[];
+    done = false;
+    symbols = new CompilerSymbols();
+    code = new CodeBuilder();
+
+    scopeMap = new Map<string, CompilerScope>();
+    mainScope: CompilerScope;
 
     constructor(
         readonly graphView: GraphView,
         readonly options: CompilerOptions,
     ) {
-        this.mainScope = new CompilerScope('root', this.code, this.graphView, this.symbols, this.options);
-        this.subgraphScopes = [...this.graphView.collectSubgraphs()]
+        this.mainScope = new CompilerScope(this, this.graphView);
+        const subgraphScopes = [...this.graphView.collectSubgraphs()]
             .map(subgraph => {
-                const scopeId = shortId();
-                return new CompilerScope(scopeId, this.code, subgraph, this.symbols, this.options);
+                return new CompilerScope(this, subgraph);
             });
+        for (const scope of [this.mainScope, ...subgraphScopes]) {
+            this.scopeMap.set(scope.scopeId, scope);
+        }
     }
 
     run() {
@@ -43,7 +46,7 @@ export class CompilerJob {
     }
 
     allScopes() {
-        return [this.mainScope, ...this.subgraphScopes];
+        return this.scopeMap.values();
     }
 
     getModuleSpec(): ModuleSpec {

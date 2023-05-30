@@ -26,7 +26,7 @@ const subgraph: SubgraphDefinition<SIn, SOut> = {
 
 export const module: ModuleDefinition<P, R> = {
     version: '1.0.0',
-    moduleName: 'Flow / Step',
+    moduleName: 'Flow / Subgraph',
     params: {
         scope: {
             schema: {
@@ -48,7 +48,6 @@ export const module: ModuleDefinition<P, R> = {
 export const compute: ModuleCompute<P, R> = async (params, ctx) => {
     const { scope } = params;
     // TODO r1 obtain subgraph
-    // ctx.getSubgraph<S>() or something nicer?
     const subgraph: (params: SIn, ctx: GraphEvalContext) => Promise<SOut> = (ctx as any).subgraph;
     const value = await subgraph({ ...scope }, ctx.newScope());
     return value;

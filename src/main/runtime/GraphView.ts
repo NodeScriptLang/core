@@ -9,6 +9,7 @@ export class GraphView {
     constructor(
         readonly loader: ModuleLoader,
         protected graphSpec: GraphSpec,
+        readonly scopeId = 'root',
     ) {}
 
     toJSON() {
@@ -89,7 +90,11 @@ export class GraphView {
 
     *collectRefs(): Iterable<string> {
         for (const node of this.getNodes()) {
-            yield* node.collectRefs();
+            yield node.ref;
+            const subgraph = node.getSubgraph();
+            if (subgraph) {
+                yield* subgraph.collectRefs();
+            }
         }
     }
 
@@ -108,12 +113,18 @@ export class GraphView {
     }
 
     async loadRefs() {
+        // Note: we need to load own graph refs first before loading subgraphs,
+        // because subgraphs cannot be resolved without their enclosing node's moduleSpec
         const promises = [];
         for (const moduleRef of this.uniqueRefs()) {
             const promise = this.loader.loadModule(moduleRef);
             promises.push(promise);
         }
-        return await Promise.allSettled(promises);
+        await Promise.allSettled(promises);
+        // 2. load all subgraphs
+        for (const subgraph of this.collectSubgraphs()) {
+            await subgraph.loadRefs();
+        }
     }
 
 }
