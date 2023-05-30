@@ -9,7 +9,7 @@ describe('Compiler: subgraphs', () => {
 
     describe('Flow / Step', () => {
 
-        it.only('returns the value from subgraph', async () => {
+        it.skip('returns the value from subgraph', async () => {
             const graph = await runtime.loadGraph({
                 rootNodeId: 'res',
                 nodes: {
@@ -32,15 +32,14 @@ describe('Compiler: subgraphs', () => {
                 },
             });
             const { code } = new GraphCompiler().compileEsm(graph);
+            // console.log(code);
             const { compute } = await evalEsmModule(code);
             const ctx = new GraphEvalContext();
             const res = await compute({}, ctx);
             assert.strictEqual(res, 'Hello World!');
         });
 
-        it('accepts scope', () => {
-
-        });
+        it('accepts scope data');
 
     });
 

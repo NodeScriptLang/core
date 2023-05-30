@@ -106,7 +106,7 @@ export class CompilerJob {
     }
 
     private emitExportCompute() {
-        const rootNode = this.graphView.getNodeById(this.options.rootNodeId);
+        const rootNode = this.graphView.getRootNode();
         if (!rootNode) {
             this.code.line(`export const compute = () => undefined;`);
         } else {

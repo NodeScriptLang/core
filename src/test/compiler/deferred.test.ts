@@ -11,6 +11,7 @@ describe('Compiler: deferred', () => {
 
     it('does not evaluate branch based on condition', async () => {
         const graph = await runtime.loadGraph({
+            rootNodeId: 'if',
             nodes: {
                 n1: {
                     ref: 'Math.Add',
@@ -37,7 +38,6 @@ describe('Compiler: deferred', () => {
             },
         });
         const { code } = new GraphCompiler().compileEsm(graph, {
-            rootNodeId: 'if',
             introspect: true,
         });
         const ctx = new GraphEvalContext();
@@ -56,6 +56,7 @@ describe('Compiler: deferred', () => {
 
     it('supports array expansion', async () => {
         const graph = await runtime.loadGraph({
+            rootNodeId: 'if',
             nodes: {
                 conditions: {
                     ref: 'Array',
@@ -98,7 +99,6 @@ describe('Compiler: deferred', () => {
             },
         });
         const { code } = new GraphCompiler().compileEsm(graph, {
-            rootNodeId: 'if',
             introspect: true,
         });
         const ctx = new GraphEvalContext();
@@ -124,6 +124,7 @@ describe('Compiler: deferred', () => {
 
     it('does not evaluate branch when expanded', async () => {
         const graph = await runtime.loadGraph({
+            rootNodeId: 'if',
             nodes: {
                 conditions: {
                     ref: 'Array',
@@ -166,7 +167,6 @@ describe('Compiler: deferred', () => {
             },
         });
         const { code } = new GraphCompiler().compileEsm(graph, {
-            rootNodeId: 'if',
             introspect: true,
         });
         const ctx = new GraphEvalContext();
@@ -190,6 +190,7 @@ describe('Compiler: deferred', () => {
 
     it('works with async nodes', async () => {
         const graph = await runtime.loadGraph({
+            rootNodeId: 'if',
             nodes: {
                 n1: {
                     ref: 'Promise',
@@ -214,7 +215,6 @@ describe('Compiler: deferred', () => {
             },
         });
         const { code } = new GraphCompiler().compileEsm(graph, {
-            rootNodeId: 'if',
             introspect: true,
         });
         const ctx = new GraphEvalContext();
@@ -233,6 +233,7 @@ describe('Compiler: deferred', () => {
 
     it('works with async + expand', async () => {
         const graph = await runtime.loadGraph({
+            rootNodeId: 'if',
             nodes: {
                 conditions: {
                     ref: 'Array',
@@ -287,7 +288,6 @@ describe('Compiler: deferred', () => {
             },
         });
         const { code } = new GraphCompiler().compileEsm(graph, {
-            rootNodeId: 'if',
             introspect: true,
         });
         const ctx = new GraphEvalContext();
@@ -317,6 +317,7 @@ describe('Compiler: deferred', () => {
 
     it('supports deferred entries (Fallback)', async () => {
         const graph = await runtime.loadGraph({
+            rootNodeId: 'fallback',
             nodes: {
                 n1: {
                     ref: '@system/EvalSync',
@@ -351,7 +352,6 @@ describe('Compiler: deferred', () => {
             },
         });
         const { code } = new GraphCompiler().compileEsm(graph, {
-            rootNodeId: 'fallback',
             introspect: true,
         });
         const ctx = new GraphEvalContext();

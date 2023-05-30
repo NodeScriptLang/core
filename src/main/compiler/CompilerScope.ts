@@ -52,7 +52,7 @@ export class CompilerScope {
         if (this.options.emitAll) {
             return this.graphView.getNodes();
         }
-        const rootNode = this.graphView.getNodeById(this.options.rootNodeId);
+        const rootNode = this.graphView.getRootNode();
         if (rootNode) {
             return [...rootNode.leftNodes()];
         }
