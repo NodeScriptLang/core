@@ -1,4 +1,4 @@
-import { GraphEvalContext, ModuleCompute, ModuleDefinition, SubgraphDefinition } from '../../main/types/index.js';
+import { SubgraphModuleCompute, SubgraphModuleDefinition } from '../../main/types/index.js';
 
 type P = {
     array: unknown[];
@@ -7,37 +7,18 @@ type P = {
 
 type R = Promise<unknown>;
 
-type SIn = {
+type SI = {
     item: unknown;
     index: number;
     [key: string]: unknown;
 };
 
-type SOut = {
+type SO = {
     done: boolean;
     result: unknown;
 };
 
-const subgraph: SubgraphDefinition<SIn, SOut> = {
-    input: {
-        item: {
-            schema: { type: 'any' },
-        },
-        index: {
-            schema: { type: 'number' },
-        },
-    },
-    output: {
-        done: {
-            schema: { type: 'boolean' },
-        },
-        result: {
-            schema: { type: 'any' },
-        }
-    }
-};
-
-export const module: ModuleDefinition<P, R> = {
+export const module: SubgraphModuleDefinition<P, R, SI, SO> = {
     version: '1.0.0',
     moduleName: 'Flow / Scan',
     description: 'Executes a subgraph for each array item. The subgraph decides whether to continue iterating or not and what result to return.',
@@ -63,14 +44,28 @@ export const module: ModuleDefinition<P, R> = {
             type: 'any',
         },
     },
-    subgraph,
+    subgraph: {
+        input: {
+            item: {
+                schema: { type: 'any' },
+            },
+            index: {
+                schema: { type: 'number' },
+            },
+        },
+        output: {
+            done: {
+                schema: { type: 'boolean' },
+            },
+            result: {
+                schema: { type: 'any' },
+            }
+        }
+    },
 };
 
-export const compute: ModuleCompute<P, R> = async (params, ctx) => {
+export const compute: SubgraphModuleCompute<P, R, SI, SO> = async (params, ctx, subgraph) => {
     const { array, scope } = params;
-    // TODO r1 obtain subgraph
-    // ctx.getSubgraph<S>() or something nicer?
-    const subgraph: (params: SIn, ctx: GraphEvalContext) => Promise<SOut> = (ctx as any).subgraph;
     for (let index = 0; index < array.length; index++) {
         const item = array[index];
         const res = await subgraph({

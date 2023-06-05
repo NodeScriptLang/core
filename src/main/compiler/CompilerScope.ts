@@ -239,6 +239,8 @@ export class CompilerScope {
         switch (node.ref) {
             case '@system/Param': return this.emitParamNode(node, resSym);
             case '@system/Result': return this.emitResultNode(node, resSym);
+            case '@system/Input': return this.emitInputNode(node, resSym);
+            case '@system/Output': return this.emitOutputNode(node, resSym);
             case '@system/Comment':
             case '@system/Frame':
                 return;
@@ -260,6 +262,16 @@ export class CompilerScope {
     }
 
     private emitResultNode(node: NodeView, resSym: string) {
+        const prop = node.getProp('value')!;
+        const expr = this.getLineExpr(prop);
+        this.code.line(`${resSym} = ${expr};`);
+    }
+
+    private emitInputNode(node: NodeView, resSym: string) {
+        this.code.line(`${resSym} = params;`);
+    }
+
+    private emitOutputNode(node: NodeView, resSym: string) {
         const prop = node.getProp('value')!;
         const expr = this.getLineExpr(prop);
         this.code.line(`${resSym} = ${expr};`);
@@ -310,21 +322,25 @@ export class CompilerScope {
 
     private emitGenericCompute(node: NodeView, resSym: string) {
         this.code.line(`ctx.nodeId = ${JSON.stringify(node.nodeId)};`);
-        this.code.line(`const $ctx = ctx.newScope();`);
+        const computeSym = this.symbols.getComputeSym(node.ref);
+        const scopeSym = this.graph.moduleSpec.newScope ? `ctx.newScope()` : `ctx`;
+        const subgraphSym = this.getSubgraphExpr(node);
+        const argsExpr = [scopeSym, subgraphSym].filter(Boolean).join(',');
+        this.code.block(`${resSym} = ${this.awaitSym(node)}${computeSym}({`, `}, ${argsExpr});`, () => {
+            this.emitNodeProps(node);
+        });
+    }
+
+    private getSubgraphExpr(node: NodeView) {
         const subgraph = node.getSubgraph();
         if (subgraph) {
             const rootNode = subgraph.getRootNode();
             if (rootNode) {
-                const subgraphSym = this.symbols.getNodeSym(subgraph.scopeId, rootNode.nodeId);
-                this.code.line(`$ctx.subgraph = ${subgraphSym};`);
-            } else {
-                this.code.line(`$ctx.subgraph = () => undefined;`);
+                return this.symbols.getNodeSym(subgraph.scopeId, rootNode.nodeId);
             }
+            return `() => undefined;`;
         }
-        const computeSym = this.symbols.getComputeSym(node.ref);
-        this.code.block(`${resSym} = ${this.awaitSym(node)}${computeSym}({`, `}, $ctx);`, () => {
-            this.emitNodeProps(node);
-        });
+        return '';
     }
 
     private emitNodeProps(node: NodeView) {

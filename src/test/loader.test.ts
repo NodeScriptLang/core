@@ -26,6 +26,7 @@ describe('ModuleLoader', () => {
             result: {
                 schema: { type: 'number' }
             },
+            newScope: false,
             cacheMode: 'auto',
             evalMode: 'auto',
             resizeMode: 'horizontal',

@@ -39,11 +39,14 @@ export const ModuleSpecSchema = new Schema<ModuleSpec>({
             properties: {},
             additionalProperties: ModuleParamSpecSchema.schema,
         },
+        result: ModuleResultSpecSchema.schema,
         subgraph: {
             ...ModuleSubgraphSpecSchema.schema,
             optional: true,
         },
-        result: ModuleResultSpecSchema.schema,
+        newScope: {
+            type: 'boolean',
+        },
         cacheMode: NodeCacheModeSchema.schema,
         evalMode: NodeEvalModeSchema.schema,
         resizeMode: NodeResizeModeSchema.schema,

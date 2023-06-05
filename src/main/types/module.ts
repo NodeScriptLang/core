@@ -11,6 +11,7 @@ export interface ModuleSpec {
     params: Record<string, ModuleParamSpec>;
     result: ModuleResultSpec;
     subgraph?: ModuleSubgraphSpec;
+    newScope: boolean;
     cacheMode: NodeCacheMode;
     evalMode: NodeEvalMode;
     resizeMode: NodeResizeMode;

@@ -1,4 +1,4 @@
-import { GraphEvalContext, ModuleCompute, ModuleDefinition, SubgraphDefinition } from '../../main/types/index.js';
+import { SubgraphModuleCompute, SubgraphModuleDefinition } from '../../main/types/index.js';
 
 type P = {
     scope: Record<string, any>;
@@ -6,25 +6,15 @@ type P = {
 
 type R = Promise<unknown>;
 
-type SIn = {
+type SI = {
     [key: string]: unknown;
 };
 
-type SOut = {
+type SO = {
     result: unknown;
 };
 
-const subgraph: SubgraphDefinition<SIn, SOut> = {
-    input: {},
-    output: {
-
-        result: {
-            schema: { type: 'any' },
-        }
-    }
-};
-
-export const module: ModuleDefinition<P, R> = {
+export const module: SubgraphModuleDefinition<P, R, SI, SO> = {
     version: '1.0.0',
     moduleName: 'Flow / Subgraph',
     params: {
@@ -42,13 +32,18 @@ export const module: ModuleDefinition<P, R> = {
             type: 'any',
         },
     },
-    subgraph,
+    subgraph: {
+        input: {},
+        output: {
+            result: {
+                schema: { type: 'any' },
+            }
+        }
+    },
 };
 
-export const compute: ModuleCompute<P, R> = async (params, ctx) => {
+export const compute: SubgraphModuleCompute<P, R, SI, SO> = async (params, ctx, subgraph) => {
     const { scope } = params;
-    // TODO r1 obtain subgraph
-    const subgraph: (params: SIn, ctx: GraphEvalContext) => Promise<SOut> = (ctx as any).subgraph;
     const value = await subgraph({ ...scope }, ctx.newScope());
     return value;
 };

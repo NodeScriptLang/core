@@ -4,12 +4,15 @@ import { ModuleVersion } from '../schema/ModuleVersion.js';
 import { GraphEvalContext } from './ctx.js';
 import { ModuleParamSpec, ModuleResultSpec, ModuleSpec } from './module.js';
 
-export type ModuleDefinition<P = unknown, R = unknown> = Omit<Partial<ModuleSpec>, 'params' | 'result' | 'subgraph'> & {
+export type ModuleDefinition<P, R> = Omit<Partial<ModuleSpec>, 'params' | 'result' | 'subgraph'> & {
     moduleName: string;
     version: ModuleVersion;
     params: ParamsDefinition<P>;
     result: ResultDefinition<R>;
-    subgraph?: SubgraphDefinition<any, any>;
+};
+
+export type SubgraphModuleDefinition<P, R, SI, SO> = ModuleDefinition<P, R> & {
+    subgraph: SubgraphDefinition<SI, SO>;
 };
 
 export type ParamsDefinition<P> = {
@@ -28,7 +31,9 @@ export type SimpleParamDef<T = unknown> = Omit<Partial<ModuleParamSpec>, 'schema
 
 export type ModuleCompute<P, R> = (this: void, params: P, ctx: GraphEvalContext) => R;
 
-export type SubgraphDefinition<SIn = unknown, SOut = unknown> = {
-    input: ParamsDefinition<SIn>;
-    output: ParamsDefinition<SOut>;
+export type SubgraphModuleCompute<P, R, SI, SO> = (this: void, params: P, ctx: GraphEvalContext, subgraph: ModuleCompute<SI, Promise<SO>>) => R;
+
+export type SubgraphDefinition<SI, SO> = {
+    input: ParamsDefinition<SI>;
+    output: ParamsDefinition<SO>;
 };

@@ -71,6 +71,7 @@ export abstract class GenericModuleLoader implements ModuleLoader {
             result: {
                 schema: { type: 'any' },
             },
+            newScope: false,
             cacheMode: 'auto',
             evalMode: 'auto',
             resizeMode: 'horizontal',
