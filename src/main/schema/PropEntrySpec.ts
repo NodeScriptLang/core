@@ -19,5 +19,6 @@ export const PropEntrySpecSchema = new Schema<PropEntrySpec>({
             optional: true,
         },
         expand: { type: 'boolean' },
+        managed: { type: 'boolean', optional: true },
     },
 });

@@ -35,6 +35,7 @@ export interface PropEntrySpec {
     linkId?: string;
     linkKey?: string;
     expand: boolean;
+    managed?: boolean;
 }
 
 export interface NodeMetadata {
