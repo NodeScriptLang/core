@@ -191,7 +191,7 @@ export class NodeView {
     }
 
     getEvalMode() {
-        if (this.metadata.evaluateManually) {
+        if (this.metadata.forceManualEval) {
             return 'manual';
         }
         return this.getModuleSpec().evalMode;
