@@ -179,6 +179,10 @@ export class CompilerScope {
         const targetSchema = line.getSchema();
         const linkNode = line.getLinkNode();
         const linkKey = line.linkKey;
+        if (this.options.comments) {
+            this.code.line(`// Line: ${line.getLineId()}`);
+            this.code.line(`// Schema: ${JSON.stringify(targetSchema)}`);
+        }
         // Linked
         if (linkNode) {
             const async = linkNode.isAsync();
@@ -237,17 +241,24 @@ export class CompilerScope {
 
     private emitNodeCompute(node: NodeView, resSym: string) {
         switch (node.ref) {
-            case '@system/Param': return this.emitParamNode(node, resSym);
-            case '@system/Result': return this.emitResultNode(node, resSym);
-            case '@system/Input': return this.emitInputNode(node, resSym);
-            case '@system/Output': return this.emitOutputNode(node, resSym);
+            case '@system/Param':
+                return this.emitParamNode(node, resSym);
+            case '@system/Input':
+                return this.emitInputNode(node, resSym);
+            case '@system/Result':
+            case '@system/Output':
+                return this.emitOutputNode(node, resSym);
             case '@system/Comment':
             case '@system/Frame':
                 return;
-            case '@system/EvalSync': return this.emitEvalSync(node, resSym);
-            case '@system/EvalAsync': return this.emitEvalAsync(node, resSym);
-            case '@system/EvalJson': return this.emitEvalJson(node, resSym);
-            default: return this.emitGenericCompute(node, resSym);
+            case '@system/EvalSync':
+                return this.emitEvalSync(node, resSym);
+            case '@system/EvalAsync':
+                return this.emitEvalAsync(node, resSym);
+            case '@system/EvalJson':
+                return this.emitEvalJson(node, resSym);
+            default:
+                return this.emitGenericCompute(node, resSym);
         }
     }
 
@@ -261,20 +272,15 @@ export class CompilerScope {
         }
     }
 
-    private emitResultNode(node: NodeView, resSym: string) {
-        const prop = node.getProp('value')!;
-        const expr = this.getLineExpr(prop);
-        this.code.line(`${resSym} = ${expr};`);
-    }
-
     private emitInputNode(node: NodeView, resSym: string) {
         this.code.line(`${resSym} = params;`);
     }
 
     private emitOutputNode(node: NodeView, resSym: string) {
-        const prop = node.getProp('value')!;
-        const expr = this.getLineExpr(prop);
-        this.code.line(`${resSym} = ${expr};`);
+        this.code.block(`const $p = {`, `}`, () => {
+            this.emitNodeProps(node);
+        });
+        this.code.line(`${resSym} = $p.value;`);
     }
 
     private emitEvalSync(node: NodeView, resSym: string) {

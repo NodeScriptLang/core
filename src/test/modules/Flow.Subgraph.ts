@@ -35,10 +35,8 @@ export const module: SubgraphModuleDefinition<P, R, SI, SO> = {
     subgraph: {
         input: {},
         output: {
-            result: {
-                schema: { type: 'any' },
-            }
-        }
+            result: { type: 'any' },
+        },
     },
 };
 

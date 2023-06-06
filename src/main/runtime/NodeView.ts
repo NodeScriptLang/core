@@ -7,6 +7,7 @@ import { ModuleSpec } from '../types/module.js';
 import { clone } from '../util/clone.js';
 import { GraphView } from './GraphView.js';
 import { PropEntryView, PropLineView, PropView } from './PropView.js';
+import { createSubgraphModuleSpec } from '../util/graph.js';
 
 export type NodeLink = {
     node: NodeView;
@@ -59,8 +60,7 @@ export class NodeView {
         }
         const scopeId = [this.graph.scopeId, this.nodeId].join('/');
         const { nodes = {}, rootNodeId = '', metadata = {} } = this.nodeSpec.subgraph ?? {};
-        // TODO r1 add params and result if needed
-        const moduleSpec = ModuleSpecSchema.create({});
+        const moduleSpec = createSubgraphModuleSpec(subgraph);
         return new GraphView(this.loader, {
             moduleSpec,
             nodes,

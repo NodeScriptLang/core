@@ -34,6 +34,10 @@ export type ModuleCompute<P, R> = (this: void, params: P, ctx: GraphEvalContext)
 export type SubgraphModuleCompute<P, R, SI, SO> = (this: void, params: P, ctx: GraphEvalContext, subgraph: ModuleCompute<SI, Promise<SO>>) => R;
 
 export type SubgraphDefinition<SI, SO> = {
-    input: ParamsDefinition<SI>;
-    output: ParamsDefinition<SO>;
+    input: SubgraphSchemaObject<SI>;
+    output: SubgraphSchemaObject<SO>;
+};
+
+export type SubgraphSchemaObject<O> = {
+    [K in keyof O]-?: SchemaDef<O[K]>;
 };

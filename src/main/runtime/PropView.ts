@@ -27,6 +27,9 @@ export abstract class PropLineView {
         this._paramSpec = this.node.getModuleSpec().params[this.propKey] ?? {
             schema: { type: 'any' },
         };
+        if (['@system/Output', '@system/Result'].includes(this.node.ref)) {
+            this._paramSpec.schema = this.graph.moduleSpec.result.schema;
+        }
     }
 
     toJSON() {
@@ -114,9 +117,6 @@ export class PropView extends PropLineView {
     }
 
     getSchema(): SchemaSpec {
-        if (this.node.ref === '@system/Result') {
-            return this.graph.moduleSpec.result.schema;
-        }
         return this.getParamSpec().schema;
     }
 
@@ -125,11 +125,13 @@ export class PropView extends PropLineView {
     }
 
     getEntries() {
+        // TODO add support for managed entries
         return (this.propSpec.entries ?? []).map(_ => new PropEntryView(this, _));
     }
 
     isSupportsEntries() {
-        const { schema, hideEntries } = this.getParamSpec();
+        const schema = this.getSchema();
+        const { hideEntries } = this.getParamSpec();
         return !hideEntries && (schema.type === 'object' || schema.type === 'array');
     }
 
@@ -189,7 +191,7 @@ export class PropEntryView extends PropLineView {
             case 'array':
                 return baseSchema.items ?? { type: 'any' };
             case 'object':
-                return baseSchema.additionalProperties ?? { type: 'any' };
+                return baseSchema.properties?.[this.key] ?? baseSchema.additionalProperties ?? { type: 'any' };
             default:
                 return { type: 'any' };
         }

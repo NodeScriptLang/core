@@ -46,20 +46,12 @@ export const module: SubgraphModuleDefinition<P, R, SI, SO> = {
     },
     subgraph: {
         input: {
-            item: {
-                schema: { type: 'any' },
-            },
-            index: {
-                schema: { type: 'number' },
-            },
+            item: { type: 'any' },
+            index: { type: 'number' },
         },
         output: {
-            done: {
-                schema: { type: 'boolean' },
-            },
-            result: {
-                schema: { type: 'any' },
-            }
+            done: { type: 'boolean' },
+            result: { type: 'any' },
         }
     },
 };

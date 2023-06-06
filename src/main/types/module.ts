@@ -40,8 +40,8 @@ export interface ModuleResultSpec {
 }
 
 export interface ModuleSubgraphSpec {
-    input: Record<string, ModuleParamSpec>;
-    output: Record<string, ModuleParamSpec>;
+    input: Record<string, SchemaSpec>;
+    output: Record<string, SchemaSpec>;
 }
 
 export type NodeEvalMode = 'auto' | 'manual';

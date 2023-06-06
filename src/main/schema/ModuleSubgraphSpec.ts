@@ -1,7 +1,7 @@
 import { Schema } from 'airtight';
 
 import { ModuleSubgraphSpec } from '../types/index.js';
-import { ModuleParamSpecSchema } from './ModuleParamSpec.js';
+import { SchemaSpecSchema } from './SchemaSpec.js';
 
 export const ModuleSubgraphSpecSchema = new Schema<ModuleSubgraphSpec>({
     id: 'ModuleSubgraphSpec',
@@ -10,12 +10,12 @@ export const ModuleSubgraphSpecSchema = new Schema<ModuleSubgraphSpec>({
         input: {
             type: 'object',
             properties: {},
-            additionalProperties: ModuleParamSpecSchema.schema,
+            additionalProperties: SchemaSpecSchema.schema,
         },
         output: {
             type: 'object',
             properties: {},
-            additionalProperties: ModuleParamSpecSchema.schema,
+            additionalProperties: SchemaSpecSchema.schema,
         },
     }
 });

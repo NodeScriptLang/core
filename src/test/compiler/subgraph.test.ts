@@ -216,13 +216,19 @@ describe('Compiler: subgraphs', () => {
                                 out: {
                                     ref: '@system/Output',
                                     props: {
-                                        done: {
-                                            linkId: 'if'
-                                        },
-                                        result: {
-                                            linkId: 'input',
-                                            linkKey: 'item.value'
-                                        },
+                                        value: {
+                                            entries: [
+                                                {
+                                                    key: 'done',
+                                                    linkId: 'if',
+                                                },
+                                                {
+                                                    key: 'result',
+                                                    linkId: 'input',
+                                                    linkKey: 'item.value',
+                                                },
+                                            ]
+                                        }
                                     },
                                 },
                             },
@@ -230,7 +236,9 @@ describe('Compiler: subgraphs', () => {
                     },
                 },
             });
-            const { code } = new GraphCompiler().compileEsm(graph);
+            const { code } = new GraphCompiler().compileEsm(graph, {
+                comments: true,
+            });
             const { compute } = await evalEsmModule(code);
             const ctx = new GraphEvalContext();
             const res = await compute({}, ctx);
