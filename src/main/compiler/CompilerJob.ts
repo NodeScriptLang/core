@@ -53,6 +53,7 @@ export class CompilerJob {
         const moduleSpec = clone(this.graphView.moduleSpec);
         moduleSpec.evalMode = this.mainScope.computeEvalMode();
         moduleSpec.result.async = this.mainScope.isAsync();
+        moduleSpec.newScope = true;
         return moduleSpec;
     }
 

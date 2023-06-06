@@ -26,6 +26,9 @@ export class NodeView {
         protected nodeSpec: NodeSpec,
     ) {
         this._moduleSpec = this.loader.resolveModule(this.nodeSpec.ref);
+        if (this.nodeSpec.ref === '@system/Result') {
+            this.nodeSpec.ref = '@system/Output';
+        }
     }
 
     toJSON() {
