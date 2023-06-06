@@ -344,7 +344,7 @@ export class CompilerScope {
             if (rootNode) {
                 return this.symbols.getNodeSym(subgraph.scopeId, rootNode.nodeId);
             }
-            return `() => undefined;`;
+            return `() => undefined`;
         }
         return '';
     }

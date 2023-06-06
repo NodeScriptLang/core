@@ -72,8 +72,7 @@ export class CompilerJob {
     private emitImports() {
         this.emitComment('Imports');
         const loader = this.graphView.loader;
-        const allRefs = [...this.collectEmittedNodes()].map(_ => _.ref);
-        const uniqueRefs = new Set(allRefs);
+        const uniqueRefs = new Set([...this.collectEmittedRefs()]);
         for (const moduleRef of uniqueRefs) {
             if (moduleRef.startsWith('@system/')) {
                 continue;
@@ -96,16 +95,18 @@ export class CompilerJob {
         this.emitComment('Node Map');
         this.code.line('export const nodeMap = new Map()');
         for (const scope of this.allScopes()) {
-            for (const node of this.collectEmittedNodes()) {
+            for (const node of scope.getEmittedNodes()) {
                 const sym = this.symbols.getNodeSym(scope.scopeId, node.nodeId);
                 this.code.line(`nodeMap.set(${JSON.stringify(node.nodeId)}, ${sym})`);
             }
         }
     }
 
-    private *collectEmittedNodes() {
+    private *collectEmittedRefs() {
         for (const scope of this.allScopes()) {
-            yield* scope.getEmittedNodes();
+            for (const node of scope.getEmittedNodes()) {
+                yield node.ref;
+            }
         }
     }
 
