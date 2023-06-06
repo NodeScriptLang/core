@@ -4,14 +4,16 @@ import { ModuleVersion } from '../schema/ModuleVersion.js';
 import { GraphEvalContext } from './ctx.js';
 import { ModuleParamSpec, ModuleResultSpec, ModuleSpec } from './module.js';
 
-export type ModuleDefinition<P = unknown, R = unknown, S = undefined> = Omit<Partial<ModuleSpec>, 'params' | 'result' | 'scope'> & {
+export type ModuleDefinition<P, R> = Omit<Partial<ModuleSpec>, 'params' | 'result' | 'subgraph'> & {
     moduleName: string;
     version: ModuleVersion;
     params: ParamsDefinition<P>;
     result: ResultDefinition<R>;
-} & (S extends undefined ? {} : {
-    scope: ParamsDefinition<S>;
-});
+};
+
+export type SubgraphModuleDefinition<P, R, SI, SO> = ModuleDefinition<P, R> & {
+    subgraph: SubgraphDefinition<SI, SO>;
+};
 
 export type ParamsDefinition<P> = {
     [K in keyof P]-?: ParamDef<P[K]>;
@@ -28,3 +30,14 @@ export type SimpleParamDef<T = unknown> = Omit<Partial<ModuleParamSpec>, 'schema
 };
 
 export type ModuleCompute<P, R> = (this: void, params: P, ctx: GraphEvalContext) => R;
+
+export type SubgraphModuleCompute<P, R, SI, SO> = (this: void, params: P, ctx: GraphEvalContext, subgraph: ModuleCompute<SI, Promise<SO>>) => R;
+
+export type SubgraphDefinition<SI, SO> = {
+    input: SubgraphSchemaObject<SI>;
+    output: SubgraphSchemaObject<SO>;
+};
+
+export type SubgraphSchemaObject<O> = {
+    [K in keyof O]-?: SchemaDef<O[K]>;
+};

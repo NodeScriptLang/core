@@ -10,6 +10,8 @@ export interface ModuleSpec {
     hidden?: boolean;
     params: Record<string, ModuleParamSpec>;
     result: ModuleResultSpec;
+    subgraph?: ModuleSubgraphSpec;
+    newScope: boolean;
     cacheMode: NodeCacheMode;
     evalMode: NodeEvalMode;
     resizeMode: NodeResizeMode;
@@ -35,6 +37,11 @@ export interface ModuleResultSpec {
     schema: SchemaSpec;
     async?: boolean;
     hideSocket?: boolean;
+}
+
+export interface ModuleSubgraphSpec {
+    input: Record<string, SchemaSpec>;
+    output: Record<string, SchemaSpec>;
 }
 
 export type NodeEvalMode = 'auto' | 'manual';

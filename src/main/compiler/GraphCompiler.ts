@@ -3,7 +3,6 @@ import { ModuleSpec, NodeEvalMode } from '../types/index.js';
 import { CompilerJob } from './CompilerJob.js';
 
 export interface CompilerOptions {
-    rootNodeId: string;
     comments: boolean;
     introspect: boolean;
     emitNodeMap: boolean;
@@ -31,7 +30,6 @@ export class GraphCompiler {
 
     compileEsm(graphView: GraphView, options: Partial<CompilerOptions> = {}): CompilerResult {
         const job = new CompilerJob(graphView, {
-            rootNodeId: options.rootNodeId ?? graphView.rootNodeId,
             comments: false,
             introspect: false,
             emitNodeMap: false,

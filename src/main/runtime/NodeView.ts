@@ -4,6 +4,7 @@ import { PropSpecSchema } from '../schema/PropSpec.js';
 import { NodeSpec } from '../types/model.js';
 import { ModuleSpec } from '../types/module.js';
 import { clone } from '../util/clone.js';
+import { createSubgraphModuleSpec } from '../util/graph.js';
 import { GraphView } from './GraphView.js';
 import { PropEntryView, PropLineView, PropView } from './PropView.js';
 
@@ -25,6 +26,9 @@ export class NodeView {
         protected nodeSpec: NodeSpec,
     ) {
         this._moduleSpec = this.loader.resolveModule(this.nodeSpec.ref);
+        if (this.nodeSpec.ref === '@system/Result') {
+            this.nodeSpec.ref = '@system/Output';
+        }
     }
 
     toJSON() {
@@ -49,6 +53,22 @@ export class NodeView {
 
     isRoot() {
         return this.graph.rootNodeId === this.nodeId;
+    }
+
+    getSubgraph(): GraphView | null {
+        const { subgraph } = this.getModuleSpec();
+        if (!subgraph) {
+            return null;
+        }
+        const scopeId = [this.graph.scopeId, this.nodeId].join('/');
+        const { nodes = {}, rootNodeId = '', metadata = {} } = this.nodeSpec.subgraph ?? {};
+        const moduleSpec = createSubgraphModuleSpec(subgraph);
+        return new GraphView(this.loader, {
+            moduleSpec,
+            nodes,
+            rootNodeId,
+            metadata,
+        }, scopeId);
     }
 
     getProps(): PropView[] {

@@ -5,19 +5,20 @@ export interface GraphSpec {
     moduleSpec: ModuleSpec;
     rootNodeId: string;
     nodes: Record<string, NodeSpec>;
-    subgraphs: Record<string, SubgraphSpec>;
     metadata: Record<string, any>;
 }
 
 export interface SubgraphSpec {
     rootNodeId: string;
     nodes: Record<string, NodeSpec>;
+    metadata: Record<string, any>;
 }
 
 export interface NodeSpec {
     ref: string;
     props: Record<string, PropSpec>;
     metadata: NodeMetadata;
+    subgraph?: SubgraphSpec;
 }
 
 export interface PropSpec {

@@ -9,6 +9,7 @@ describe('Compiler: sync/async', () => {
 
     it('compiles sync function when the tree is sync (even if there are other async nodes)', async () => {
         const graph = await runtime.loadGraph({
+            rootNodeId: 'res',
             nodes: {
                 p1: {
                     ref: 'Number',
@@ -31,7 +32,7 @@ describe('Compiler: sync/async', () => {
                 }
             },
         });
-        const { code } = new GraphCompiler().compileEsm(graph, { rootNodeId: 'res' });
+        const { code } = new GraphCompiler().compileEsm(graph);
         const { compute } = await evalEsmModule(code);
         const ctx = new GraphEvalContext();
         const res = await compute({}, ctx);
@@ -42,7 +43,7 @@ describe('Compiler: sync/async', () => {
 
     it('compiles async function if one of the nodes is async', async () => {
         const graph = await runtime.loadGraph({
-            rootNodeId: 'res',
+            rootNodeId: 'promise',
             nodes: {
                 p1: {
                     ref: 'Number',
@@ -50,7 +51,7 @@ describe('Compiler: sync/async', () => {
                         value: { value: '42' },
                     }
                 },
-                res: {
+                sum: {
                     ref: 'Math.Add',
                     props: {
                         a: { linkId: 'p1' },
@@ -60,12 +61,12 @@ describe('Compiler: sync/async', () => {
                 promise: {
                     ref: 'Promise',
                     props: {
-                        value: { linkId: 'res' },
+                        value: { linkId: 'sum' },
                     }
                 }
             },
         });
-        const { code } = new GraphCompiler().compileEsm(graph, { rootNodeId: 'promise' });
+        const { code } = new GraphCompiler().compileEsm(graph);
         const { compute } = await evalEsmModule(code);
         const ctx = new GraphEvalContext();
         const res = await compute({}, ctx);
@@ -76,7 +77,7 @@ describe('Compiler: sync/async', () => {
 
     it('(regression) type conversion chaining works from sync to async', async () => {
         const graph = await runtime.loadGraph({
-            rootNodeId: 'res',
+            rootNodeId: 'promise',
             nodes: {
                 p1: {
                     ref: 'Number',
@@ -92,7 +93,7 @@ describe('Compiler: sync/async', () => {
                 }
             },
         });
-        const { code } = new GraphCompiler().compileEsm(graph, { rootNodeId: 'promise' });
+        const { code } = new GraphCompiler().compileEsm(graph);
         const { compute } = await evalEsmModule(code);
         const ctx = new GraphEvalContext();
         const res = await compute({}, ctx);

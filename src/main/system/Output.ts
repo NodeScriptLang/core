@@ -1,12 +1,8 @@
 import { ModuleSpecSchema } from '../schema/ModuleSpec.js';
 
-/**
- * @deprecated use Output instead
- */
-export const Result = ModuleSpecSchema.create({
-    moduleName: 'Result',
+export const Output = ModuleSpecSchema.create({
+    moduleName: 'Output',
     version: '1.0.0',
-    resizeMode: 'none',
     hidden: true,
     params: {
         value: {

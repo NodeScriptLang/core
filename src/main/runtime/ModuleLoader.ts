@@ -16,7 +16,9 @@ export abstract class GenericModuleLoader implements ModuleLoader {
         this.addModule('@system/Comment', systemNodes.Comment);
         this.addModule('@system/Frame', systemNodes.Frame);
         this.addModule('@system/Param', systemNodes.Param);
-        this.addModule('@system/Result', systemNodes.Result);
+        this.addModule('@system/Result', systemNodes.Output);
+        this.addModule('@system/Input', systemNodes.Input);
+        this.addModule('@system/Output', systemNodes.Output);
         this.addModule('@system/EvalSync', systemNodes.EvalSync);
         this.addModule('@system/EvalAsync', systemNodes.EvalAsync);
         this.addModule('@system/EvalJson', systemNodes.EvalJson);
@@ -66,6 +68,7 @@ export abstract class GenericModuleLoader implements ModuleLoader {
             result: {
                 schema: { type: 'any' },
             },
+            newScope: false,
             cacheMode: 'auto',
             evalMode: 'auto',
             resizeMode: 'horizontal',
@@ -78,6 +81,7 @@ export abstract class GenericModuleLoader implements ModuleLoader {
 }
 
 export class StandardModuleLoader extends GenericModuleLoader {
+
     registryUrl = 'https://registry.nodescript.dev';
 
     resolveModuleUrl(ref: string) {

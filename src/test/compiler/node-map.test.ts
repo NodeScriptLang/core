@@ -9,6 +9,7 @@ describe('Compiler: nodeMap', () => {
 
     it('emits nodeMap', async () => {
         const graph = await runtime.loadGraph({
+            rootNodeId: 'plus1',
             nodes: {
                 p1: {
                     ref: '@system/Param',
@@ -40,7 +41,6 @@ describe('Compiler: nodeMap', () => {
             },
         });
         const { code } = new GraphCompiler().compileEsm(graph, {
-            rootNodeId: 'plus1',
             emitAll: true,
             emitNodeMap: true,
         });

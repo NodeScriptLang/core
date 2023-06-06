@@ -112,7 +112,7 @@ describe('Compiler: basics', () => {
                         }
                     },
                     res: {
-                        ref: '@system/Result',
+                        ref: '@system/Output',
                         props: {
                             value: { linkId: 'p' },
                         }

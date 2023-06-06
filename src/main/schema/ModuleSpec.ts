@@ -4,6 +4,7 @@ import { ModuleSpec } from '../types/index.js';
 import { ModuleNameSchema } from './ModuleName.js';
 import { ModuleParamSpecSchema } from './ModuleParamSpec.js';
 import { ModuleResultSpecSchema } from './ModuleResultSpec.js';
+import { ModuleSubgraphSpecSchema } from './ModuleSubgraphSpec.js';
 import { ModuleVersionSchema } from './ModuleVersion.js';
 import { NodeCacheModeSchema } from './NodeCacheMode.js';
 import { NodeEvalModeSchema } from './NodeEvalMode.js';
@@ -39,6 +40,13 @@ export const ModuleSpecSchema = new Schema<ModuleSpec>({
             additionalProperties: ModuleParamSpecSchema.schema,
         },
         result: ModuleResultSpecSchema.schema,
+        subgraph: {
+            ...ModuleSubgraphSpecSchema.schema,
+            optional: true,
+        },
+        newScope: {
+            type: 'boolean',
+        },
         cacheMode: NodeCacheModeSchema.schema,
         evalMode: NodeEvalModeSchema.schema,
         resizeMode: NodeResizeModeSchema.schema,

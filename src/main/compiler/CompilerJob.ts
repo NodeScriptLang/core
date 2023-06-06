@@ -10,18 +10,25 @@ import { CompilerOptions } from './GraphCompiler.js';
  * Compiler's unit of work.
  */
 export class CompilerJob {
-    private done = false;
-    private symbols = new CompilerSymbols();
-    private code = new CodeBuilder();
-    private mainScope: CompilerScope;
-    private subgraphScopes: CompilerScope[];
+    done = false;
+    symbols = new CompilerSymbols();
+    code = new CodeBuilder();
+
+    scopeMap = new Map<string, CompilerScope>();
+    mainScope: CompilerScope;
 
     constructor(
         readonly graphView: GraphView,
         readonly options: CompilerOptions,
     ) {
-        this.mainScope = new CompilerScope('root', this.code, this.graphView, this.symbols, this.options);
-        this.subgraphScopes = [...this.collectSubgraphScopes()];
+        this.mainScope = new CompilerScope(this, this.graphView);
+        const subgraphScopes = [...this.graphView.collectSubgraphs()]
+            .map(subgraph => {
+                return new CompilerScope(this, subgraph);
+            });
+        for (const scope of [this.mainScope, ...subgraphScopes]) {
+            this.scopeMap.set(scope.scopeId, scope);
+        }
     }
 
     run() {
@@ -31,7 +38,6 @@ export class CompilerJob {
         this.prepareNodeSymbols();
         this.emitImports();
         this.emitNodeFunctions();
-        // this.emitExportModule();
         this.emitExportCompute();
         if (this.options.emitNodeMap) {
             this.emitNodeMap();
@@ -40,13 +46,14 @@ export class CompilerJob {
     }
 
     allScopes() {
-        return [this.mainScope, ...this.subgraphScopes];
+        return this.scopeMap.values();
     }
 
     getModuleSpec(): ModuleSpec {
         const moduleSpec = clone(this.graphView.moduleSpec);
         moduleSpec.evalMode = this.mainScope.computeEvalMode();
         moduleSpec.result.async = this.mainScope.isAsync();
+        moduleSpec.newScope = true;
         return moduleSpec;
     }
 
@@ -65,11 +72,9 @@ export class CompilerJob {
     private emitImports() {
         this.emitComment('Imports');
         const loader = this.graphView.loader;
-        const allRefs = this.allScopes()
-            .flatMap(_ => _.getEmittedNodes())
-            .map(_ => _.ref);
-        const moduleRefs = new Set(allRefs);
-        for (const moduleRef of moduleRefs) {
+        const allRefs = [...this.collectEmittedNodes()].map(_ => _.ref);
+        const uniqueRefs = new Set(allRefs);
+        for (const moduleRef of uniqueRefs) {
             if (moduleRef.startsWith('@system/')) {
                 continue;
             }
@@ -91,15 +96,21 @@ export class CompilerJob {
         this.emitComment('Node Map');
         this.code.line('export const nodeMap = new Map()');
         for (const scope of this.allScopes()) {
-            for (const node of scope.getEmittedNodes()) {
+            for (const node of this.collectEmittedNodes()) {
                 const sym = this.symbols.getNodeSym(scope.scopeId, node.nodeId);
                 this.code.line(`nodeMap.set(${JSON.stringify(node.nodeId)}, ${sym})`);
             }
         }
     }
 
+    private *collectEmittedNodes() {
+        for (const scope of this.allScopes()) {
+            yield* scope.getEmittedNodes();
+        }
+    }
+
     private emitExportCompute() {
-        const rootNode = this.graphView.getNodeById(this.options.rootNodeId);
+        const rootNode = this.graphView.getRootNode();
         if (!rootNode) {
             this.code.line(`export const compute = () => undefined;`);
         } else {
@@ -111,22 +122,6 @@ export class CompilerJob {
     private emitComment(str: string) {
         if (this.options.comments) {
             this.code.line(`// ${str}`);
-        }
-    }
-
-    private *collectSubgraphScopes(): Iterable<CompilerScope> {
-        for (const node of this.mainScope.getEmittedNodes()) {
-            if (node.ref !== '@system/Subgraph') {
-                continue;
-            }
-            const { subgraphId } = node.metadata;
-            const subgraph = this.graphView.getSubgraphById(subgraphId);
-            if (subgraph) {
-                yield new CompilerScope(subgraphId, this.code, subgraph, this.symbols, {
-                    ...this.options,
-                    rootNodeId: subgraph.rootNodeId,
-                });
-            }
         }
     }
 

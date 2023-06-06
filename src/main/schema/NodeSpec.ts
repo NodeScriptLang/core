@@ -3,6 +3,7 @@ import { Schema } from 'airtight';
 import { NodeSpec } from '../types/index.js';
 import { NodeMetadataSchema } from './NodeMetadata.js';
 import { PropSpecSchema } from './PropSpec.js';
+import { SubgraphSpecSchema } from './SubgraphSpec.js';
 
 export const NodeSpecSchema = new Schema<NodeSpec>({
     id: 'NodeSpec',
@@ -15,5 +16,9 @@ export const NodeSpecSchema = new Schema<NodeSpec>({
             additionalProperties: PropSpecSchema.schema,
         },
         metadata: NodeMetadataSchema.schema,
-    }
+        subgraph: {
+            ...SubgraphSpecSchema.schema,
+            optional: true,
+        },
+    },
 });

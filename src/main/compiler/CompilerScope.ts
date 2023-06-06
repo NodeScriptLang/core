@@ -1,10 +1,8 @@
 import { GraphView, NodeLink, NodeView, PropLineView, PropView } from '../runtime/index.js';
 import { SchemaSpec } from '../types/schema.js';
 import { convertAuto, isSchemaCompatible, MultiMap } from '../util/index.js';
-import { CodeBuilder } from './CodeBuilder.js';
 import { CompilerError } from './CompilerError.js';
-import { CompilerSymbols } from './CompilerSymbols.js';
-import { CompilerOptions } from './GraphCompiler.js';
+import { CompilerJob } from './CompilerJob.js';
 
 export class CompilerScope {
 
@@ -14,15 +12,28 @@ export class CompilerScope {
     private lineExprMap = new Map<string, string>();
 
     constructor(
-        readonly scopeId: string,
-        readonly code: CodeBuilder,
-        readonly graphView: GraphView,
-        readonly symbols: CompilerSymbols,
-        readonly options: CompilerOptions,
+        readonly job: CompilerJob,
+        readonly graph: GraphView,
     ) {
         this.emittedNodes = this.computeEmittedNodes();
-        this.linkMap = graphView.computeLinkMap();
+        this.linkMap = graph.computeLinkMap();
         this.async = this.emittedNodes.some(_ => _.getModuleSpec().result.async);
+    }
+
+    get scopeId() {
+        return this.graph.scopeId;
+    }
+
+    get code() {
+        return this.job.code;
+    }
+
+    get symbols() {
+        return this.job.symbols;
+    }
+
+    get options() {
+        return this.job.options;
     }
 
     getEmittedNodes() {
@@ -50,11 +61,11 @@ export class CompilerScope {
 
     private computeEmittedNodes() {
         if (this.options.emitAll) {
-            return this.graphView.getNodes();
+            return this.graph.getNodes();
         }
-        const rootNode = this.graphView.getNodeById(this.options.rootNodeId);
+        const rootNode = this.graph.getRootNode();
         if (rootNode) {
-            return this.graphView.orderNodes([...rootNode.leftNodes()]);
+            return [...rootNode.leftNodes()];
         }
         return [];
     }
@@ -168,6 +179,10 @@ export class CompilerScope {
         const targetSchema = line.getSchema();
         const linkNode = line.getLinkNode();
         const linkKey = line.linkKey;
+        if (this.options.comments) {
+            this.code.line(`// Line: ${line.getLineId()}`);
+            this.code.line(`// Schema: ${JSON.stringify(targetSchema)}`);
+        }
         // Linked
         if (linkNode) {
             const async = linkNode.isAsync();
@@ -226,15 +241,24 @@ export class CompilerScope {
 
     private emitNodeCompute(node: NodeView, resSym: string) {
         switch (node.ref) {
-            case '@system/Param': return this.emitParamNode(node, resSym);
-            case '@system/Result': return this.emitResultNode(node, resSym);
+            case '@system/Param':
+                return this.emitParamNode(node, resSym);
+            case '@system/Input':
+                return this.emitInputNode(node, resSym);
+            case '@system/Result':
+            case '@system/Output':
+                return this.emitOutputNode(node, resSym);
             case '@system/Comment':
             case '@system/Frame':
                 return;
-            case '@system/EvalSync': return this.emitEvalSync(node, resSym);
-            case '@system/EvalAsync': return this.emitEvalAsync(node, resSym);
-            case '@system/EvalJson': return this.emitEvalJson(node, resSym);
-            default: return this.emitGenericCompute(node, resSym);
+            case '@system/EvalSync':
+                return this.emitEvalSync(node, resSym);
+            case '@system/EvalAsync':
+                return this.emitEvalAsync(node, resSym);
+            case '@system/EvalJson':
+                return this.emitEvalJson(node, resSym);
+            default:
+                return this.emitGenericCompute(node, resSym);
         }
     }
 
@@ -248,10 +272,15 @@ export class CompilerScope {
         }
     }
 
-    private emitResultNode(node: NodeView, resSym: string) {
-        const prop = node.getProp('value')!;
-        const expr = this.getLineExpr(prop);
-        this.code.line(`${resSym} = ${expr};`);
+    private emitInputNode(node: NodeView, resSym: string) {
+        this.code.line(`${resSym} = params;`);
+    }
+
+    private emitOutputNode(node: NodeView, resSym: string) {
+        this.code.block(`const $p = {`, `}`, () => {
+            this.emitNodeProps(node);
+        });
+        this.code.line(`${resSym} = $p.value;`);
     }
 
     private emitEvalSync(node: NodeView, resSym: string) {
@@ -298,11 +327,26 @@ export class CompilerScope {
     }
 
     private emitGenericCompute(node: NodeView, resSym: string) {
-        const computeSym = this.symbols.getComputeSym(node.ref);
         this.code.line(`ctx.nodeId = ${JSON.stringify(node.nodeId)};`);
-        this.code.block(`${resSym} = ${this.awaitSym(node)}${computeSym}({`, `}, ctx.newScope());`, () => {
+        const computeSym = this.symbols.getComputeSym(node.ref);
+        const scopeSym = this.graph.moduleSpec.newScope ? `ctx.newScope()` : `ctx`;
+        const subgraphSym = this.getSubgraphExpr(node);
+        const argsExpr = [scopeSym, subgraphSym].filter(Boolean).join(',');
+        this.code.block(`${resSym} = ${this.awaitSym(node)}${computeSym}({`, `}, ${argsExpr});`, () => {
             this.emitNodeProps(node);
         });
+    }
+
+    private getSubgraphExpr(node: NodeView) {
+        const subgraph = node.getSubgraph();
+        if (subgraph) {
+            const rootNode = subgraph.getRootNode();
+            if (rootNode) {
+                return this.symbols.getNodeSym(subgraph.scopeId, rootNode.nodeId);
+            }
+            return `() => undefined;`;
+        }
+        return '';
     }
 
     private emitNodeProps(node: NodeView) {
