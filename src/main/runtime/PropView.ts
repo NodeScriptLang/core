@@ -125,8 +125,40 @@ export class PropView extends PropLineView {
     }
 
     getEntries() {
-        // TODO add support for managed entries
-        return (this.propSpec.entries ?? []).map(_ => new PropEntryView(this, _));
+        return [
+            ...this.getManagedEntries(),
+            ...this.getCustomEntries(),
+        ];
+    }
+
+    /**
+     * Managed entries appear for each property defined in parent prop's schema.
+     *
+     * They are special in a couple ways:
+     *
+     * - users can't delete them or change their key
+     * - the order of managed entries is predefined
+     * - they have stable ids so that they are consistently persisted
+     */
+    getManagedEntries(): PropEntryView[] {
+        const schema = this.getSchema();
+        if (schema.type !== 'object') {
+            return [];
+        }
+        const existingEntries = (this.propSpec.entries ?? []).filter(_ => _.managed);
+        const entries: PropEntryView[] = [];
+        for (const key of Object.keys(schema.properties ?? {})) {
+            const id = key.replace(/[^0-9a-z]/i, '_');
+            const entrySpec: PropEntrySpec = existingEntries.find(_ => _.id === id) ??
+                { id, key, value: '', managed: true, expand: false };
+            entries.push(new PropEntryView(this, entrySpec));
+        }
+        return entries;
+    }
+
+    getCustomEntries(): PropEntryView[] {
+        const entrySpecs = (this.propSpec.entries ?? []).filter(_ => !_.managed);
+        return entrySpecs.map(_ => new PropEntryView(this, _));
     }
 
     isSupportsEntries() {
