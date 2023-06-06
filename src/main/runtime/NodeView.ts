@@ -1,13 +1,12 @@
 import { coerce } from 'airtight';
 
-import { ModuleSpecSchema } from '../schema/ModuleSpec.js';
 import { PropSpecSchema } from '../schema/PropSpec.js';
 import { NodeSpec } from '../types/model.js';
 import { ModuleSpec } from '../types/module.js';
 import { clone } from '../util/clone.js';
+import { createSubgraphModuleSpec } from '../util/graph.js';
 import { GraphView } from './GraphView.js';
 import { PropEntryView, PropLineView, PropView } from './PropView.js';
-import { createSubgraphModuleSpec } from '../util/graph.js';
 
 export type NodeLink = {
     node: NodeView;
