@@ -46,6 +46,7 @@ export const ModuleSpecSchema = new Schema<ModuleSpec>({
         },
         newScope: {
             type: 'boolean',
+            default: false,
         },
         cacheMode: NodeCacheModeSchema.schema,
         evalMode: NodeEvalModeSchema.schema,
