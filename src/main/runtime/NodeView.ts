@@ -55,6 +55,11 @@ export class NodeView {
         return this.graph.rootNodeId === this.nodeId;
     }
 
+    hasSubgraph() {
+        const { subgraph } = this.getModuleSpec();
+        return !!subgraph;
+    }
+
     getSubgraph(): GraphView | null {
         const { subgraph } = this.getModuleSpec();
         if (!subgraph) {
