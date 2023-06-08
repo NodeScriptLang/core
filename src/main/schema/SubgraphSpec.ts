@@ -6,7 +6,9 @@ export const SubgraphSpecSchema = new Schema<SubgraphSpec>({
     id: 'SubgraphSpec',
     type: 'object',
     properties: {
-        rootNodeId: { type: 'string' },
+        rootNodeId: {
+            type: 'string',
+        },
         nodes: {
             type: 'object',
             properties: {},
@@ -20,5 +22,5 @@ export const SubgraphSpecSchema = new Schema<SubgraphSpec>({
             properties: {},
             additionalProperties: { type: 'any' },
         },
-    }
+    },
 });

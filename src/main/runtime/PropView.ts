@@ -24,12 +24,17 @@ export abstract class PropLineView {
         readonly propKey: string,
         protected propLine: PropLine,
     ) {
-        this._paramSpec = this.node.getModuleSpec().params[this.propKey] ?? {
+        const paramSpec = this.node.getModuleSpec().params[this.propKey] ?? {
             schema: { type: 'any' },
         };
+        let schema = paramSpec.schema;
         if (['@system/Output', '@system/Result'].includes(this.node.ref)) {
-            this._paramSpec.schema = this.graph.moduleSpec.result.schema;
+            schema = this.graph.moduleSpec.result.schema;
         }
+        this._paramSpec = {
+            ...paramSpec,
+            schema,
+        };
     }
 
     toJSON() {

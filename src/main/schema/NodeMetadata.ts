@@ -10,15 +10,16 @@ export const NodeMetadataSchema = new Schema<NodeMetadata>({
         pos: PointSchema.schema,
         w: { type: 'number', default: 5 },
         h: { type: 'number', default: 5 },
-        label: { type: 'string' },
-        collapsed: { type: 'boolean' },
+        label: { type: 'string', default: '' },
+        collapsed: { type: 'boolean', default: false },
         listedProps: {
             type: 'object',
             properties: {},
             additionalProperties: { type: 'boolean' },
+            default: {},
         }
     },
     additionalProperties: {
         type: 'any'
-    }
+    },
 });

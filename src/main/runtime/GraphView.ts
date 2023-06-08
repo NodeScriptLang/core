@@ -9,11 +9,16 @@ export class GraphView {
     constructor(
         readonly loader: ModuleLoader,
         protected graphSpec: GraphSpec,
-        readonly scopeId = 'root',
+        readonly parentNode: NodeView | null = null,
     ) {}
 
     toJSON() {
         return clone(this.graphSpec);
+    }
+
+    get scopeId(): string {
+        return this.parentNode == null ? 'root' :
+            this.parentNode.graph.scopeId + ':' + this.parentNode.nodeId;
     }
 
     get moduleSpec() {
@@ -26,6 +31,14 @@ export class GraphView {
 
     get rootNodeId() {
         return this.graphSpec.rootNodeId;
+    }
+
+    get rootGraph(): GraphView {
+        return this.parentNode == null ? this : this.parentNode.graph.rootGraph;
+    }
+
+    isSubgraph() {
+        return this.parentNode != null;
     }
 
     isNodeExists(id: string) {
