@@ -222,6 +222,10 @@ export class PropEntryView extends PropLineView {
         return this.parentProp.getLineId() + ':' + this.propEntrySpec.id;
     }
 
+    isManaged() {
+        return this.propEntrySpec.managed;
+    }
+
     getSchema(): SchemaSpec {
         const baseSchema = this.parentProp.getSchema();
         switch (baseSchema.type) {

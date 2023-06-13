@@ -23,7 +23,7 @@ export class NodeView {
     constructor(
         readonly graph: GraphView,
         readonly nodeId: string,
-        protected nodeSpec: NodeSpec,
+        readonly nodeSpec: NodeSpec,
     ) {
         this._moduleSpec = this.loader.resolveModule(this.nodeSpec.ref);
         if (this.nodeSpec.ref === '@system/Result') {
@@ -55,7 +55,7 @@ export class NodeView {
         return this.graph.rootNodeId === this.nodeId;
     }
 
-    hasSubgraph() {
+    supportsSubgraph() {
         const { subgraph } = this.getModuleSpec();
         return !!subgraph;
     }
