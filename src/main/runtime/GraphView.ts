@@ -41,6 +41,13 @@ export class GraphView {
         return this.parentNode != null;
     }
 
+    *ancestors(): Iterable<GraphView> {
+        if (this.parentNode) {
+            yield* this.parentNode.graph.ancestors();
+        }
+        yield this;
+    }
+
     isNodeExists(id: string) {
         return this.graphSpec.nodes[id] != null;
     }
