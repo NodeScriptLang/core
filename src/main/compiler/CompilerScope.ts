@@ -71,16 +71,16 @@ export class CompilerScope {
     }
 
     private emitNode(node: NodeView) {
-        this.emitComment(`${node.ref} ${node.getNodeUid()}`);
-        const sym = this.symbols.getNodeSym(node.getNodeUid());
+        this.emitComment(`${node.ref} ${node.nodeUid}`);
+        const sym = this.symbols.getNodeSym(node.nodeUid);
         this.code.block(`${this.asyncSym(node)}function ${sym}(params, ctx) {`, `}`, () => {
             if (this.isNodeCached(node)) {
-                this.code.line(`let $c = ctx.cache.get("${node.getNodeUid()}");`);
+                this.code.line(`let $c = ctx.cache.get("${node.nodeUid}");`);
                 this.code.line(`if ($c) { return $c.res; }`);
                 this.code.block(`$c = (${this.asyncSym(node)}() => {`, `})();`, () => {
                     this.emitNodeBodyIntrospect(node);
                 });
-                this.code.line(`ctx.cache.set("${node.getNodeUid()}", { res: $c });`);
+                this.code.line(`ctx.cache.set("${node.nodeUid}", { res: $c });`);
                 this.code.line(`return $c;`);
             } else {
                 this.emitNodeBodyIntrospect(node);
@@ -92,7 +92,7 @@ export class CompilerScope {
         const resSym = '$r';
         this.code.line(`let ${resSym};`);
         if (this.options.introspect) {
-            const nodeUid = node.getNodeUid();
+            const nodeUid = node.nodeUid;
             this.code.block('try {', '}', () => {
                 if (this.options.evalMode === 'manual') {
                     this.code.line(`ctx.checkPendingNode(${JSON.stringify(nodeUid)});`);
@@ -146,7 +146,7 @@ export class CompilerScope {
         this.code.block(`for (let $i = 0; $i < $l; $i++) {`, `}`, () => {
             if (this.options.introspect) {
                 this.code.line(`ctx.nodeEvaluated.emit({` +
-                    `nodeUid: ${JSON.stringify(node.getNodeUid())},` +
+                    `nodeUid: ${JSON.stringify(node.nodeUid)},` +
                     `progress: $i / $l,` +
                 `});`);
             }
@@ -160,7 +160,7 @@ export class CompilerScope {
     private emitNodePreamble(node: NodeView) {
         const syms: string[] = [];
         for (const line of node.allLines()) {
-            const lineUid = line.getLineUid();
+            const lineUid = line.lineUid;
             const sym = this.symbols.createLineSym(lineUid);
             const { decl, expr } = this.createLineDecl(line, sym);
             if (decl) {
@@ -181,7 +181,7 @@ export class CompilerScope {
         const linkNode = line.getLinkNode();
         const linkKey = line.linkKey;
         if (this.options.comments) {
-            this.code.line(`// Line: ${line.getLineUid()}`);
+            this.code.line(`// Line: ${line.lineUid}`);
             this.code.line(`// Schema: ${JSON.stringify(targetSchema)}`);
         }
         // Linked
@@ -193,7 +193,7 @@ export class CompilerScope {
                 sourceSchema = { type: 'any' };
             }
             // 2. create a base expression for calling the linked function, i.e. r1(params, ctx)
-            const linkSym = this.symbols.getNodeSym(linkNode.getNodeUid());
+            const linkSym = this.symbols.getNodeSym(linkNode.nodeUid);
             let callExpr = `${linkSym}(params, ctx)`;
             // 3. compose in linkKey operation
             if (linkKey) {
@@ -233,7 +233,7 @@ export class CompilerScope {
     private emitExpandedPreamble(node: NodeView) {
         const expSyms: string[] = [];
         for (const line of node.expandedLines()) {
-            const lineUid = line.getLineUid();
+            const lineUid = line.lineUid;
             const sym = this.symbols.getLineSym(lineUid);
             expSyms.push(sym);
         }
@@ -342,7 +342,7 @@ export class CompilerScope {
         if (subgraph) {
             const rootNode = subgraph.getRootNode();
             if (rootNode) {
-                return this.symbols.getNodeSym(rootNode.getNodeUid());
+                return this.symbols.getNodeSym(rootNode.nodeUid);
             }
             return `() => undefined`;
         }
@@ -397,7 +397,7 @@ export class CompilerScope {
     }
 
     private getLineExpr(line: PropLineView) {
-        const lineId = line.getLineUid();
+        const lineId = line.lineUid;
         const expr = this.lineExprMap.get(lineId);
         if (!expr) {
             throw new CompilerError(`Line expression not found: ${lineId}`);

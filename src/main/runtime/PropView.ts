@@ -41,8 +41,8 @@ export abstract class PropLineView {
         return clone(this.propLine);
     }
 
-    abstract getLineUid(): string;
     abstract getSchema(): SchemaSpec;
+    abstract get lineUid(): string;
 
     get graph() {
         return this.node.graph;
@@ -117,8 +117,8 @@ export class PropView extends PropLineView {
         super(node, propKey, propSpec);
     }
 
-    getLineUid() {
-        return this.node.getNodeUid() + ':' + this.propKey;
+    get lineUid() {
+        return this.node.nodeUid + ':' + this.propKey;
     }
 
     getSchema(): SchemaSpec {
@@ -218,8 +218,8 @@ export class PropEntryView extends PropLineView {
         return this.propEntrySpec.key;
     }
 
-    getLineUid() {
-        return this.parentProp.getLineUid() + ':' + this.propEntrySpec.id;
+    get lineUid() {
+        return this.parentProp.lineUid + ':' + this.propEntrySpec.id;
     }
 
     isManaged() {

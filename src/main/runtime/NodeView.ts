@@ -26,8 +26,8 @@ export class NodeView {
         readonly nodeId: string,
         readonly nodeSpec: NodeSpec,
     ) {
-        this._nodeUid = this.graph.scopeId + ':' + nodeId;
         this._moduleSpec = this.loader.resolveModule(this.nodeSpec.ref);
+        this._nodeUid = this.graph.scopeId + ':' + nodeId;
         if (this.nodeSpec.ref === '@system/Result') {
             this.nodeSpec.ref = '@system/Output';
         }
@@ -49,16 +49,16 @@ export class NodeView {
         return this.nodeSpec.metadata;
     }
 
+    get nodeUid() {
+        return this._nodeUid;
+    }
+
     getModuleSpec() {
         return this._moduleSpec;
     }
 
     isRoot() {
         return this.graph.rootNodeId === this.nodeId;
-    }
-
-    getNodeUid() {
-        return this._nodeUid;
     }
 
     supportsSubgraph() {
