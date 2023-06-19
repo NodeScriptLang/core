@@ -19,12 +19,14 @@ export type NodeLink = {
 export class NodeView {
 
     private _moduleSpec: ModuleSpec;
+    private _nodeUid: string;
 
     constructor(
         readonly graph: GraphView,
         readonly nodeId: string,
         readonly nodeSpec: NodeSpec,
     ) {
+        this._nodeUid = this.graph.scopeId + ':' + nodeId;
         this._moduleSpec = this.loader.resolveModule(this.nodeSpec.ref);
         if (this.nodeSpec.ref === '@system/Result') {
             this.nodeSpec.ref = '@system/Output';
@@ -53,6 +55,10 @@ export class NodeView {
 
     isRoot() {
         return this.graph.rootNodeId === this.nodeId;
+    }
+
+    getNodeUid() {
+        return this._nodeUid;
     }
 
     supportsSubgraph() {

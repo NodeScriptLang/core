@@ -226,13 +226,13 @@ describe('Compiler: array expansion', () => {
         const res = await compute({}, ctx);
         assert.deepStrictEqual(res, [1, 2, 42]);
         assert.deepStrictEqual(results, [
-            { nodeId: 'res', progress: 0 },
-            { nodeId: 'arr', progress: 0 },
-            { nodeId: 'arr', result: [1, 2, 42] },
-            { nodeId: 'res', progress: 0 },
-            { nodeId: 'res', progress: 1 / 3 },
-            { nodeId: 'res', progress: 2 / 3 },
-            { nodeId: 'res', result: [1, 2, 42] },
+            { nodeUid: 'root:res', progress: 0 },
+            { nodeUid: 'root:arr', progress: 0 },
+            { nodeUid: 'root:arr', result: [1, 2, 42] },
+            { nodeUid: 'root:res', progress: 0 },
+            { nodeUid: 'root:res', progress: 1 / 3 },
+            { nodeUid: 'root:res', progress: 2 / 3 },
+            { nodeUid: 'root:res', result: [1, 2, 42] },
         ]);
     });
 

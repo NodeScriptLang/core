@@ -60,10 +60,10 @@ describe('Compiler: basics', () => {
         }, ctx);
         assert.strictEqual(res, 33);
         assert.deepStrictEqual(nodeResults, [
-            { nodeId: 'res', progress: 0 },
-            { nodeId: 'p1', progress: 0 },
-            { nodeId: 'p1', result: 12 },
-            { nodeId: 'res', result: 33 },
+            { nodeUid: 'root:res', progress: 0 },
+            { nodeUid: 'root:p1', progress: 0 },
+            { nodeUid: 'root:p1', result: 12 },
+            { nodeUid: 'root:res', result: 33 },
         ]);
     });
 

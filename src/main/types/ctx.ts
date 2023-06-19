@@ -13,7 +13,6 @@ export interface Deferred {
 export interface GraphEvalContext {
     readonly lib: RuntimeLib;
 
-    nodeId: string;
     cache: Map<string, any>;
     locals: Map<string, any>;
     nodeEvaluated: Event<NodeResult>;
@@ -30,7 +29,7 @@ export interface GraphEvalContext {
     get(object: unknown, keyish: string): unknown;
     set(object: unknown, keyish: string, value: unknown): void;
     toArray(object: unknown): unknown[];
-    checkPendingNode(nodeId: string): void;
+    checkPendingNode(nodeUid: string): void;
 
     // TODO drop schema (left for compatibility)
     deferred(fn: () => unknown, schema?: SchemaSpec): unknown;

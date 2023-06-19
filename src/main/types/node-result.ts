@@ -1,5 +1,5 @@
 export interface NodeResult {
-    nodeId: string;
+    nodeUid: string;
     result?: any;
     error?: any;
     progress?: number;

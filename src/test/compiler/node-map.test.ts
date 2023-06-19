@@ -46,13 +46,13 @@ describe('Compiler: nodeMap', () => {
         });
         const { nodeMap } = await evalEsmModule(code);
         const ctx = new GraphEvalContext();
-        const p1 = await nodeMap.get('p1')({ value: 42 }, ctx);
+        const p1 = await nodeMap.get('root:p1')({ value: 42 }, ctx);
         assert.strictEqual(p1, 42);
-        const plus1 = await nodeMap.get('plus1')({ value: 42 }, ctx);
+        const plus1 = await nodeMap.get('root:plus1')({ value: 42 }, ctx);
         assert.strictEqual(plus1, 43);
-        const plus2 = await nodeMap.get('plus2')({ value: 42 }, ctx);
+        const plus2 = await nodeMap.get('root:plus2')({ value: 42 }, ctx);
         assert.strictEqual(plus2, 44);
-        const mul2 = await nodeMap.get('mul2')({ value: 80 }, ctx);
+        const mul2 = await nodeMap.get('root:mul2')({ value: 80 }, ctx);
         assert.strictEqual(mul2, 160);
     });
 

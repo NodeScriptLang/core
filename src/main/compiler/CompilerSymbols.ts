@@ -24,23 +24,23 @@ export class CompilerSymbols {
         return sym;
     }
 
-    getNodeSym(scopeId: string, nodeId: string, fallback?: string) {
-        return this.symtable.get(`node:${scopeId}:${nodeId}`, fallback);
+    getNodeSym(nodeUid: string, fallback?: string) {
+        return this.symtable.get(`node:${nodeUid}`, fallback);
     }
 
-    createNodeSym(scopeId: string, nodeId: string) {
+    createNodeSym(nodeUid: string) {
         const sym = this.symtable.nextSym('r');
-        this.symtable.set(`node:${scopeId}:${nodeId}`, sym);
+        this.symtable.set(`node:${nodeUid}`, sym);
         return sym;
     }
 
-    getLineSym(scopeId: string, lineId: string) {
-        return this.symtable.get(`prop:${scopeId}:${lineId}`);
+    getLineSym(lineUid: string) {
+        return this.symtable.get(`prop:${lineUid}`);
     }
 
-    createLineSym(scopeId: string, lineId: string) {
+    createLineSym(lineUid: string) {
         const sym = this.symtable.nextSym('p');
-        this.symtable.set(`prop:${scopeId}:${lineId}`, sym);
+        this.symtable.set(`prop:${lineUid}`, sym);
         return sym;
     }
 

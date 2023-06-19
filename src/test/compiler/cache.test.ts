@@ -36,13 +36,13 @@ describe('Compiler: cache', () => {
         const res = await compute({}, ctx);
         assert.deepStrictEqual(res, 84);
         assert.deepStrictEqual(results, [
-            { nodeId: 'res', progress: 0 },
-            { nodeId: 'p', progress: 0 },
-            { nodeId: 'p', result: '42' },
-            { nodeId: 'res', result: 84 },
+            { nodeUid: 'root:res', progress: 0 },
+            { nodeUid: 'root:p', progress: 0 },
+            { nodeUid: 'root:p', result: '42' },
+            { nodeUid: 'root:res', result: 84 },
         ]);
         assert.deepStrictEqual(ctx.cache.size, 1);
-        assert.deepStrictEqual(ctx.cache.get('p'), { res: '42' });
+        assert.deepStrictEqual(ctx.cache.get('root:p'), { res: '42' });
     });
 
     it('does not cache node when its result is only used once', async () => {
@@ -72,10 +72,10 @@ describe('Compiler: cache', () => {
         const res = await compute({}, ctx);
         assert.deepStrictEqual(res, 54);
         assert.deepStrictEqual(results, [
-            { nodeId: 'res', progress: 0 },
-            { nodeId: 'p', progress: 0 },
-            { nodeId: 'p', result: '42' },
-            { nodeId: 'res', result: 54 },
+            { nodeUid: 'root:res', progress: 0 },
+            { nodeUid: 'root:p', progress: 0 },
+            { nodeUid: 'root:p', result: '42' },
+            { nodeUid: 'root:res', result: 54 },
         ]);
         assert.deepStrictEqual(ctx.cache.size, 0);
     });

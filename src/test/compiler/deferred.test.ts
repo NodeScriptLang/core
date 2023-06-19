@@ -47,10 +47,10 @@ describe('Compiler: deferred', () => {
         const res = await compute({}, ctx);
         assert.deepStrictEqual(res, 7);
         assert.deepStrictEqual(results, [
-            { nodeId: 'if', progress: 0 },
-            { nodeId: 'n2', progress: 0 },
-            { nodeId: 'n2', result: 7 },
-            { nodeId: 'if', result: 7 },
+            { nodeUid: 'root:if', progress: 0 },
+            { nodeUid: 'root:n2', progress: 0 },
+            { nodeUid: 'root:n2', result: 7 },
+            { nodeUid: 'root:if', result: 7 },
         ]);
     });
 
@@ -108,17 +108,17 @@ describe('Compiler: deferred', () => {
         const res = await compute({}, ctx);
         assert.deepStrictEqual(res, ['one', 'Hello', 'three']);
         assert.deepStrictEqual(results, [
-            { nodeId: 'if', progress: 0 },
-            { nodeId: 'conditions', progress: 0 },
-            { nodeId: 'conditions', result: [true, false, true] },
-            { nodeId: 'arr', progress: 0 },
-            { nodeId: 'arr', result: ['one', 'two', 'three'] },
-            { nodeId: 'if', progress: 0 },
-            { nodeId: 'if', progress: 1 / 3 },
-            { nodeId: 'str', progress: 0 },
-            { nodeId: 'str', result: 'Hello' },
-            { nodeId: 'if', progress: 2 / 3 },
-            { nodeId: 'if', result: ['one', 'Hello', 'three'] }
+            { nodeUid: 'root:if', progress: 0 },
+            { nodeUid: 'root:conditions', progress: 0 },
+            { nodeUid: 'root:conditions', result: [true, false, true] },
+            { nodeUid: 'root:arr', progress: 0 },
+            { nodeUid: 'root:arr', result: ['one', 'two', 'three'] },
+            { nodeUid: 'root:if', progress: 0 },
+            { nodeUid: 'root:if', progress: 1 / 3 },
+            { nodeUid: 'root:str', progress: 0 },
+            { nodeUid: 'root:str', result: 'Hello' },
+            { nodeUid: 'root:if', progress: 2 / 3 },
+            { nodeUid: 'root:if', result: ['one', 'Hello', 'three'] }
         ]);
     });
 
@@ -176,15 +176,15 @@ describe('Compiler: deferred', () => {
         const res = await compute({}, ctx);
         assert.deepStrictEqual(res, ['one', 'two', 'three']);
         assert.deepStrictEqual(results, [
-            { nodeId: 'if', progress: 0 },
-            { nodeId: 'conditions', progress: 0 },
-            { nodeId: 'conditions', result: [true, true, true] },
-            { nodeId: 'arr', progress: 0 },
-            { nodeId: 'arr', result: ['one', 'two', 'three'] },
-            { nodeId: 'if', progress: 0 },
-            { nodeId: 'if', progress: 1 / 3 },
-            { nodeId: 'if', progress: 2 / 3 },
-            { nodeId: 'if', result: ['one', 'two', 'three'] }
+            { nodeUid: 'root:if', progress: 0 },
+            { nodeUid: 'root:conditions', progress: 0 },
+            { nodeUid: 'root:conditions', result: [true, true, true] },
+            { nodeUid: 'root:arr', progress: 0 },
+            { nodeUid: 'root:arr', result: ['one', 'two', 'three'] },
+            { nodeUid: 'root:if', progress: 0 },
+            { nodeUid: 'root:if', progress: 1 / 3 },
+            { nodeUid: 'root:if', progress: 2 / 3 },
+            { nodeUid: 'root:if', result: ['one', 'two', 'three'] }
         ]);
     });
 
@@ -224,10 +224,10 @@ describe('Compiler: deferred', () => {
         const res = await compute({}, ctx);
         assert.deepStrictEqual(res, 'World');
         assert.deepStrictEqual(results, [
-            { nodeId: 'if', progress: 0 },
-            { nodeId: 'n2', progress: 0 },
-            { nodeId: 'n2', result: 'World' },
-            { nodeId: 'if', result: 'World' },
+            { nodeUid: 'root:if', progress: 0 },
+            { nodeUid: 'root:n2', progress: 0 },
+            { nodeUid: 'root:n2', result: 'World' },
+            { nodeUid: 'root:if', result: 'World' },
         ]);
     });
 
@@ -297,21 +297,21 @@ describe('Compiler: deferred', () => {
         const res = await compute({}, ctx);
         assert.deepStrictEqual(res, ['one', 'Hello', 'three']);
         assert.deepStrictEqual(results, [
-            { nodeId: 'if', progress: 0 },
-            { nodeId: 'conditionsAsync', progress: 0 },
-            { nodeId: 'conditions', progress: 0 },
-            { nodeId: 'conditions', result: [true, false, true] },
-            { nodeId: 'conditionsAsync', result: [true, false, true] },
-            { nodeId: 'arrAsync', progress: 0 },
-            { nodeId: 'arr', progress: 0 },
-            { nodeId: 'arr', result: ['one', 'two', 'three'] },
-            { nodeId: 'arrAsync', result: ['one', 'two', 'three'] },
-            { nodeId: 'if', progress: 0 },
-            { nodeId: 'if', progress: 1 / 3 },
-            { nodeId: 'valAsync', progress: 0 },
-            { nodeId: 'valAsync', result: 'Hello' },
-            { nodeId: 'if', progress: 2 / 3 },
-            { nodeId: 'if', result: ['one', 'Hello', 'three'] }
+            { nodeUid: 'root:if', progress: 0 },
+            { nodeUid: 'root:conditionsAsync', progress: 0 },
+            { nodeUid: 'root:conditions', progress: 0 },
+            { nodeUid: 'root:conditions', result: [true, false, true] },
+            { nodeUid: 'root:conditionsAsync', result: [true, false, true] },
+            { nodeUid: 'root:arrAsync', progress: 0 },
+            { nodeUid: 'root:arr', progress: 0 },
+            { nodeUid: 'root:arr', result: ['one', 'two', 'three'] },
+            { nodeUid: 'root:arrAsync', result: ['one', 'two', 'three'] },
+            { nodeUid: 'root:if', progress: 0 },
+            { nodeUid: 'root:if', progress: 1 / 3 },
+            { nodeUid: 'root:valAsync', progress: 0 },
+            { nodeUid: 'root:valAsync', result: 'Hello' },
+            { nodeUid: 'root:if', progress: 2 / 3 },
+            { nodeUid: 'root:if', result: ['one', 'Hello', 'three'] }
         ]);
     });
 
@@ -361,12 +361,12 @@ describe('Compiler: deferred', () => {
         const res = await compute({}, ctx);
         assert.deepStrictEqual(res, 'Hello');
         assert.deepStrictEqual(results, [
-            { nodeId: 'fallback', progress: 0 },
-            { nodeId: 'n1', progress: 0 },
-            { nodeId: 'n1', result: null },
-            { nodeId: 'n2', progress: 0 },
-            { nodeId: 'n2', result: 'Hello' },
-            { nodeId: 'fallback', result: 'Hello' },
+            { nodeUid: 'root:fallback', progress: 0 },
+            { nodeUid: 'root:n1', progress: 0 },
+            { nodeUid: 'root:n1', result: null },
+            { nodeUid: 'root:n2', progress: 0 },
+            { nodeUid: 'root:n2', result: 'Hello' },
+            { nodeUid: 'root:fallback', result: 'Hello' },
         ]);
     });
 

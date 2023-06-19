@@ -64,7 +64,7 @@ export class CompilerJob {
     private prepareNodeSymbols() {
         for (const scope of this.allScopes()) {
             for (const node of scope.getEmittedNodes()) {
-                this.symbols.createNodeSym(scope.scopeId, node.nodeId);
+                this.symbols.createNodeSym(node.getNodeUid());
             }
         }
     }
@@ -96,8 +96,8 @@ export class CompilerJob {
         this.code.line('export const nodeMap = new Map()');
         for (const scope of this.allScopes()) {
             for (const node of scope.getEmittedNodes()) {
-                const sym = this.symbols.getNodeSym(scope.scopeId, node.nodeId);
-                this.code.line(`nodeMap.set(${JSON.stringify(node.nodeId)}, ${sym})`);
+                const sym = this.symbols.getNodeSym(node.getNodeUid());
+                this.code.line(`nodeMap.set(${JSON.stringify(node.getNodeUid())}, ${sym})`);
             }
         }
     }
@@ -115,7 +115,7 @@ export class CompilerJob {
         if (!rootNode) {
             this.code.line(`export const compute = () => undefined;`);
         } else {
-            const rootNodeSym = this.symbols.getNodeSym('root', rootNode.nodeId);
+            const rootNodeSym = this.symbols.getNodeSym(rootNode.getNodeUid());
             this.code.line(`export const compute = ${rootNodeSym};`);
         }
     }

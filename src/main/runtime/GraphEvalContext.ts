@@ -14,8 +14,7 @@ export const SYM_DEFERRED = Symbol.for('NodeScript:Deferred');
 export class GraphEvalContext implements t.GraphEvalContext {
     readonly lib = runtimeLib;
 
-    nodeId: string = '';
-    pendingNodeIds: Set<string>;
+    pendingNodeUids: Set<string>;
     nodeEvaluated: Event<t.NodeResult>;
     // Each context maintains its own cache. Subscopes have separate caches
     // and do not delegate to parent contexts.
@@ -25,13 +24,13 @@ export class GraphEvalContext implements t.GraphEvalContext {
 
     constructor(readonly parent: GraphEvalContext | null = null) {
         this.nodeEvaluated = parent ? parent.nodeEvaluated : new Event();
-        this.pendingNodeIds = parent ? parent.pendingNodeIds : new Set();
+        this.pendingNodeUids = parent ? parent.pendingNodeUids : new Set();
     }
 
     clear() {
         this.cache.clear();
         this.locals.clear();
-        this.pendingNodeIds.clear();
+        this.pendingNodeUids.clear();
     }
 
     async finalize() {}
@@ -80,8 +79,8 @@ export class GraphEvalContext implements t.GraphEvalContext {
         return convertAuto(value, targetSchema);
     }
 
-    checkPendingNode(nodeId: string) {
-        if (this.pendingNodeIds.has(nodeId)) {
+    checkPendingNode(nodeUid: string) {
+        if (this.pendingNodeUids.has(nodeUid)) {
             throw new NodePendingError();
         }
     }

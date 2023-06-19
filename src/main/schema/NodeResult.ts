@@ -6,7 +6,7 @@ export const NodeResultSchema = new Schema<NodeResult>({
     id: 'NodeResult',
     type: 'object',
     properties: {
-        nodeId: { type: 'string' },
+        nodeUid: { type: 'string' },
         result: { type: 'any', optional: true },
         error: { type: 'any', optional: true },
         progress: { type: 'number', optional: true },
