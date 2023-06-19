@@ -23,11 +23,11 @@ export class NodeView {
 
     constructor(
         readonly graph: GraphView,
-        readonly nodeId: string,
+        readonly localId: string,
         readonly nodeSpec: NodeSpec,
     ) {
         this._moduleSpec = this.loader.resolveModule(this.nodeSpec.ref);
-        this._nodeUid = this.graph.scopeId + ':' + nodeId;
+        this._nodeUid = this.graph.scopeId + ':' + localId;
         if (this.nodeSpec.ref === '@system/Result') {
             this.nodeSpec.ref = '@system/Output';
         }
@@ -58,7 +58,7 @@ export class NodeView {
     }
 
     isRoot() {
-        return this.graph.rootNodeId === this.nodeId;
+        return this.graph.rootNodeId === this.localId;
     }
 
     supportsSubgraph() {
@@ -137,7 +137,7 @@ export class NodeView {
     }
 
     getOutboundLinks(linkMap = this.graph.computeLinkMap()) {
-        return linkMap.get(this.nodeId);
+        return linkMap.get(this.localId);
     }
 
     *inboundLinks(): Iterable<NodeLink> {
@@ -169,10 +169,10 @@ export class NodeView {
     }
 
     *leftNodes(visited: Set<string> = new Set()): Iterable<NodeView> {
-        if (visited.has(this.nodeId)) {
+        if (visited.has(this.localId)) {
             return;
         }
-        visited.add(this.nodeId);
+        visited.add(this.localId);
         yield this;
         for (const link of this.inboundLinks()) {
             yield* link.linkNode.leftNodes(visited);
@@ -181,7 +181,7 @@ export class NodeView {
 
     *rightNodes(linkMap = this.graph.computeLinkMap()): Iterable<NodeView> {
         yield this;
-        for (const link of linkMap.get(this.nodeId)) {
+        for (const link of linkMap.get(this.localId)) {
             yield* link.node.rightNodes(linkMap);
         }
     }
@@ -193,7 +193,7 @@ export class NodeView {
      */
     canLinkTo(node: NodeView) {
         for (const n of this.leftNodes()) {
-            if (n.nodeId === node.nodeId) {
+            if (n.localId === node.localId) {
                 return false;
             }
         }

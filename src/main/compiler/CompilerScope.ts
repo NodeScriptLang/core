@@ -424,7 +424,7 @@ export class CompilerScope {
                 if (node.getEvalMode() === 'manual') {
                     return true;
                 }
-                const links = this.linkMap.get(node.nodeId);
+                const links = this.linkMap.get(node.localId);
                 if (links.size > 1) {
                     return true;
                 }

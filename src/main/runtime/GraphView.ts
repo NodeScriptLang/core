@@ -18,7 +18,7 @@ export class GraphView {
 
     get scopeId(): string {
         return this.parentNode == null ? 'root' :
-            this.parentNode.graph.scopeId + ':' + this.parentNode.nodeId;
+            this.parentNode.graph.scopeId + ':' + this.parentNode.localId;
     }
 
     get moduleSpec() {
@@ -67,9 +67,9 @@ export class GraphView {
 
     getNodesByRef(ref: string): NodeView[] {
         const results: NodeView[] = [];
-        for (const [nodeId, nodeSpec] of Object.entries(this.graphSpec.nodes)) {
+        for (const [localId, nodeSpec] of Object.entries(this.graphSpec.nodes)) {
             if (nodeSpec.ref === ref) {
-                results.push(new NodeView(this, nodeId, nodeSpec));
+                results.push(new NodeView(this, localId, nodeSpec));
             }
         }
         return results;
@@ -102,7 +102,7 @@ export class GraphView {
         const map = new MultiMap<string, NodeLink>();
         for (const node of this.getNodes()) {
             for (const link of node.inboundLinks()) {
-                map.add(link.linkNode.nodeId, link);
+                map.add(link.linkNode.localId, link);
             }
         }
         return map;
