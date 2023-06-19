@@ -53,8 +53,12 @@ export class GraphView {
     }
 
     getNodeById(id: string): NodeView | null {
-        const nodeSpec = this.graphSpec.nodes[id];
-        return nodeSpec ? new NodeView(this, id, nodeSpec) : null;
+        const localId = id.includes(':') ? id.split(':').pop() : id;
+        if (!localId) {
+            return null;
+        }
+        const nodeSpec = this.graphSpec.nodes[localId];
+        return nodeSpec ? new NodeView(this, localId, nodeSpec) : null;
     }
 
     getNodes() {
