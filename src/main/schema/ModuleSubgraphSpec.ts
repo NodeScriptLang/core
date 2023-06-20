@@ -12,10 +12,6 @@ export const ModuleSubgraphSpecSchema = new Schema<ModuleSubgraphSpec>({
             properties: {},
             additionalProperties: SchemaSpecSchema.schema,
         },
-        output: {
-            type: 'object',
-            properties: {},
-            additionalProperties: SchemaSpecSchema.schema,
-        },
+        output: SchemaSpecSchema.schema,
     }
 });

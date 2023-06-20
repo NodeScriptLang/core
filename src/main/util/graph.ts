@@ -8,10 +8,7 @@ export function createSubgraphModuleSpec(subgraph: ModuleSubgraphSpec) {
     return ModuleSpecSchema.create({
         params: Object.fromEntries(paramEntries),
         result: {
-            schema: {
-                type: 'object',
-                properties: subgraph.output,
-            },
+            schema: subgraph.output,
         }
     });
 }

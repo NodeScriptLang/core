@@ -50,8 +50,11 @@ export const module: SubgraphModuleDefinition<P, R, SI, SO> = {
             index: { type: 'number' },
         },
         output: {
-            done: { type: 'boolean' },
-            result: { type: 'any' },
+            type: 'object',
+            properties: {
+                done: { type: 'boolean' },
+                result: { type: 'any' },
+            },
         }
     },
 };

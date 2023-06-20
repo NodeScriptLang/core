@@ -41,7 +41,7 @@ export interface ModuleResultSpec {
 
 export interface ModuleSubgraphSpec {
     input: Record<string, SchemaSpec>;
-    output: Record<string, SchemaSpec>;
+    output: SchemaSpec;
 }
 
 export type NodeEvalMode = 'auto' | 'manual';

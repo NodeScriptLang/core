@@ -35,7 +35,7 @@ export type SubgraphModuleCompute<P, R, SI, SO> = (this: void, params: P, ctx: G
 
 export type SubgraphDefinition<SI, SO> = {
     input: SubgraphSchemaObject<SI>;
-    output: SubgraphSchemaObject<SO>;
+    output: SchemaDef<SO>;
 };
 
 export type SubgraphSchemaObject<O> = {
