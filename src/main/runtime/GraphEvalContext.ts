@@ -87,9 +87,8 @@ export class GraphEvalContext implements t.GraphEvalContext {
         }
     }
 
-    // TODO drop schema (left for compatibility)
-    deferred(fn: () => unknown, schema?: SchemaSpec): Deferred {
-        return new Deferred(fn, schema);
+    deferred(fn: () => unknown): Deferred {
+        return new Deferred(fn);
     }
 
     isDeferred(value: unknown): value is t.Deferred {
@@ -98,16 +97,8 @@ export class GraphEvalContext implements t.GraphEvalContext {
 
     resolveDeferred(value: unknown): unknown {
         if (this.isDeferred(value)) {
-            const { schema, resolve } = value;
-            const val = resolve();
-            // TODO drop schema (left for compatibility)
-            if (schema) {
-                if (val instanceof Promise) {
-                    return val.then(v => this.convertType(v, schema));
-                }
-                return this.convertType(val, schema);
-            }
-            return val;
+            const { resolve } = value;
+            return resolve();
         }
         return value;
     }
@@ -122,15 +113,11 @@ export class NodePendingError extends Error {
 export class Deferred implements t.Deferred {
 
     resolve: () => unknown;
-    // TODO drop schema (left for compatibility)
-    schema: t.SchemaSpec | undefined;
 
     constructor(
         resolve: () => unknown,
-        schema?: SchemaSpec | undefined,
     ) {
         this.resolve = resolve;
-        this.schema = schema;
     }
 
     get [SYM_DEFERRED]() {

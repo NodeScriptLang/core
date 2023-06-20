@@ -6,8 +6,6 @@ import { SchemaSpec } from './schema.js';
 
 export interface Deferred {
     resolve: () => unknown;
-    // TODO drop schema (left for compatibility)
-    schema: SchemaSpec | undefined;
 }
 
 export interface GraphEvalContext {
@@ -32,8 +30,7 @@ export interface GraphEvalContext {
     toArray(object: unknown): unknown[];
     checkPendingNode(nodeUid: string): void;
 
-    // TODO drop schema (left for compatibility)
-    deferred(fn: () => unknown, schema?: SchemaSpec): unknown;
+    deferred(fn: () => unknown): unknown;
     isDeferred(value: unknown): value is Deferred;
     resolveDeferred(value: unknown): unknown;
 }
