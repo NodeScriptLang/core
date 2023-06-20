@@ -339,14 +339,21 @@ export class CompilerScope {
 
     private getSubgraphExpr(node: NodeView) {
         const subgraph = node.getSubgraph();
-        if (subgraph) {
-            const rootNode = subgraph.getRootNode();
-            if (rootNode) {
-                return this.symbols.getNodeSym(rootNode.nodeUid);
-            }
+        if (!subgraph) {
+            return '';
+        }
+        const rootNode = subgraph.getRootNode();
+        if (!rootNode) {
             return `() => undefined`;
         }
-        return '';
+        const sym = this.symbols.getNodeSym(rootNode.nodeUid);
+        if (this.options.introspect) {
+            return `(params, ctx) => {` +
+                `ctx.scopeCaptured.emit({ scopeId: ${JSON.stringify(subgraph.scopeId)}, params });` +
+                `return ${sym}(params, ctx)` +
+            `}`;
+        }
+        return sym;
     }
 
     private emitNodeProps(node: NodeView) {

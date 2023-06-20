@@ -16,6 +16,7 @@ export class GraphEvalContext implements t.GraphEvalContext {
 
     pendingNodeUids: Set<string>;
     nodeEvaluated: Event<t.NodeResult>;
+    scopeCaptured: Event<t.ScopeData>;
     // Each context maintains its own cache. Subscopes have separate caches
     // and do not delegate to parent contexts.
     cache = new Map<string, any>();
@@ -24,6 +25,7 @@ export class GraphEvalContext implements t.GraphEvalContext {
 
     constructor(readonly parent: GraphEvalContext | null = null) {
         this.nodeEvaluated = parent ? parent.nodeEvaluated : new Event();
+        this.scopeCaptured = parent ? parent.scopeCaptured : new Event();
         this.pendingNodeUids = parent ? parent.pendingNodeUids : new Set();
     }
 

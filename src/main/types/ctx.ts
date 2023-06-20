@@ -16,6 +16,7 @@ export interface GraphEvalContext {
     cache: Map<string, any>;
     locals: Map<string, any>;
     nodeEvaluated: Event<NodeResult>;
+    scopeCaptured: Event<ScopeData>;
 
     clear(): void;
     finalize(): Promise<void>;
@@ -35,4 +36,9 @@ export interface GraphEvalContext {
     deferred(fn: () => unknown, schema?: SchemaSpec): unknown;
     isDeferred(value: unknown): value is Deferred;
     resolveDeferred(value: unknown): unknown;
+}
+
+export interface ScopeData {
+    scopeId: string;
+    params: any;
 }

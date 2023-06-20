@@ -2,6 +2,7 @@ import assert from 'assert';
 
 import { GraphCompiler } from '../../main/compiler/index.js';
 import { GraphEvalContext } from '../../main/runtime/index.js';
+import { ScopeData } from '../../main/types/ctx.js';
 import { evalEsmModule } from '../../main/util/eval.js';
 import { runtime } from '../runtime.js';
 
@@ -146,11 +147,22 @@ describe('Compiler: subgraphs', () => {
                     },
                 },
             });
-            const { code } = new GraphCompiler().compileEsm(graph);
+            const { code } = new GraphCompiler().compileEsm(graph, {
+                introspect: true,
+            });
             const { compute } = await evalEsmModule(code);
+            const scopeData: ScopeData[] = [];
             const ctx = new GraphEvalContext();
+            ctx.scopeCaptured.on(data => {
+                scopeData.push(data);
+            });
             const res = await compute({}, ctx);
             assert.deepStrictEqual(res, [2, 3, 4]);
+            assert.deepStrictEqual(scopeData, [
+                { scopeId: 'root:res', params: { a: 1, b: 1 } },
+                { scopeId: 'root:res', params: { a: 1, b: 2 } },
+                { scopeId: 'root:res', params: { a: 1, b: 3 } }
+            ]);
         });
 
     });
