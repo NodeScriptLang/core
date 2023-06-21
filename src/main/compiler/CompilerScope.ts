@@ -44,15 +44,6 @@ export class CompilerScope {
         return this.async;
     }
 
-    computeEvalMode() {
-        for (const node of this.emittedNodes) {
-            if (node.getEvalMode() === 'manual') {
-                return 'manual';
-            }
-        }
-        return 'auto';
-    }
-
     emitNodeFunctions() {
         for (const node of this.emittedNodes) {
             this.emitNode(node);
@@ -63,11 +54,7 @@ export class CompilerScope {
         if (this.options.emitAll) {
             return this.graph.getNodes();
         }
-        const rootNode = this.graph.getRootNode();
-        if (rootNode) {
-            return [...rootNode.leftNodes()];
-        }
-        return [];
+        return this.graph.getEmittedNodes();
     }
 
     private emitNode(node: NodeView) {
@@ -94,7 +81,9 @@ export class CompilerScope {
         if (this.options.introspect) {
             const nodeUid = node.nodeUid;
             this.code.block('try {', '}', () => {
-                if (this.options.evalMode === 'manual') {
+                this.code.line(`ctx.nodeUid = ${JSON.stringify(nodeUid)}`);
+                if (!node.supportsSubgraph()) {
+                    // For subgraphs, pending check is done prior to calling the subgraph the first time.
                     this.code.line(`ctx.checkPendingNode(${JSON.stringify(nodeUid)});`);
                 }
                 this.code.line(`ctx.nodeEvaluated.emit({` +
@@ -176,6 +165,16 @@ export class CompilerScope {
         }
     }
 
+    private emitExpandedPreamble(node: NodeView) {
+        const expSyms: string[] = [];
+        for (const line of node.expandedLines()) {
+            const lineUid = line.lineUid;
+            const sym = this.symbols.getLineSym(lineUid);
+            expSyms.push(sym);
+        }
+        this.code.line(`const $l = Math.min(${expSyms.map(s => `${s}.length`).join(',')});`);
+    }
+
     private createLineDecl(line: PropLineView, sym: string): { decl?: string; expr: string } {
         const targetSchema = line.getSchema();
         const linkNode = line.getLinkNode();
@@ -228,16 +227,6 @@ export class CompilerScope {
         return {
             expr: this.escapeValue(value),
         };
-    }
-
-    private emitExpandedPreamble(node: NodeView) {
-        const expSyms: string[] = [];
-        for (const line of node.expandedLines()) {
-            const lineUid = line.lineUid;
-            const sym = this.symbols.getLineSym(lineUid);
-            expSyms.push(sym);
-        }
-        this.code.line(`const $l = Math.min(${expSyms.map(s => `${s}.length`).join(',')});`);
     }
 
     private emitNodeCompute(node: NodeView, resSym: string) {
@@ -348,10 +337,13 @@ export class CompilerScope {
         }
         const sym = this.symbols.getNodeSym(rootNode.nodeUid);
         if (this.options.introspect) {
-            return `(params, ctx) => {` +
-                `ctx.scopeCaptured.emit({ scopeId: ${JSON.stringify(subgraph.scopeId)}, params });` +
-                `return ${sym}(params, ctx)` +
-            `}`;
+            return [
+                `(params, ctx) => {`,
+                `ctx.scopeCaptured.emit({ nodeUid: ${JSON.stringify(node.nodeUid)}, params });`,
+                `ctx.checkPendingNode(${JSON.stringify(node.nodeUid)});`,
+                `return ${sym}(params, ctx);`,
+                `}`,
+            ].join('');
         }
         return sym;
     }

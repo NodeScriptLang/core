@@ -51,7 +51,7 @@ export class CompilerJob {
 
     getModuleSpec(): ModuleSpec {
         const moduleSpec = clone(this.graphView.moduleSpec);
-        moduleSpec.evalMode = this.mainScope.computeEvalMode();
+        moduleSpec.evalMode = this.mainScope.graph.getEvalMode();
         moduleSpec.result.async = this.mainScope.isAsync();
         moduleSpec.newScope = true;
         return moduleSpec;

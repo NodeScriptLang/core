@@ -1,4 +1,5 @@
 import { GraphSpec } from '../types/model.js';
+import { NodeEvalMode } from '../types/module.js';
 import { clone } from '../util/clone.js';
 import { MultiMap } from '../util/multimap.js';
 import { ModuleLoader } from './ModuleLoader.js';
@@ -91,6 +92,23 @@ export class GraphView {
             }
         }
         return [...candidates];
+    }
+
+    getEmittedNodes(): NodeView[] {
+        const rootNode = this.getRootNode();
+        if (rootNode) {
+            return [...rootNode.leftNodes()];
+        }
+        return [];
+    }
+
+    getEvalMode(): NodeEvalMode {
+        for (const node of this.getEmittedNodes()) {
+            if (node.getEvalMode() === 'manual') {
+                return 'manual';
+            }
+        }
+        return 'auto';
     }
 
     *allLinks(): Iterable<NodeLink> {

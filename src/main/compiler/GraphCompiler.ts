@@ -1,5 +1,5 @@
 import { GraphView } from '../runtime/index.js';
-import { ModuleSpec, NodeEvalMode } from '../types/index.js';
+import { ModuleSpec } from '../types/index.js';
 import { CompilerJob } from './CompilerJob.js';
 
 export interface CompilerOptions {
@@ -7,7 +7,6 @@ export interface CompilerOptions {
     introspect: boolean;
     emitNodeMap: boolean;
     emitAll: boolean;
-    evalMode: NodeEvalMode;
 }
 
 export interface CompilerResult {
@@ -34,7 +33,6 @@ export class GraphCompiler {
             introspect: false,
             emitNodeMap: false,
             emitAll: false,
-            evalMode: 'auto',
             ...options
         });
         job.run();

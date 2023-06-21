@@ -159,9 +159,9 @@ describe('Compiler: subgraphs', () => {
             const res = await compute({}, ctx);
             assert.deepStrictEqual(res, [2, 3, 4]);
             assert.deepStrictEqual(scopeData, [
-                { scopeId: 'root:res', params: { a: 1, b: 1 } },
-                { scopeId: 'root:res', params: { a: 1, b: 2 } },
-                { scopeId: 'root:res', params: { a: 1, b: 3 } }
+                { nodeUid: 'root:res', params: { a: 1, b: 1 } },
+                { nodeUid: 'root:res', params: { a: 1, b: 2 } },
+                { nodeUid: 'root:res', params: { a: 1, b: 3 } }
             ]);
         });
 

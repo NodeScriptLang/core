@@ -1,6 +1,5 @@
 import { Event } from 'nanoevent';
 
-import { NodeResult } from './node-result.js';
 import { RuntimeLib } from './runtime-lib.js';
 import { SchemaSpec } from './schema.js';
 
@@ -11,6 +10,7 @@ export interface Deferred {
 export interface GraphEvalContext {
     readonly lib: RuntimeLib;
 
+    nodeUid: string;
     cache: Map<string, any>;
     locals: Map<string, any>;
     nodeEvaluated: Event<NodeResult>;
@@ -35,7 +35,15 @@ export interface GraphEvalContext {
     resolveDeferred(value: unknown): unknown;
 }
 
+export interface NodeResult {
+    nodeUid: string;
+    result?: any;
+    error?: any;
+    progress?: number;
+    timestamp?: number;
+}
+
 export interface ScopeData {
-    scopeId: string;
+    nodeUid: string;
     params: any;
 }

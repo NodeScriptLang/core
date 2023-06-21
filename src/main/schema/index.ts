@@ -11,7 +11,6 @@ export * from './NodeCacheMode.js';
 export * from './NodeEvalMode.js';
 export * from './NodeMetadata.js';
 export * from './NodeResizeMode.js';
-export * from './NodeResult.js';
 export * from './NodeSpec.js';
 export * from './Point.js';
 export * from './PropEntrySpec.js';

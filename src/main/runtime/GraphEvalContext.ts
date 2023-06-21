@@ -14,6 +14,7 @@ export const SYM_DEFERRED = Symbol.for('NodeScript:Deferred');
 export class GraphEvalContext implements t.GraphEvalContext {
     readonly lib = runtimeLib;
 
+    nodeUid = '';
     pendingNodeUids: Set<string>;
     nodeEvaluated: Event<t.NodeResult>;
     scopeCaptured: Event<t.ScopeData>;
