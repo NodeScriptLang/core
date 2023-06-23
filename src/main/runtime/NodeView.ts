@@ -18,6 +18,25 @@ export type NodeLink = {
 
 export class NodeView {
 
+    /**
+     * Returns nodes in right-to-left order based on topology.
+     */
+    static orderNodes(nodes: Iterable<NodeView>): NodeView[] {
+        const result = [...nodes];
+        for (let i = 0; i < result.length; i++) {
+            const node = result[i];
+            for (const link of node.inboundLinks()) {
+                const index = result.findIndex(_ => _.nodeUid === link.linkNode.nodeUid);
+                if (index > -1 && index < i) {
+                    result.splice(i, 1);
+                    result.splice(index, 0, node);
+                    i = index;
+                }
+            }
+        }
+        return result;
+    }
+
     private _moduleSpec: ModuleSpec;
     private _nodeUid: string;
 
