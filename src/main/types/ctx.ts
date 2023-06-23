@@ -19,6 +19,7 @@ export interface GraphEvalContext {
     clear(): void;
     finalize(): Promise<void>;
     newScope(): GraphEvalContext;
+    checkPendingNode(nodeUid: string): void;
 
     getLocal<T>(key: string, defaultValue?: T): T | undefined;
     setLocal(key: string, value: unknown): void;
@@ -28,7 +29,6 @@ export interface GraphEvalContext {
     get(object: unknown, keyish: string): unknown;
     set(object: unknown, keyish: string, value: unknown): void;
     toArray(object: unknown): unknown[];
-    checkPendingNode(nodeUid: string): void;
 
     deferred(fn: () => unknown): unknown;
     isDeferred(value: unknown): value is Deferred;

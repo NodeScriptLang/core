@@ -7,6 +7,7 @@ export interface CompilerOptions {
     introspect: boolean;
     emitNodeMap: boolean;
     emitAll: boolean;
+    forceCache: boolean;
 }
 
 export interface CompilerResult {
@@ -33,6 +34,7 @@ export class GraphCompiler {
             introspect: false,
             emitNodeMap: false,
             emitAll: false,
+            forceCache: false,
             ...options
         });
         job.run();

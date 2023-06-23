@@ -417,6 +417,9 @@ export class CompilerScope {
     }
 
     private isNodeCached(node: NodeView) {
+        if (this.options.forceCache) {
+            return true;
+        }
         const cache = node.getModuleSpec().cacheMode ?? 'auto';
         switch (cache) {
             case 'auto': {
@@ -427,7 +430,7 @@ export class CompilerScope {
                 if (links.size > 1) {
                     return true;
                 }
-                return [...links].some(link => link.prop.isExpanded());
+                return node.isExpanded();
             }
             case 'always':
                 return true;
