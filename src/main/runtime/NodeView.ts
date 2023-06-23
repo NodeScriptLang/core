@@ -2,7 +2,7 @@ import { coerce } from 'airtight';
 
 import { PropSpecSchema } from '../schema/PropSpec.js';
 import { NodeSpec } from '../types/model.js';
-import { ModuleSpec } from '../types/module.js';
+import { ModuleSpec, NodeEvalMode } from '../types/module.js';
 import { clone } from '../util/clone.js';
 import { createSubgraphModuleSpec } from '../util/graph.js';
 import { GraphView } from './GraphView.js';
@@ -219,11 +219,16 @@ export class NodeView {
         return true;
     }
 
-    getEvalMode() {
+    getEvalMode(): NodeEvalMode {
         if (this.metadata.forceManualEval) {
             return 'manual';
         }
-        return this.getModuleSpec().evalMode;
+        const evalMode = this.getModuleSpec().evalMode;
+        if (evalMode === 'auto' && this.supportsSubgraph()) {
+            // Subgraphs with manual evaluation take precedence
+            return this.getSubgraph()?.getEvalMode() ?? 'auto';
+        }
+        return evalMode;
     }
 
     isAsync() {
