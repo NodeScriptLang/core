@@ -329,7 +329,7 @@ export class CompilerScope {
     private emitGenericCompute(node: NodeView, resSym: string) {
         this.code.line(`ctx.nodeId = ${JSON.stringify(node.nodeId)};`);
         const computeSym = this.symbols.getComputeSym(node.ref);
-        const scopeSym = this.graph.moduleSpec.newScope ? `ctx.newScope()` : `ctx`;
+        const scopeSym = node.getModuleSpec().newScope ? `ctx.newScope()` : `ctx`;
         const subgraphSym = this.getSubgraphExpr(node);
         const argsExpr = [scopeSym, subgraphSym].filter(Boolean).join(',');
         this.code.block(`${resSym} = ${this.awaitSym(node)}${computeSym}({`, `}, ${argsExpr});`, () => {
