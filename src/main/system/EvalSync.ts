@@ -4,7 +4,7 @@ export const EvalSync = ModuleSpecSchema.create({
     moduleName: 'Eval / Sync',
     version: '1.0.0',
     description: 'Evaluates synchronous JavaScript code with provided arguments.',
-    keywords: ['eval', 'compute', 'js', 'javascript', 'function', 'execute', 'expression', 'sync'],
+    keywords: ['javascript', 'expression'],
     resizeMode: 'all',
     params: {
         args: {

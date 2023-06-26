@@ -4,7 +4,7 @@ export const EvalAsync = ModuleSpecSchema.create({
     moduleName: 'Eval / Async',
     version: '1.0.0',
     description: 'Evaluates asynchronous JavaScript code with provided arguments.',
-    keywords: ['eval', 'compute', 'js', 'javascript', 'function', 'execute', 'expression', 'async'],
+    keywords: ['javascript', 'expression'],
     resizeMode: 'all',
     params: {
         args: {
