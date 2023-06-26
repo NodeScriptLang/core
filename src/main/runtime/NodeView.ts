@@ -187,7 +187,12 @@ export class NodeView {
         }
     }
 
-    *leftNodes(visited: Set<string> = new Set()): Iterable<NodeView> {
+    /**
+     * Returns this node, plus all the nodes connect to its inbound sockets, recursively.
+     *
+     * This can also be thought of as a list of node's transitive dependencies.
+     */
+    *leftNodes(visited = new Set<string>()): Iterable<NodeView> {
         if (visited.has(this.localId)) {
             return;
         }
@@ -198,10 +203,19 @@ export class NodeView {
         }
     }
 
-    *rightNodes(linkMap = this.graph.computeLinkMap()): Iterable<NodeView> {
+    /**
+     * Returns this node, plus all the nodes connected to its outbound sockets, recursively.
+     *
+     * This can also be thought of as a list of node's dependents.
+     */
+    *rightNodes(linkMap = this.graph.computeLinkMap(), visited = new Set<string>()): Iterable<NodeView> {
+        if (visited.has(this.localId)) {
+            return;
+        }
+        visited.add(this.localId);
         yield this;
         for (const link of linkMap.get(this.localId)) {
-            yield* link.node.rightNodes(linkMap);
+            yield* link.node.rightNodes(linkMap, visited);
         }
     }
 
@@ -219,6 +233,15 @@ export class NodeView {
         return true;
     }
 
+    /**
+     * Determines whether Node is evaluated manually (by pressing a Play button)
+     * or immediately in the editor. Has no effect outside of the editor.
+     *
+     * Manually evaluated nodes cascade up and takes precedence, i.e. if a graph contains at least one
+     * node with `evalMode: manual`, then its own `evalMode` is also manual.
+     * Same applies to subgraphs: if a subgraph contains manually evaluated nodes,
+     * then its enclosing node is also manually evaluated.
+     */
     getEvalMode(): NodeEvalMode {
         if (this.metadata.forceManualEval) {
             return 'manual';
@@ -231,6 +254,10 @@ export class NodeView {
         return evalMode;
     }
 
+    /**
+     * Returns `true` if the node itself or any of its left nodes are async,
+     * i.e. have `moduleSpec.result.async: true`.
+     */
     isAsync() {
         if (this.getModuleSpec().result.async) {
             return true;

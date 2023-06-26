@@ -102,6 +102,12 @@ export class GraphView {
         return [];
     }
 
+    /**
+     * Returns `manual` if any of the emitted nodes are manually evaluated,
+     * otherwise returns `auto`.
+     *
+     * @see NodeView.getEvalMode for more info on node evaluation semantics.
+     */
     getEvalMode(): NodeEvalMode {
         for (const node of this.getEmittedNodes()) {
             if (node.getEvalMode() === 'manual') {
