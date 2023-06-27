@@ -8,14 +8,6 @@ import { createSubgraphModuleSpec } from '../util/graph.js';
 import { GraphView } from './GraphView.js';
 import { PropEntryView, PropLineView, PropView } from './PropView.js';
 
-export type NodeLink = {
-    node: NodeView;
-    linkNode: NodeView;
-    prop: PropView;
-    entry?: PropEntryView;
-    linkKey?: string;
-};
-
 export class NodeView {
 
     /**
@@ -270,4 +262,28 @@ export class NodeView {
         return false;
     }
 
+    getDebugSampling(): NodeDebugSampling {
+        const debugSampling = this.metadata?.debugSampling ?? {};
+        return {
+            enabled: !!debugSampling.enabled,
+            limit: Number(debugSampling.limit) || 1,
+            offset: Number(debugSampling.offset) || 0,
+        };
+    }
+
+
+}
+
+export interface NodeLink {
+    node: NodeView;
+    linkNode: NodeView;
+    prop: PropView;
+    entry?: PropEntryView;
+    linkKey?: string;
+}
+
+export interface NodeDebugSampling {
+    enabled: boolean;
+    limit: number;
+    offset: number;
 }

@@ -125,6 +125,16 @@ export class CompilerScope {
 
     private emitRegularNode(node: NodeView, resSym: string) {
         this.emitNodeCompute(node, resSym);
+        if (this.options.introspect) {
+            const sampling = node.getDebugSampling();
+            if (sampling.enabled) {
+                this.code.line([
+                    `if (Array.isArray(${resSym})) {`,
+                    `${resSym} = ${resSym}.slice(${sampling.offset}, ${sampling.offset + sampling.limit})`,
+                    `}`,
+                ].join(''));
+            }
+        }
     }
 
     private emitExpandedNode(node: NodeView, resSym: string) {
@@ -132,11 +142,18 @@ export class CompilerScope {
         // repeating the computation per each value of expanded property
         this.emitExpandedPreamble(node);
         this.code.line(`${resSym} = []`);
-        this.code.block(`for (let $i = 0; $i < $l; $i++) {`, `}`, () => {
+        let offset = 0;
+        if (this.options.introspect) {
+            const debugSampling = node.getDebugSampling();
+            if (debugSampling.enabled) {
+                offset = debugSampling.offset;
+            }
+        }
+        this.code.block(`for (let $i = ${offset}; $i < ${offset} + $l; $i++) {`, `}`, () => {
             if (this.options.introspect) {
                 this.code.line(`ctx.nodeEvaluated.emit({` +
                     `nodeUid: ${JSON.stringify(node.nodeUid)},` +
-                    `progress: $i / $l,` +
+                    `progress: ($i - ${offset}) / $l,` +
                 `});`);
             }
             const tempSym = `$t`;
@@ -166,13 +183,19 @@ export class CompilerScope {
     }
 
     private emitExpandedPreamble(node: NodeView) {
-        const expSyms: string[] = [];
+        const args: string[] = [];
         for (const line of node.expandedLines()) {
             const lineUid = line.lineUid;
             const sym = this.symbols.getLineSym(lineUid);
-            expSyms.push(sym);
+            args.push(`${sym}.length`);
         }
-        this.code.line(`const $l = Math.min(${expSyms.map(s => `${s}.length`).join(',')});`);
+        if (this.options.introspect) {
+            const sampling = node.getDebugSampling();
+            if (sampling.enabled) {
+                args.push(`${sampling.limit}`);
+            }
+        }
+        this.code.line(`const $l = Math.min(${args.join(',')});`);
     }
 
     private createLineDecl(line: PropLineView, sym: string): { decl?: string; expr: string } {
