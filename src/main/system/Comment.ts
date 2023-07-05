@@ -5,7 +5,7 @@ export const Comment: ModuleSpec = ModuleSpecSchema.create({
     moduleName: 'Comment',
     version: '1.0.0',
     resizeMode: 'all',
-    // TODO migrate to metadata.label
+    hideEvalControls: true,
     params: {
         comment: {
             schema: { type: 'string' },
@@ -13,5 +13,6 @@ export const Comment: ModuleSpec = ModuleSpecSchema.create({
     },
     result: {
         schema: { type: 'any' },
+        hideSocket: true,
     },
 });

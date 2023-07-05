@@ -30,6 +30,7 @@ describe('ModuleLoader', () => {
             cacheMode: 'auto',
             evalMode: 'auto',
             resizeMode: 'horizontal',
+            hideEvalControls: false,
             attributes: {},
         });
     });

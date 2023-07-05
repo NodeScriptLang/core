@@ -51,10 +51,13 @@ export const ModuleSpecSchema = new Schema<ModuleSpec>({
         cacheMode: NodeCacheModeSchema.schema,
         evalMode: NodeEvalModeSchema.schema,
         resizeMode: NodeResizeModeSchema.schema,
+        hideEvalControls: {
+            type: 'boolean',
+        },
         attributes: {
             type: 'object',
             properties: {},
             additionalProperties: { type: 'any' },
-        }
+        },
     }
 });
