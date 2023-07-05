@@ -15,6 +15,7 @@ export interface ModuleSpec {
     cacheMode: NodeCacheMode;
     evalMode: NodeEvalMode;
     resizeMode: NodeResizeMode;
+    hideEvalControls: boolean;
     attributes: Record<string, any>;
 }
 

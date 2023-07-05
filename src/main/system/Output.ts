@@ -4,6 +4,7 @@ export const Output = ModuleSpecSchema.create({
     moduleName: 'Output',
     version: '1.0.0',
     hidden: true,
+    hideEvalControls: true,
     params: {
         value: {
             schema: {
