@@ -72,6 +72,7 @@ export abstract class GenericModuleLoader implements ModuleLoader {
             cacheMode: 'auto',
             evalMode: 'auto',
             resizeMode: 'horizontal',
+            hideEvalControls: false,
             attributes: {
                 ref,
             },
