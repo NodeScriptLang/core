@@ -53,6 +53,7 @@ export const ModuleSpecSchema = new Schema<ModuleSpec>({
         resizeMode: NodeResizeModeSchema.schema,
         hideEvalControls: {
             type: 'boolean',
+            default: false,
         },
         attributes: {
             type: 'object',
