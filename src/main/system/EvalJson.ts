@@ -14,6 +14,7 @@ export const EvalJson = ModuleSpecSchema.create({
             attributes: {
                 renderer: 'json',
             },
+            minHeight: 4,
         }
     },
     result: {
