@@ -32,6 +32,7 @@ export interface ModuleParamSpec {
     hideEntries?: boolean;
     hideValue?: boolean;
     attributes: Record<string, any>;
+    minHeight?: number;
 }
 
 export interface ModuleResultSpec {

@@ -22,6 +22,7 @@ export const EvalSync = ModuleSpecSchema.create({
             attributes: {
                 renderer: 'javascript',
             },
+            minHeight: 4,
         }
     },
     result: {

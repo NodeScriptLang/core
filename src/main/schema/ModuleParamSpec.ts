@@ -55,5 +55,9 @@ export const ModuleParamSpecSchema = new Schema<ModuleParamSpec>({
                 type: 'any',
             }
         },
+        minHeight: {
+            type: 'number',
+            optional: true,
+        },
     }
 });
