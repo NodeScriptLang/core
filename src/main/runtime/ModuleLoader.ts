@@ -22,6 +22,7 @@ export abstract class GenericModuleLoader implements ModuleLoader {
         this.addModule('@system/EvalSync', systemNodes.EvalSync);
         this.addModule('@system/EvalAsync', systemNodes.EvalAsync);
         this.addModule('@system/EvalJson', systemNodes.EvalJson);
+        this.addModule('@system/Subgraph', systemNodes.Subgraph);
     }
 
     abstract resolveComputeUrl(ref: string): string;

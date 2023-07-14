@@ -7,3 +7,4 @@ export * from './Frame.js';
 export * from './Input.js';
 export * from './Output.js';
 export * from './Param.js';
+export * from './Subgraph.js';
