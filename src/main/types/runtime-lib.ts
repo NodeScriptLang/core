@@ -21,6 +21,6 @@ export interface RuntimeLib {
     merge(a: unknown, b: unknown): unknown;
 
     matchPath(path: string, value: string, prefix?: boolean): PathParams | null;
-    parseJson(str: string, defaultValue?: any): unknown;
+    parseJson(str: string, defaultValue?: any): any;
     toRegExp(value: unknown): RegExp;
 }
