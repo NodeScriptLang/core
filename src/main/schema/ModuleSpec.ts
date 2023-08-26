@@ -30,6 +30,10 @@ export const ModuleSpecSchema = new Schema<ModuleSpec>({
             type: 'string',
             optional: true,
         },
+        sourceUrl: {
+            type: 'string',
+            optional: true,
+        },
         hidden: {
             type: 'boolean',
             optional: true,

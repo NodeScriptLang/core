@@ -7,6 +7,7 @@ export interface ModuleSpec {
     description: string;
     keywords: string[];
     deprecated?: string;
+    sourceUrl?: string;
     hidden?: boolean;
     params: Record<string, ModuleParamSpec>;
     result: ModuleResultSpec;
@@ -32,6 +33,7 @@ export interface ModuleParamSpec {
     hideEntries?: boolean;
     hideValue?: boolean;
     attributes: Record<string, any>;
+    // TODO move to attributes
     minHeight?: number;
 }
 
