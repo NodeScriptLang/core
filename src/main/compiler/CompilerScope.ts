@@ -81,6 +81,7 @@ export class CompilerScope {
         if (this.options.introspect) {
             const nodeUid = node.nodeUid;
             this.code.block('try {', '}', () => {
+                this.code.line(`const $startedAt = Date.now();`);
                 this.code.line(`ctx.nodeUid = ${JSON.stringify(nodeUid)}`);
                 if (!node.supportsSubgraph()) {
                     // For subgraphs, pending check is done prior to calling the subgraph the first time.
@@ -95,7 +96,7 @@ export class CompilerScope {
                     this.code.line(`ctx.nodeEvaluated.emit({` +
                         `nodeUid: ${JSON.stringify(nodeUid)},` +
                         `result: ${resSym},` +
-                        `timestamp: Date.now(),` +
+                        `duration: Date.now() - $startedAt,` +
                         `});`);
                 }
                 this.code.line(`return ${resSym};`);
@@ -104,7 +105,7 @@ export class CompilerScope {
                 this.code.line(`ctx.nodeEvaluated.emit({` +
                     `nodeUid: ${JSON.stringify(nodeUid)},` +
                     `error,` +
-                    `timestamp: Date.now(),` +
+                    `duration: Date.now() - $startedAt,` +
                     `});`);
                 this.code.line('throw error;');
             });

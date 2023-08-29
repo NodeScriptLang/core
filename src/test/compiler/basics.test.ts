@@ -54,7 +54,7 @@ describe('Compiler: basics', () => {
         const { compute } = await evalEsmModule(code);
         const ctx = new GraphEvalContext();
         const nodeResults: NodeResult[] = [];
-        ctx.nodeEvaluated.on(_ => nodeResults.push(omit(_, 'timestamp')));
+        ctx.nodeEvaluated.on(_ => nodeResults.push(omit(_, 'duration')));
         const res = await compute({
             value: 12
         }, ctx);

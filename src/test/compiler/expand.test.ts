@@ -222,7 +222,7 @@ describe('Compiler: array expansion', () => {
         const { compute } = await evalEsmModule(code);
         const ctx = new GraphEvalContext();
         const results: NodeResult[] = [];
-        ctx.nodeEvaluated.on(_ => results.push(omit(_, 'timestamp')));
+        ctx.nodeEvaluated.on(_ => results.push(omit(_, 'duration')));
         const res = await compute({}, ctx);
         assert.deepStrictEqual(res, [1, 2, 42]);
         assert.deepStrictEqual(results, [

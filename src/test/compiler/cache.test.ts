@@ -32,7 +32,7 @@ describe('Compiler: cache', () => {
         const { compute } = await evalEsmModule(code);
         const ctx = new GraphEvalContext();
         const results: NodeResult[] = [];
-        ctx.nodeEvaluated.on(_ => results.push(omit(_, 'timestamp')));
+        ctx.nodeEvaluated.on(_ => results.push(omit(_, 'duration')));
         const res = await compute({}, ctx);
         assert.deepStrictEqual(res, 84);
         assert.deepStrictEqual(results, [
@@ -68,7 +68,7 @@ describe('Compiler: cache', () => {
         const { compute } = await evalEsmModule(code);
         const ctx = new GraphEvalContext();
         const results: NodeResult[] = [];
-        ctx.nodeEvaluated.on(_ => results.push(omit(_, 'timestamp')));
+        ctx.nodeEvaluated.on(_ => results.push(omit(_, 'duration')));
         const res = await compute({}, ctx);
         assert.deepStrictEqual(res, 54);
         assert.deepStrictEqual(results, [
