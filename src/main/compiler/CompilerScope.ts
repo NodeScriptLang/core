@@ -80,8 +80,8 @@ export class CompilerScope {
         this.code.line(`let ${resSym};`);
         if (this.options.introspect) {
             const nodeUid = node.nodeUid;
+            this.code.line(`const $startedAt = Date.now();`);
             this.code.block('try {', '}', () => {
-                this.code.line(`const $startedAt = Date.now();`);
                 this.code.line(`ctx.nodeUid = ${JSON.stringify(nodeUid)}`);
                 if (!node.supportsSubgraph()) {
                     // For subgraphs, pending check is done prior to calling the subgraph the first time.
