@@ -4,6 +4,7 @@ import { Event } from 'nanoevent';
 import * as t from '../types/index.js';
 import { SchemaSpec } from '../types/index.js';
 import { convertAuto, runtimeLib } from '../util/index.js';
+import { GraphProfiler } from './GraphProfiler.js';
 
 export const SYM_DEFERRED = Symbol.for('NodeScript:Deferred');
 
@@ -18,13 +19,16 @@ export class GraphEvalContext implements t.GraphEvalContext {
     pendingNodeUids: Set<string>;
     nodeEvaluated: Event<t.NodeResult>;
     scopeCaptured: Event<t.ScopeData>;
+    profiler = new GraphProfiler();
     // Each context maintains its own cache. Subscopes have separate caches
     // and do not delegate to parent contexts.
     cache = new Map<string, any>();
     // Locals are stored per-context. Lookups delegate up the hierarchy.
     locals = new Map<string, any>();
 
-    constructor(readonly parent: GraphEvalContext | null = null) {
+    constructor(
+        readonly parent: GraphEvalContext | null = null,
+    ) {
         this.nodeEvaluated = parent ? parent.nodeEvaluated : new Event();
         this.scopeCaptured = parent ? parent.scopeCaptured : new Event();
         this.pendingNodeUids = parent ? parent.pendingNodeUids : new Set();
@@ -37,6 +41,10 @@ export class GraphEvalContext implements t.GraphEvalContext {
     }
 
     async finalize() {}
+
+    get depth(): number {
+        return this.parent ? this.parent.depth + 1 : 0;
+    }
 
     getLocal<T>(key: string, defaultValue?: T): T | undefined {
         const val = this.locals.get(key);
@@ -64,7 +72,6 @@ export class GraphEvalContext implements t.GraphEvalContext {
     convertType(value: unknown, schema: SchemaSpec) {
         return new Schema(schema as any).decode(value);
     }
-
 
     get(object: unknown, keyish: string) {
         return this.lib.get(object, keyish);
@@ -102,6 +109,10 @@ export class GraphEvalContext implements t.GraphEvalContext {
             return resolve();
         }
         return value;
+    }
+
+    span(spanId: string, type: t.ProfileSpanType): void {
+        this.profiler.collectSpan(spanId, type);
     }
 
 }

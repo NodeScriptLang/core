@@ -33,6 +33,8 @@ export interface GraphEvalContext {
     deferred(fn: () => unknown): unknown;
     isDeferred(value: unknown): value is Deferred;
     resolveDeferred(value: unknown): unknown;
+
+    span(spanId: string, type: ProfileSpanType): void;
 }
 
 export interface NodeResult {
@@ -46,3 +48,5 @@ export interface ScopeData {
     nodeUid: string;
     params: any;
 }
+
+export type ProfileSpanType = 's' | 'c' | 'e';

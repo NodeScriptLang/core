@@ -78,10 +78,11 @@ export class CompilerScope {
     private emitNodeBodyIntrospect(node: NodeView) {
         const resSym = '$r';
         this.code.line(`let ${resSym};`);
+        this.code.line(`ctx.span(${JSON.stringify(node.nodeUid)}, 's');`);
+        this.code.line(`ctx.nodeUid = ${JSON.stringify(node.nodeUid)}`);
         if (this.options.introspect) {
             const nodeUid = node.nodeUid;
             this.code.block('try {', '}', () => {
-                this.code.line(`ctx.nodeUid = ${JSON.stringify(nodeUid)}`);
                 if (!node.supportsSubgraph()) {
                     // For subgraphs, pending check is done prior to calling the subgraph the first time.
                     this.code.line(`ctx.checkPendingNode(${JSON.stringify(nodeUid)});`);
@@ -200,12 +201,12 @@ export class CompilerScope {
         const targetSchema = line.getSchema();
         const linkNode = line.getLinkNode();
         const linkKey = line.linkKey;
-        if (this.options.comments) {
-            this.code.line(`// Line: ${line.lineUid}`);
-            this.code.line(`// Schema: ${JSON.stringify(targetSchema)}`);
-        }
         // Linked
         if (linkNode) {
+            if (this.options.comments) {
+                this.code.line(`// Line: ${line.lineUid}`);
+                this.code.line(`// Schema: ${JSON.stringify(targetSchema)}`);
+            }
             const async = linkNode.isAsync();
             // 1. figure if type conversion is necessary
             let sourceSchema = linkNode.getModuleSpec().result.schema;
@@ -251,26 +252,32 @@ export class CompilerScope {
     }
 
     private emitNodeCompute(node: NodeView, resSym: string) {
-        switch (node.ref) {
-            case '@system/Param':
-                return this.emitParamNode(node, resSym);
-            case '@system/Input':
-                return this.emitInputNode(node, resSym);
-            case '@system/Result':
-            case '@system/Output':
-                return this.emitOutputNode(node, resSym);
-            case '@system/Comment':
-            case '@system/Frame':
-                return;
-            case '@system/EvalSync':
-                return this.emitEvalSync(node, resSym);
-            case '@system/EvalAsync':
-                return this.emitEvalAsync(node, resSym);
-            case '@system/EvalJson':
-                return this.emitEvalJson(node, resSym);
-            default:
-                return this.emitGenericCompute(node, resSym);
-        }
+        this.code.block('try {', '}', () => {
+            this.code.line(`ctx.span(${JSON.stringify(node.nodeUid)}, 'c');`);
+            switch (node.ref) {
+                case '@system/Param':
+                    return this.emitParamNode(node, resSym);
+                case '@system/Input':
+                    return this.emitInputNode(node, resSym);
+                case '@system/Result':
+                case '@system/Output':
+                    return this.emitOutputNode(node, resSym);
+                case '@system/Comment':
+                case '@system/Frame':
+                    return;
+                case '@system/EvalSync':
+                    return this.emitEvalSync(node, resSym);
+                case '@system/EvalAsync':
+                    return this.emitEvalAsync(node, resSym);
+                case '@system/EvalJson':
+                    return this.emitEvalJson(node, resSym);
+                default:
+                    return this.emitGenericCompute(node, resSym);
+            }
+        });
+        this.code.block('finally {', '}', () => {
+            this.code.line(`ctx.span(${JSON.stringify(node.nodeUid)}, 'e');`);
+        });
     }
 
     private emitParamNode(node: NodeView, resSym: string) {
