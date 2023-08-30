@@ -42,14 +42,11 @@ describe('Compiler: profiler', () => {
         const res = compute({}, ctx);
         assert.strictEqual(res, 9);
         assert.deepStrictEqual(profiler.spans.map(span => [span[0], span[1]]), [
-            ['s', 'root:a'],
-            ['s', 'root:b'],
             ['s', 'root:c'],
-            ['c', 'root:c'],
             ['e', 'root:c'],
-            ['c', 'root:b'],
+            ['s', 'root:b'],
             ['e', 'root:b'],
-            ['c', 'root:a'],
+            ['s', 'root:a'],
             ['e', 'root:a'],
         ]);
     });

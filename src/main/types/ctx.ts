@@ -49,4 +49,4 @@ export interface ScopeData {
     params: any;
 }
 
-export type ProfileSpanType = 's' | 'c' | 'e';
+export type ProfileSpanType = 's' | 'e';

@@ -78,7 +78,6 @@ export class CompilerScope {
     private emitNodeBodyIntrospect(node: NodeView) {
         const resSym = '$r';
         this.code.line(`let ${resSym};`);
-        this.code.line(`ctx.span(${JSON.stringify(node.nodeUid)}, 's');`);
         this.code.line(`ctx.nodeUid = ${JSON.stringify(node.nodeUid)}`);
         if (this.options.introspect) {
             const nodeUid = node.nodeUid;
@@ -253,7 +252,7 @@ export class CompilerScope {
 
     private emitNodeCompute(node: NodeView, resSym: string) {
         this.code.block('try {', '}', () => {
-            this.code.line(`ctx.span(${JSON.stringify(node.nodeUid)}, 'c');`);
+            this.code.line(`ctx.span(${JSON.stringify(node.nodeUid)}, 's');`);
             switch (node.ref) {
                 case '@system/Param':
                     return this.emitParamNode(node, resSym);
