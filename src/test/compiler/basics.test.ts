@@ -4,7 +4,6 @@ import { GraphCompiler } from '../../main/compiler/index.js';
 import { GraphEvalContext } from '../../main/runtime/index.js';
 import { NodeResult } from '../../main/types/index.js';
 import { evalEsmModule } from '../../main/util/eval.js';
-import { omit } from '../helpers.js';
 import { runtime } from '../runtime.js';
 
 describe('Compiler: basics', () => {
@@ -54,7 +53,7 @@ describe('Compiler: basics', () => {
         const { compute } = await evalEsmModule(code);
         const ctx = new GraphEvalContext();
         const nodeResults: NodeResult[] = [];
-        ctx.nodeEvaluated.on(_ => nodeResults.push(omit(_, 'duration')));
+        ctx.nodeEvaluated.on(_ => nodeResults.push(_));
         const res = await compute({
             value: 12
         }, ctx);

@@ -80,7 +80,6 @@ export class CompilerScope {
         this.code.line(`let ${resSym};`);
         if (this.options.introspect) {
             const nodeUid = node.nodeUid;
-            this.code.line(`const $startedAt = Date.now();`);
             this.code.block('try {', '}', () => {
                 this.code.line(`ctx.nodeUid = ${JSON.stringify(nodeUid)}`);
                 if (!node.supportsSubgraph()) {
@@ -96,7 +95,6 @@ export class CompilerScope {
                     this.code.line(`ctx.nodeEvaluated.emit({` +
                         `nodeUid: ${JSON.stringify(nodeUid)},` +
                         `result: ${resSym},` +
-                        `duration: Date.now() - $startedAt,` +
                         `});`);
                 }
                 this.code.line(`return ${resSym};`);
@@ -105,7 +103,6 @@ export class CompilerScope {
                 this.code.line(`ctx.nodeEvaluated.emit({` +
                     `nodeUid: ${JSON.stringify(nodeUid)},` +
                     `error,` +
-                    `duration: Date.now() - $startedAt,` +
                     `});`);
                 this.code.line('throw error;');
             });

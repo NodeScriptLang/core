@@ -4,7 +4,6 @@ import { GraphCompiler } from '../../main/compiler/index.js';
 import { GraphEvalContext } from '../../main/runtime/index.js';
 import { NodeResult } from '../../main/types/index.js';
 import { evalEsmModule } from '../../main/util/eval.js';
-import { omit } from '../helpers.js';
 import { runtime } from '../runtime.js';
 
 describe('Compiler: cache', () => {
@@ -32,7 +31,7 @@ describe('Compiler: cache', () => {
         const { compute } = await evalEsmModule(code);
         const ctx = new GraphEvalContext();
         const results: NodeResult[] = [];
-        ctx.nodeEvaluated.on(_ => results.push(omit(_, 'duration')));
+        ctx.nodeEvaluated.on(_ => results.push(_));
         const res = await compute({}, ctx);
         assert.deepStrictEqual(res, 84);
         assert.deepStrictEqual(results, [
@@ -68,7 +67,7 @@ describe('Compiler: cache', () => {
         const { compute } = await evalEsmModule(code);
         const ctx = new GraphEvalContext();
         const results: NodeResult[] = [];
-        ctx.nodeEvaluated.on(_ => results.push(omit(_, 'duration')));
+        ctx.nodeEvaluated.on(_ => results.push(_));
         const res = await compute({}, ctx);
         assert.deepStrictEqual(res, 54);
         assert.deepStrictEqual(results, [

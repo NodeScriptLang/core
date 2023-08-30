@@ -40,7 +40,6 @@ export interface NodeResult {
     result?: any;
     error?: any;
     progress?: number;
-    duration?: number;
 }
 
 export interface ScopeData {
