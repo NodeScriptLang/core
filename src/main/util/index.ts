@@ -9,6 +9,7 @@ export * from './json.js';
 export * from './merge.js';
 export * from './multimap.js';
 export * from './regexp.js';
+export * from './response.js';
 export * from './runtime-lib.js';
 export * from './seq.js';
 export * from './serialize.js';
