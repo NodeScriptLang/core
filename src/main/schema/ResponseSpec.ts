@@ -6,7 +6,7 @@ export interface ResponseSpec {
     status: number;
     headers: HttpDict;
     body: any;
-    attributes: Record<string, string>;
+    attributes?: Record<string, string>;
 }
 
 export const ResponseSpecSchema = new Schema<ResponseSpec>({
@@ -20,6 +20,7 @@ export const ResponseSpecSchema = new Schema<ResponseSpec>({
             type: 'object',
             properties: {},
             additionalProperties: { type: 'string' },
+            optional: true,
         }
     },
 });

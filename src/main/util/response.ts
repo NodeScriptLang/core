@@ -10,7 +10,6 @@ export function errorToResponse(error: any): ResponseSpec {
             name: error?.name ?? 'Error',
             message: error?.message ?? 'Unknown error',
         },
-        attributes: {},
     };
 }
 
@@ -21,7 +20,6 @@ export function resultToResponse(value: any): ResponseSpec {
             status: 204,
             headers: {},
             body: '',
-            attributes: {},
         };
     }
     // Explicit response
@@ -33,24 +31,10 @@ export function resultToResponse(value: any): ResponseSpec {
             },
         });
     }
-    // String response
-    if (typeof value === 'string') {
-        return {
-            status: 200,
-            headers: {
-                'content-type': ['text/plain'],
-            },
-            body: value,
-            attributes: {},
-        };
-    }
-    // Default JSON response
+    // Default response (content-type should be inferred by the sender)
     return {
         status: 200,
-        headers: {
-            'content-type': ['application/json'],
-        },
-        body: JSON.stringify(value),
-        attributes: {},
+        headers: {},
+        body: value,
     };
 }
