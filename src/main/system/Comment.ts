@@ -5,8 +5,6 @@ export const Comment: ModuleSpec = ModuleSpecSchema.create({
     moduleName: 'Comment',
     version: '1.0.0',
     resizeMode: 'all',
-    hideEvalControls: true,
-    hidden: true,
     params: {
         comment: {
             schema: { type: 'string' },
@@ -15,5 +13,9 @@ export const Comment: ModuleSpec = ModuleSpecSchema.create({
     result: {
         schema: { type: 'any' },
         hideSocket: true,
+    },
+    attributes: {
+        hidden: true,
+        hideEvalControls: true,
     },
 });

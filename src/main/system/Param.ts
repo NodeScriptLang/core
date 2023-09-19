@@ -4,8 +4,6 @@ export const Param = ModuleSpecSchema.create({
     moduleName: 'Param',
     version: '0.0.0',
     resizeMode: 'horizontal',
-    hideEvalControls: true,
-    hidden: true,
     params: {
         key: {
             schema: {
@@ -17,4 +15,7 @@ export const Param = ModuleSpecSchema.create({
         schema: { type: 'any' },
     },
     cacheMode: 'never',
+    attributes: {
+        hidden: true,
+    }
 });

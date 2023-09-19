@@ -11,8 +11,10 @@ export const EvalAsync = ModuleSpecSchema.create({
             schema: {
                 type: 'object',
             },
-            addItemLabel: 'Add argument',
-            removeItemLabel: 'Remove argument',
+            attributes: {
+                addItemLabel: 'Add argument',
+                removeItemLabel: 'Remove argument',
+            },
         },
         code: {
             schema: {
@@ -21,8 +23,8 @@ export const EvalAsync = ModuleSpecSchema.create({
             hideSocket: true,
             attributes: {
                 renderer: 'javascript',
+                minHeight: 4,
             },
-            minHeight: 4,
         }
     },
     result: {

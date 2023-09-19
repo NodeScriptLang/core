@@ -8,7 +8,6 @@ export interface ModuleSpec {
     keywords: string[];
     deprecated?: string;
     sourceUrl?: string;
-    hidden?: boolean;
     params: Record<string, ModuleParamSpec>;
     result: ModuleResultSpec;
     subgraph?: ModuleSubgraphSpec;
@@ -16,7 +15,6 @@ export interface ModuleSpec {
     cacheMode: NodeCacheMode;
     evalMode: NodeEvalMode;
     resizeMode: NodeResizeMode;
-    hideEvalControls: boolean;
     attributes: Record<string, any>;
 }
 
@@ -25,16 +23,10 @@ export interface ModuleParamSpec {
     label?: string;
     deferred?: boolean;
     advanced?: boolean;
-    addItemLabel?: string;
-    removeItemLabel?: string;
-    keyPlaceholder?: string;
-    valuePlaceholder?: string;
     hideSocket?: boolean;
     hideEntries?: boolean;
     hideValue?: boolean;
     attributes: Record<string, any>;
-    // TODO move to attributes
-    minHeight?: number;
 }
 
 export interface ModuleResultSpec {

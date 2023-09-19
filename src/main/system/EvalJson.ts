@@ -13,8 +13,8 @@ export const EvalJson = ModuleSpecSchema.create({
             hideSocket: true,
             attributes: {
                 renderer: 'json',
+                minHeight: 4,
             },
-            minHeight: 4,
         }
     },
     result: {

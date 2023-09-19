@@ -34,10 +34,6 @@ export const ModuleSpecSchema = new Schema<ModuleSpec>({
             type: 'string',
             optional: true,
         },
-        hidden: {
-            type: 'boolean',
-            optional: true,
-        },
         params: {
             type: 'object',
             properties: {},
@@ -55,10 +51,6 @@ export const ModuleSpecSchema = new Schema<ModuleSpec>({
         cacheMode: NodeCacheModeSchema.schema,
         evalMode: NodeEvalModeSchema.schema,
         resizeMode: NodeResizeModeSchema.schema,
-        hideEvalControls: {
-            type: 'boolean',
-            default: false,
-        },
         attributes: {
             type: 'object',
             properties: {},

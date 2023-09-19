@@ -63,7 +63,6 @@ export abstract class GenericModuleLoader implements ModuleLoader {
             keywords: [],
             description: `Module ${ref} not found`,
             deprecated: '',
-            hidden: true,
             params: {},
             result: {
                 schema: { type: 'any' },
@@ -72,7 +71,6 @@ export abstract class GenericModuleLoader implements ModuleLoader {
             cacheMode: 'auto',
             evalMode: 'auto',
             resizeMode: 'horizontal',
-            hideEvalControls: false,
             attributes: {
                 ref,
             },
