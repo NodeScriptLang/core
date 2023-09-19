@@ -17,5 +17,6 @@ export const Output = ModuleSpecSchema.create({
     attributes: {
         hidden: true,
         hideEvalControls: true,
+        forceColor: 'yellow',
     },
 });

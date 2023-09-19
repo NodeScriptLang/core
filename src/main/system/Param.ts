@@ -17,5 +17,6 @@ export const Param = ModuleSpecSchema.create({
     cacheMode: 'never',
     attributes: {
         hidden: true,
+        forceColor: 'cyan',
     }
 });
