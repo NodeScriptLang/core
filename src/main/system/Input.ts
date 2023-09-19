@@ -10,6 +10,7 @@ export const Input = ModuleSpecSchema.create({
     cacheMode: 'never',
     attributes: {
         hidden: true,
+        hideEvalControls: true,
         forceColor: 'cyan',
     },
 });
