@@ -1,6 +1,7 @@
 // This file is auto-generated
 export * from './GraphSpec.js';
 export * from './HttpDict.js';
+export * from './KeyValue.js';
 export * from './ModuleName.js';
 export * from './ModuleParamSpec.js';
 export * from './ModuleResultSpec.js';
