@@ -345,7 +345,7 @@ export class CompilerScope {
     private emitGenericCompute(node: NodeView, resSym: string) {
         const computeSym = this.symbols.getComputeSym(node.ref);
         const scopeSym = node.getModuleSpec().newScope ?
-            `ctx.newScope(${JSON.stringify(node.nodeUid)}, ${JSON.stringify(node.getLabel())})` :
+            `ctx.newScope(${JSON.stringify(node.getLabel())})` :
             `ctx`;
         const subgraphSym = this.getSubgraphExpr(node);
         const argsExpr = [scopeSym, subgraphSym].filter(Boolean).join(',');

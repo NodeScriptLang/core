@@ -15,6 +15,7 @@ export const SYM_DEFERRED = Symbol.for('NodeScript:Deferred');
 export class GraphEvalContext implements t.GraphEvalContext {
     readonly lib = runtimeLib;
 
+    contextId = shortId();
     pendingNodeUids: Set<string>;
     nodeEvaluated: Event<t.NodeResult>;
     scopeCaptured: Event<t.ScopeData>;
@@ -27,7 +28,6 @@ export class GraphEvalContext implements t.GraphEvalContext {
 
     constructor(
         readonly parent: GraphEvalContext | null = null,
-        readonly contextId = shortId(),
         readonly contextName = '',
     ) {
         this.nodeEvaluated = parent ? parent.nodeEvaluated : new Event();
@@ -66,8 +66,8 @@ export class GraphEvalContext implements t.GraphEvalContext {
         }
     }
 
-    newScope(contextId?: string, contextName?: string): t.GraphEvalContext {
-        return new GraphEvalContext(this, contextId, contextName);
+    newScope(contextName?: string): t.GraphEvalContext {
+        return new GraphEvalContext(this, contextName);
     }
 
     convertType(value: unknown, schema: SchemaSpec) {
