@@ -10,7 +10,6 @@ export interface Deferred {
 export interface GraphEvalContext {
     readonly lib: RuntimeLib;
 
-    nodeUid: string;
     cache: Map<string, any>;
     locals: Map<string, any>;
     nodeEvaluated: Event<NodeResult>;

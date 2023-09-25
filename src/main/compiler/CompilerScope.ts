@@ -78,7 +78,6 @@ export class CompilerScope {
     private emitNodeBodyIntrospect(node: NodeView) {
         const resSym = '$r';
         this.code.line(`let ${resSym};`);
-        this.code.line(`ctx.nodeUid = ${JSON.stringify(node.nodeUid)}`);
         if (this.options.introspect) {
             const nodeUid = node.nodeUid;
             this.code.block('try {', '}', () => {
@@ -345,7 +344,9 @@ export class CompilerScope {
 
     private emitGenericCompute(node: NodeView, resSym: string) {
         const computeSym = this.symbols.getComputeSym(node.ref);
-        const scopeSym = node.getModuleSpec().newScope ? `ctx.newScope()` : `ctx`;
+        const scopeSym = node.getModuleSpec().newScope ?
+            `ctx.newScope(${JSON.stringify(node.nodeUid)}, ${JSON.stringify(node.getLabel())})` :
+            `ctx`;
         const subgraphSym = this.getSubgraphExpr(node);
         const argsExpr = [scopeSym, subgraphSym].filter(Boolean).join(',');
         this.code.block(`${resSym} = ${this.awaitSym(node)}${computeSym}({`, `}, ${argsExpr});`, () => {

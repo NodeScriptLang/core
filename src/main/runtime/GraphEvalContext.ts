@@ -3,7 +3,7 @@ import { Event } from 'nanoevent';
 
 import * as t from '../types/index.js';
 import { SchemaSpec } from '../types/index.js';
-import { convertAuto, runtimeLib } from '../util/index.js';
+import { convertAuto, runtimeLib, shortId } from '../util/index.js';
 import { GraphProfiler } from './GraphProfiler.js';
 
 export const SYM_DEFERRED = Symbol.for('NodeScript:Deferred');
@@ -15,7 +15,6 @@ export const SYM_DEFERRED = Symbol.for('NodeScript:Deferred');
 export class GraphEvalContext implements t.GraphEvalContext {
     readonly lib = runtimeLib;
 
-    nodeUid = '';
     pendingNodeUids: Set<string>;
     nodeEvaluated: Event<t.NodeResult>;
     scopeCaptured: Event<t.ScopeData>;
@@ -28,6 +27,8 @@ export class GraphEvalContext implements t.GraphEvalContext {
 
     constructor(
         readonly parent: GraphEvalContext | null = null,
+        readonly contextId = shortId(),
+        readonly contextName = '',
     ) {
         this.nodeEvaluated = parent ? parent.nodeEvaluated : new Event();
         this.scopeCaptured = parent ? parent.scopeCaptured : new Event();
@@ -65,8 +66,8 @@ export class GraphEvalContext implements t.GraphEvalContext {
         }
     }
 
-    newScope(): t.GraphEvalContext {
-        return new GraphEvalContext(this);
+    newScope(contextId?: string, contextName?: string): t.GraphEvalContext {
+        return new GraphEvalContext(this, contextId, contextName);
     }
 
     convertType(value: unknown, schema: SchemaSpec) {

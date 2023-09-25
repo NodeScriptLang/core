@@ -72,6 +72,10 @@ export class NodeView {
         return this.graph.rootNodeId === this.localId;
     }
 
+    getLabel() {
+        return this.metadata.label ?? this.getModuleSpec().moduleName;
+    }
+
     supportsSubgraph() {
         const { subgraph } = this.getModuleSpec();
         return !!subgraph;
