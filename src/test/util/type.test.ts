@@ -112,4 +112,10 @@ describe('convertAnyVal', () => {
         assert.deepStrictEqual(convertAnyVal(input), result);
     });
 
+    it(`converts '0x0' to 0`, () => {
+        const input = '0x0';
+        const result: any = 0;
+        assert.deepStrictEqual(convertAnyVal(input), result);
+    });
+
 });
