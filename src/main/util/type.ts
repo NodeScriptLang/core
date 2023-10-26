@@ -38,7 +38,7 @@ export function convertAnyVal(value: string) {
         case '[]':
             return [];
         default: {
-            if (/^[+-]?(0x[0-9A-Fa-f]+|[0-9]+([eE][+-]?[0-9]+)?)/.test(value)) {
+            if (/^[+-]?[0-9]/.test(value)) {
                 const num = Number(value);
                 if (!isNaN(num)) {
                     return num;
