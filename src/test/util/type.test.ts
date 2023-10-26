@@ -100,9 +100,21 @@ describe('convertAnyVal', () => {
         assert.deepStrictEqual(convertAnyVal(input), result);
     });
 
+    it(`converts '1e30' to 1e+30`, () => {
+        const input = '1e30';
+        const result: any = 1e+30;
+        assert.deepStrictEqual(convertAnyVal(input), result);
+    });
+
     it(`converts '1e-5' to 0.00001`, () => {
         const input = '1e-5';
         const result: any = 0.00001;
+        assert.deepStrictEqual(convertAnyVal(input), result);
+    });
+
+    it(`converts '1e-40' to 1e-40`, () => {
+        const input = '1e-40';
+        const result: any = 1e-40;
         assert.deepStrictEqual(convertAnyVal(input), result);
     });
 
