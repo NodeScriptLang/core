@@ -270,6 +270,8 @@ export class CompilerScope {
                     return this.emitEvalAsync(node, resSym);
                 case '@system/EvalJson':
                     return this.emitEvalJson(node, resSym);
+                case '@system/EvalTemplate':
+                    return this.emitEvalTemplate(node, resSym);
                 default:
                     return this.emitGenericCompute(node, resSym);
             }
@@ -341,6 +343,24 @@ export class CompilerScope {
         } catch (error: any) {
             this.code.line(`throw new Error(${JSON.stringify(error.message)})`);
         }
+    }
+
+    private emitEvalTemplate(node: NodeView, resSym: string) {
+        const template = (node.getProp('template')?.value ?? '')
+            .replace(/`/g, '\\`')
+            .replace(/\\\\`/g, '\\\\\\`');
+        this.code.block(`const $p = {`, `}`, () => {
+            const prop = node.getProp('args');
+            if (prop) {
+                this.emitProp(prop);
+            }
+        });
+        const args = node.getProp('args')?.getEntries() ?? [];
+        const argList = args.map(_ => _.key).join(',');
+        const argVals = args.map(_ => `$p.args[${JSON.stringify(_.key)}]`).join(',');
+        this.code.block(`${resSym} = ((${argList}) => {`, `})(${argVals})`, () => {
+            this.code.line(`return \`${template}\``);
+        });
     }
 
     private emitGenericCompute(node: NodeView, resSym: string) {
