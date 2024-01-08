@@ -37,11 +37,13 @@ export class NodeView {
         readonly localId: string,
         readonly nodeSpec: NodeSpec,
     ) {
-        this._moduleSpec = this.loader.resolveModule(this.nodeSpec.ref);
-        this._nodeUid = this.graph.scopeId + ':' + localId;
-        if (this.nodeSpec.ref === '@system/Result') {
+        const { ref } = nodeSpec;
+        if (ref === '@system/Result') {
             this.nodeSpec.ref = '@system/Output';
         }
+        this._moduleSpec = this.loader.resolveModule(ref);
+        this._nodeUid = this.graph.scopeId + ':' + localId;
+        this.applyParamAliases();
     }
 
     toJSON() {
@@ -262,6 +264,9 @@ export class NodeView {
         return false;
     }
 
+    /**
+     * @deprecated
+     */
     getDebugSampling(): NodeDebugSampling {
         const debugSampling = this.metadata?.debugSampling ?? {};
         return {
@@ -271,6 +276,27 @@ export class NodeView {
         };
     }
 
+    private applyParamAliases() {
+        for (const [paramKey, paramSpec] of Object.entries(this._moduleSpec.params)) {
+            // Do not apply alias if prop exists
+            if (this.nodeSpec.props[paramKey]) {
+                return;
+            }
+            const aliases = paramSpec.attributes?.aliases || [];
+            if (Array.isArray(aliases)) {
+                // Assign the prop of the first alias, drop all others
+                for (const aliasKey of aliases) {
+                    const propSpec = this.nodeSpec.props[aliasKey];
+                    if (propSpec) {
+                        this.nodeSpec.props[paramKey] = propSpec;
+                    }
+                }
+                for (const aliasKey of aliases) {
+                    delete this.nodeSpec.props[aliasKey];
+                }
+            }
+        }
+    }
 
 }
 
