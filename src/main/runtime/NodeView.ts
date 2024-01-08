@@ -264,36 +264,25 @@ export class NodeView {
         return false;
     }
 
-    /**
-     * @deprecated
-     */
-    getDebugSampling(): NodeDebugSampling {
-        const debugSampling = this.metadata?.debugSampling ?? {};
-        return {
-            enabled: !!debugSampling.enabled,
-            limit: Number(debugSampling.limit) || 1,
-            offset: Number(debugSampling.offset) || 0,
-        };
-    }
-
     private applyParamAliases() {
         for (const [paramKey, paramSpec] of Object.entries(this._moduleSpec.params)) {
             // Do not apply alias if prop exists
             if (this.nodeSpec.props[paramKey]) {
                 return;
             }
-            const aliases = paramSpec.attributes?.aliases || [];
-            if (Array.isArray(aliases)) {
-                // Assign the prop of the first alias, drop all others
-                for (const aliasKey of aliases) {
-                    const propSpec = this.nodeSpec.props[aliasKey];
-                    if (propSpec) {
-                        this.nodeSpec.props[paramKey] = propSpec;
-                    }
+            const aliases = paramSpec.attributes?.aliases;
+            if (!Array.isArray(aliases)) {
+                continue;
+            }
+            // Assign the prop of the first alias, drop all others
+            for (const aliasKey of aliases) {
+                const propSpec = this.nodeSpec.props[aliasKey];
+                if (propSpec) {
+                    this.nodeSpec.props[paramKey] = propSpec;
                 }
-                for (const aliasKey of aliases) {
-                    delete this.nodeSpec.props[aliasKey];
-                }
+            }
+            for (const aliasKey of aliases) {
+                delete this.nodeSpec.props[aliasKey];
             }
         }
     }
@@ -306,10 +295,4 @@ export interface NodeLink {
     prop: PropView;
     entry?: PropEntryView;
     linkKey?: string;
-}
-
-export interface NodeDebugSampling {
-    enabled: boolean;
-    limit: number;
-    offset: number;
 }
