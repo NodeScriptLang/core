@@ -268,7 +268,7 @@ export class NodeView {
         for (const [paramKey, paramSpec] of Object.entries(this._moduleSpec.params)) {
             // Do not apply alias if prop exists
             if (this.nodeSpec.props[paramKey]) {
-                return;
+                continue;
             }
             const aliases = paramSpec.attributes?.aliases;
             if (!Array.isArray(aliases)) {
