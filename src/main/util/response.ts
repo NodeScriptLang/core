@@ -9,6 +9,7 @@ export function errorToResponse(error: any): ResponseSpec {
         body: {
             name: error?.name ?? 'Error',
             message: error?.message ?? 'Unknown error',
+            details: error?.details ?? undefined,
         },
     };
 }
