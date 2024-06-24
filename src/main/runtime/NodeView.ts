@@ -131,6 +131,17 @@ export class NodeView {
 
     *allLines(): Iterable<PropLineView> {
         for (const prop of this.getProps()) {
+            yield prop;
+            if (prop.isUsesEntries()) {
+                for (const entry of prop.getEntries()) {
+                    yield entry;
+                }
+            }
+        }
+    }
+
+    *effectiveLines(): Iterable<PropLineView> {
+        for (const prop of this.getProps()) {
             if (prop.isUsesEntries()) {
                 for (const entry of prop.getEntries()) {
                     yield entry;
@@ -142,7 +153,7 @@ export class NodeView {
     }
 
     *expandedLines(): Iterable<PropLineView> {
-        for (const line of this.allLines()) {
+        for (const line of this.effectiveLines()) {
             if (line.isExpanded()) {
                 yield line;
             }

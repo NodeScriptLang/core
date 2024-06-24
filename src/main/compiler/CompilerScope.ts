@@ -146,7 +146,7 @@ export class CompilerScope {
 
     private emitNodePreamble(node: NodeView) {
         const syms: string[] = [];
-        for (const line of node.allLines()) {
+        for (const line of node.effectiveLines()) {
             const lineUid = line.lineUid;
             const sym = this.symbols.createLineSym(lineUid);
             const { decl, expr } = this.createLineDecl(line, sym);
