@@ -4,6 +4,7 @@ import { getType, Schema, SchemaDef } from 'airtight';
 
 import { RuntimeLib } from '../types/runtime-lib.js';
 import { anyContains, anyEquals } from './compare.js';
+import { fetchRelay } from './fetch.js';
 import { parseJson } from './json.js';
 import { merge } from './merge.js';
 import { toRegExp } from './regexp.js';
@@ -21,4 +22,5 @@ export const runtimeLib: RuntimeLib = {
     parseJson,
     toRegExp,
     matchPath,
+    fetch: fetchRelay,
 };

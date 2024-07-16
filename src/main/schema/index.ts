@@ -1,4 +1,7 @@
 // This file is auto-generated
+export * from './FetchHeaders.js';
+export * from './FetchMethod.js';
+export * from './FetchRequestSpec.js';
 export * from './GraphSpec.js';
 export * from './HttpDict.js';
 export * from './KeyValue.js';

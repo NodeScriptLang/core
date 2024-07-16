@@ -1,6 +1,8 @@
 import { PathParams } from '@nodescript/pathmatcher';
 import { DataType, SchemaDef, SchemaLike } from 'airtight';
 
+import { FetchFunction } from './fetch.js';
+
 export interface ComparisonOptions {
     strict?: boolean;
     collapseWhitespace?: boolean;
@@ -20,6 +22,7 @@ export interface RuntimeLib {
     set(object: unknown, keyish: string, value: unknown): void;
     merge(a: unknown, b: unknown): unknown;
 
+    fetch: FetchFunction;
     matchPath(path: string, value: string, prefix?: boolean): PathParams | null;
     parseJson(str: string, defaultValue?: any): any;
     toRegExp(value: unknown): RegExp;
