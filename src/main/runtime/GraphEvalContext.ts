@@ -4,7 +4,6 @@ import { Event } from 'nanoevent';
 import * as t from '../types/index.js';
 import { SchemaSpec } from '../types/index.js';
 import { convertAuto, runtimeLib } from '../util/index.js';
-import { GraphProfiler } from './GraphProfiler.js';
 
 export const SYM_DEFERRED = Symbol.for('NodeScript:Deferred');
 
@@ -19,7 +18,6 @@ export class GraphEvalContext implements t.GraphEvalContext {
     pendingNodeUids: Set<string>;
     nodeEvaluated: Event<t.NodeResult>;
     scopeCaptured: Event<t.ScopeData>;
-    profiler = new GraphProfiler();
     // Each context maintains its own cache. Subscopes have separate caches
     // and do not delegate to parent contexts.
     cache = new Map<string, any>();
@@ -111,9 +109,10 @@ export class GraphEvalContext implements t.GraphEvalContext {
         return value;
     }
 
-    span(spanId: string, type: t.ProfileSpanType): void {
-        this.profiler.collectSpan(spanId, type);
-    }
+    /**
+     * @deprecated kept for backwards compatibility
+     */
+    span() {}
 
 }
 

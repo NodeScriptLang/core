@@ -228,34 +228,28 @@ export class CompilerScope {
     }
 
     private emitNodeCompute(node: NodeView, resSym: string) {
-        this.code.block('try {', '}', () => {
-            this.code.line(`ctx.span(${JSON.stringify(node.nodeUid)}, 's');`);
-            switch (node.ref) {
-                case '@system/Param':
-                    return this.emitParamNode(node, resSym);
-                case '@system/Input':
-                    return this.emitInputNode(node, resSym);
-                case '@system/Result':
-                case '@system/Output':
-                    return this.emitOutputNode(node, resSym);
-                case '@system/Comment':
-                case '@system/Frame':
-                    return;
-                case '@system/EvalSync':
-                    return this.emitEvalSync(node, resSym);
-                case '@system/EvalAsync':
-                    return this.emitEvalAsync(node, resSym);
-                case '@system/EvalJson':
-                    return this.emitEvalJson(node, resSym);
-                case '@system/EvalTemplate':
-                    return this.emitEvalTemplate(node, resSym);
-                default:
-                    return this.emitGenericCompute(node, resSym);
-            }
-        });
-        this.code.block('finally {', '}', () => {
-            this.code.line(`ctx.span(${JSON.stringify(node.nodeUid)}, 'e');`);
-        });
+        switch (node.ref) {
+            case '@system/Param':
+                return this.emitParamNode(node, resSym);
+            case '@system/Input':
+                return this.emitInputNode(node, resSym);
+            case '@system/Result':
+            case '@system/Output':
+                return this.emitOutputNode(node, resSym);
+            case '@system/Comment':
+            case '@system/Frame':
+                return;
+            case '@system/EvalSync':
+                return this.emitEvalSync(node, resSym);
+            case '@system/EvalAsync':
+                return this.emitEvalAsync(node, resSym);
+            case '@system/EvalJson':
+                return this.emitEvalJson(node, resSym);
+            case '@system/EvalTemplate':
+                return this.emitEvalTemplate(node, resSym);
+            default:
+                return this.emitGenericCompute(node, resSym);
+        }
     }
 
     private emitParamNode(node: NodeView, resSym: string) {
