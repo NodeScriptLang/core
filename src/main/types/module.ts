@@ -20,7 +20,6 @@ export interface ModuleSpec {
 
 export interface ModuleParamSpec {
     schema: SchemaSpec;
-    label?: string;
     deferred?: boolean;
     advanced?: boolean;
     hideSocket?: boolean;

@@ -2,7 +2,7 @@ import { FetchFunction, FetchRequestSpec } from '../types/index.js';
 import { parseJson } from './json.js';
 
 export const fetchRelay: FetchFunction = async (req: FetchRequestSpec, body?: any) => {
-    const fetchServiceUrl = req.connectOptions.fetchServiceUrl ?? 'https://fetch.nodescript.dev/request';
+    const fetchServiceUrl = req.connectOptions?.fetchServiceUrl ?? 'https://fetch.nodescript.dev/request';
     const res = await fetch(fetchServiceUrl, {
         method: 'POST',
         headers: makeControlHeaders(req),
