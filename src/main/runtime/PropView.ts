@@ -125,10 +125,6 @@ export class PropView extends PropLineView {
         return this.getParamSpec().schema;
     }
 
-    getLabel() {
-        return this.getParamSpec().label ?? humanize(this.propKey);
-    }
-
     getEntries() {
         return [
             ...this.getManagedEntries(),

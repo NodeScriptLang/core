@@ -7,10 +7,6 @@ export const ModuleParamSpecSchema = new Schema<ModuleParamSpec>({
     id: 'ModuleParamSpec',
     type: 'object',
     properties: {
-        label: {
-            type: 'string',
-            optional: true,
-        },
         schema: SchemaSpecSchema.schema as any,
         deferred: {
             type: 'boolean',
