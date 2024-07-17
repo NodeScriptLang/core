@@ -5,7 +5,6 @@ import { ModuleParamSpec } from '../types/module.js';
 import { SchemaSpec } from '../types/schema.js';
 import { clone } from '../util/clone.js';
 import { evaluateEscapes } from '../util/escape.js';
-import { humanize } from '../util/string.js';
 import { NodeView } from './NodeView.js';
 
 export type PropLine = {
