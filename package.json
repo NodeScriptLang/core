@@ -23,7 +23,7 @@
         "compile": "run-s compile:*",
         "compile:ts": "tsc -b",
         "lint": "eslint --ext=.js,.ts --cache .",
-        "test": "NODE_ENV=test mocha --node-option=experimental-network-imports",
+        "test": "NODE_ENV=test mocha",
         "test:dev": "nodemon --config nodemon.test.json",
         "preversion": "npm run lint",
         "version": "run-s compile",
