@@ -1,4 +1,4 @@
-import { getType, Schema } from 'airtight';
+import { getDefaultValue, getType, Schema } from 'airtight';
 
 import { SchemaSpec } from '../types/schema.js';
 import { parseJson } from './json.js';
@@ -9,6 +9,7 @@ export function convertAuto(value: string, targetSchema: SchemaSpec = { type: 'a
     if (targetSchema.type === 'any') {
         return convertAnyVal(value);
     }
+    let val: any = value;
     if (value === '') {
         if (targetSchema.optional) {
             return undefined;
@@ -16,8 +17,8 @@ export function convertAuto(value: string, targetSchema: SchemaSpec = { type: 'a
         if (targetSchema.nullable) {
             return null;
         }
+        val = getDefaultValue(targetSchema);
     }
-    let val: any = value;
     if (targetSchema.type === 'object' || targetSchema.type === 'array') {
         val = parseJson(val, undefined);
     }

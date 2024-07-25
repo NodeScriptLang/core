@@ -66,7 +66,7 @@ export abstract class PropLineView {
     }
 
     isUsingDefaultValue() {
-        return this.getStaticValue() !== '';
+        return this.getStaticValue() === '';
     }
 
     /**
