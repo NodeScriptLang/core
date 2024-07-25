@@ -1,6 +1,7 @@
 import { getType, Schema } from 'airtight';
 
 import { SchemaSpec } from '../types/schema.js';
+import { parseJson } from './json.js';
 
 export { getType };
 
@@ -16,7 +17,11 @@ export function convertAuto(value: string, targetSchema: SchemaSpec = { type: 'a
             return null;
         }
     }
-    return new Schema(targetSchema as any).decode(value);
+    let val: any = value;
+    if (targetSchema.type === 'object' || targetSchema.type === 'array') {
+        val = parseJson(val, undefined);
+    }
+    return new Schema(targetSchema as any).decode(val);
 }
 
 export function convertAnyVal(value: string) {

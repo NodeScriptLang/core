@@ -1,5 +1,3 @@
-import { coerce, getDefaultValue } from 'airtight';
-
 import { PropEntrySpec, PropSpec } from '../types/model.js';
 import { ModuleParamSpec } from '../types/module.js';
 import { SchemaSpec } from '../types/schema.js';
@@ -64,19 +62,11 @@ export abstract class PropLineView {
     }
 
     getStaticValue(): string {
-        if (!this.value) {
-            return this.getDefaultValue();
-        }
         return evaluateEscapes(this.value);
     }
 
-    getDefaultValue(): string {
-        const str = coerce('string', getDefaultValue(this.getSchema())) ?? '';
-        return evaluateEscapes(str);
-    }
-
     isUsingDefaultValue() {
-        return this.getStaticValue() === this.getDefaultValue();
+        return this.getStaticValue() !== '';
     }
 
     /**
