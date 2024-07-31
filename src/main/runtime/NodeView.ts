@@ -27,7 +27,7 @@ export class NodeView {
         return result;
     }
 
-    private _moduleSpec: ModuleSpec;
+    private _moduleSpec: ModuleSpec | null = null;
     private _nodeUid: string;
 
     constructor(
@@ -39,9 +39,7 @@ export class NodeView {
         if (ref === '@system/Result') {
             this.nodeSpec.ref = '@system/Output';
         }
-        this._moduleSpec = this.loader.resolveModule(ref);
         this._nodeUid = this.graph.scopeId + ':' + localId;
-        this.applyParamAliases();
     }
 
     toJSON() {
@@ -64,7 +62,14 @@ export class NodeView {
         return this._nodeUid;
     }
 
+    async reloadModuleSpec() {
+        this._moduleSpec = await this.loader.loadModule(this.ref);
+    }
+
     getModuleSpec() {
+        if (!this._moduleSpec) {
+            this._moduleSpec = this.loader.resolveModule(this.ref);
+        }
         return this._moduleSpec;
     }
 
@@ -269,29 +274,6 @@ export class NodeView {
             }
         }
         return false;
-    }
-
-    private applyParamAliases() {
-        for (const [paramKey, paramSpec] of Object.entries(this._moduleSpec.params)) {
-            // Do not apply alias if prop exists
-            if (this.nodeSpec.props[paramKey]) {
-                continue;
-            }
-            const aliases = paramSpec.attributes?.aliases;
-            if (!Array.isArray(aliases)) {
-                continue;
-            }
-            // Assign the prop of the first alias, drop all others
-            for (const aliasKey of aliases) {
-                const propSpec = this.nodeSpec.props[aliasKey];
-                if (propSpec) {
-                    this.nodeSpec.props[paramKey] = propSpec;
-                }
-            }
-            for (const aliasKey of aliases) {
-                delete this.nodeSpec.props[aliasKey];
-            }
-        }
     }
 
 }
