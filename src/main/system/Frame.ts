@@ -11,6 +11,5 @@ export const Frame = ModuleSpecSchema.create({
     },
     attributes: {
         hideEvalControls: true,
-        hidden: true,
     },
 });

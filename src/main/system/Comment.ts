@@ -15,7 +15,6 @@ export const Comment: ModuleSpec = ModuleSpecSchema.create({
         hideSocket: true,
     },
     attributes: {
-        hidden: true,
         hideEvalControls: true,
     },
 });
