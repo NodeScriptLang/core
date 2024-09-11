@@ -16,6 +16,7 @@ export const FetchRequestSpecSchema = new Schema<FetchRequestSpec>({
             type: 'object',
             properties: {},
             additionalProperties: { type: 'any' },
+            optional: true,
         },
     },
 });

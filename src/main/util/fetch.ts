@@ -27,7 +27,7 @@ function makeControlHeaders(req: FetchRequestSpec): Record<string, string> {
         'x-fetch-method': req.method,
         'x-fetch-url': req.url,
         'x-fetch-headers': JSON.stringify(req.headers),
-        'x-fetch-connect-options': JSON.stringify(req.connectOptions),
+        'x-fetch-connect-options': JSON.stringify(req.connectOptions ?? {}),
     };
     if (req.proxy) {
         headers['x-fetch-proxy'] = req.proxy.trim();

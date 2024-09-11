@@ -18,7 +18,7 @@ export interface FetchRequestSpec {
     headers: FetchHeaders;
     proxy?: string;
     followRedirects?: boolean;
-    connectOptions: Record<string, any>;
+    connectOptions?: Record<string, any>;
 }
 
 export interface FetchResponseSpec {
