@@ -29,7 +29,6 @@ describe('ModuleLoader', () => {
             newScope: false,
             cacheMode: 'auto',
             evalMode: 'auto',
-            resizeMode: 'horizontal',
             attributes: {},
         });
     });

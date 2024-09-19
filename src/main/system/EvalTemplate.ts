@@ -6,7 +6,6 @@ export const EvalTemplate = ModuleSpecSchema.create({
     description: 'Evaluates a JavaScript template string. ' +
     'Use ${expression} syntax to insert argument values or arbitrary expressions.',
     keywords: ['string', 'expression'],
-    resizeMode: 'all',
     params: {
         args: {
             schema: {
@@ -24,7 +23,6 @@ export const EvalTemplate = ModuleSpecSchema.create({
             hideSocket: true,
             attributes: {
                 renderer: 'textarea',
-                minHeight: 4,
             },
         }
     },

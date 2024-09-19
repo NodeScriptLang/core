@@ -4,7 +4,6 @@ export const EvalJson = ModuleSpecSchema.create({
     moduleName: 'Eval / Json',
     version: '1.0.0',
     description: 'Returns a JSON value.',
-    resizeMode: 'all',
     params: {
         code: {
             schema: {
@@ -13,7 +12,6 @@ export const EvalJson = ModuleSpecSchema.create({
             hideSocket: true,
             attributes: {
                 renderer: 'json',
-                minHeight: 4,
             },
         }
     },

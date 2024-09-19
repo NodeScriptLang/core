@@ -8,7 +8,6 @@ import { ModuleSubgraphSpecSchema } from './ModuleSubgraphSpec.js';
 import { ModuleVersionSchema } from './ModuleVersion.js';
 import { NodeCacheModeSchema } from './NodeCacheMode.js';
 import { NodeEvalModeSchema } from './NodeEvalMode.js';
-import { NodeResizeModeSchema } from './NodeResizeMode.js';
 
 export const ModuleSpecSchema = new Schema<ModuleSpec>({
     id: 'ModuleSpec',
@@ -50,7 +49,6 @@ export const ModuleSpecSchema = new Schema<ModuleSpec>({
         },
         cacheMode: NodeCacheModeSchema.schema,
         evalMode: NodeEvalModeSchema.schema,
-        resizeMode: NodeResizeModeSchema.schema,
         attributes: {
             type: 'object',
             properties: {},

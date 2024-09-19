@@ -14,7 +14,6 @@ export interface ModuleSpec {
     newScope: boolean;
     cacheMode: NodeCacheMode;
     evalMode: NodeEvalMode;
-    resizeMode: NodeResizeMode;
     attributes: Record<string, any>;
 }
 
@@ -42,5 +41,3 @@ export interface ModuleSubgraphSpec {
 export type NodeEvalMode = 'auto' | 'manual';
 
 export type NodeCacheMode = 'auto' | 'always' | 'never';
-
-export type NodeResizeMode = 'horizontal' | 'all' | 'none';
