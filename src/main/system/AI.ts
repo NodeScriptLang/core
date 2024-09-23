@@ -11,8 +11,8 @@ export const AI = ModuleSpecSchema.create({
                 type: 'object',
             },
             attributes: {
-                addItemLabel: 'Add argument',
-                removeItemLabel: 'Remove argument',
+                addItemLabel: 'Add input',
+                removeItemLabel: 'Remove input',
             },
         },
         code: {
