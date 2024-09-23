@@ -239,6 +239,8 @@ export class CompilerScope {
             case '@system/Comment':
             case '@system/Frame':
                 return;
+            case '@system/AI':
+                return this.emitAI(node, resSym);
             case '@system/EvalSync':
                 return this.emitEvalSync(node, resSym);
             case '@system/EvalAsync':
@@ -274,35 +276,44 @@ export class CompilerScope {
     }
 
     private emitEvalSync(node: NodeView, resSym: string) {
-        const code = node.getProp('code')?.value ?? '';
-        this.code.block(`const $p = {`, `}`, () => {
-            const prop = node.getProp('args');
-            if (prop) {
-                this.emitProp(prop);
-            }
-        });
-        const args = node.getProp('args')?.getEntries() ?? [];
-        const argList = args.map(_ => _.key).join(',');
-        const argVals = args.map(_ => `$p.args[${JSON.stringify(_.key)}]`).join(',');
-        this.code.block(`${resSym} = ((${argList}) => {`, `})(${argVals})`, () => {
-            this.code.line(code);
-        });
+        this.emitEvalLike(node, resSym, false, 'code', 'args');
     }
 
     private emitEvalAsync(node: NodeView, resSym: string) {
-        const code = node.getProp('code')?.value ?? '';
+        this.emitEvalLike(node, resSym, true, 'code', 'args');
+    }
+
+    private emitAI(node: NodeView, resSym: string) {
+        const async = node.isAsync();
+        this.emitEvalLike(node, resSym, async, 'code', 'inputs');
+    }
+
+    private emitEvalLike(
+        node: NodeView,
+        resSym: string,
+        async: boolean,
+        codeKey: string,
+        argsKey: string,
+    ) {
+        const code = node.getProp(codeKey)?.value ?? '';
         this.code.block(`const $p = {`, `}`, () => {
-            const prop = node.getProp('args');
+            const prop = node.getProp(argsKey);
             if (prop) {
                 this.emitProp(prop);
             }
         });
-        const args = node.getProp('args')?.getEntries() ?? [];
+        const args = node.getProp(argsKey)?.getEntries().filter(_ => _.key.trim() !== '') ?? [];
         const argList = args.map(_ => _.key).join(',');
-        const argVals = args.map(_ => `$p.args[${JSON.stringify(_.key)}]`).join(',');
-        this.code.block(`${resSym} = await (async (${argList}) => {`, `})(${argVals})`, () => {
-            this.code.line(code);
-        });
+        const argVals = args.map(_ => `$p.${argsKey}[${JSON.stringify(_.key)}]`).join(',');
+        if (async) {
+            this.code.block(`${resSym} = await (async (${argList}) => {`, `})(${argVals})`, () => {
+                this.code.line(code);
+            });
+        } else {
+            this.code.block(`${resSym} = ((${argList}) => {`, `})(${argVals})`, () => {
+                this.code.line(code);
+            });
+        }
     }
 
     private emitEvalJson(node: NodeView, resSym: string) {

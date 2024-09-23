@@ -265,6 +265,9 @@ export class NodeView {
      * i.e. have `moduleSpec.result.async: true`.
      */
     isAsync() {
+        if (this.metadata.async) {
+            return true;
+        }
         if (this.getModuleSpec().result.async) {
             return true;
         }

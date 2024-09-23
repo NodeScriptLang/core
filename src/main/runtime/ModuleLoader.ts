@@ -1,5 +1,5 @@
 import { ModuleSpecSchema } from '../schema/ModuleSpec.js';
-import * as systemNodes from '../system/index.js';
+import * as systemModules from '../system/index.js';
 import { ModuleSpec } from '../types/index.js';
 
 export interface ModuleLoader {
@@ -13,16 +13,17 @@ export abstract class GenericModuleLoader implements ModuleLoader {
     modules = new Map<string, ModuleSpec>();
 
     constructor() {
-        this.addModule('@system/Comment', systemNodes.Comment);
-        this.addModule('@system/Frame', systemNodes.Frame);
-        this.addModule('@system/Param', systemNodes.Param);
-        this.addModule('@system/Result', systemNodes.Output);
-        this.addModule('@system/Input', systemNodes.Input);
-        this.addModule('@system/Output', systemNodes.Output);
-        this.addModule('@system/EvalSync', systemNodes.EvalSync);
-        this.addModule('@system/EvalAsync', systemNodes.EvalAsync);
-        this.addModule('@system/EvalJson', systemNodes.EvalJson);
-        this.addModule('@system/EvalTemplate', systemNodes.EvalTemplate);
+        this.addModule('@system/AI', systemModules.AI);
+        this.addModule('@system/Comment', systemModules.Comment);
+        this.addModule('@system/EvalAsync', systemModules.EvalAsync);
+        this.addModule('@system/EvalJson', systemModules.EvalJson);
+        this.addModule('@system/EvalSync', systemModules.EvalSync);
+        this.addModule('@system/EvalTemplate', systemModules.EvalTemplate);
+        this.addModule('@system/Frame', systemModules.Frame);
+        this.addModule('@system/Input', systemModules.Input);
+        this.addModule('@system/Output', systemModules.Output);
+        this.addModule('@system/Param', systemModules.Param);
+        this.addModule('@system/Result', systemModules.Output);
     }
 
     abstract resolveComputeUrl(ref: string): string;
