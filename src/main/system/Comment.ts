@@ -9,7 +9,8 @@ export const Comment: ModuleSpec = ModuleSpecSchema.create({
             schema: { type: 'string' },
             hideSocket: true,
             attributes: {
-                renderer: 'textarea'
+                renderer: 'textarea',
+                minHeight: 2,
             },
         }
     },
