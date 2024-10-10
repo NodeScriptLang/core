@@ -25,12 +25,7 @@ export function resultToResponse(value: any): ResponseSpec {
     }
     // Explicit response
     if (value && value.$response) {
-        return ResponseSpecSchema.decode({
-            ...value.$response,
-            headers: {
-                ...value.$response.headers,
-            },
-        });
+        return ResponseSpecSchema.decode(value.$response);
     }
     // Default response (content-type should be inferred by the sender)
     return {
