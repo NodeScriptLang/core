@@ -45,6 +45,7 @@ export interface NodeMetadata {
     h: number;
     label: string;
     collapsed: boolean;
+    docked: boolean;
     listedProps: Record<string, boolean>;
     [key: string]: any;
 }

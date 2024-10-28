@@ -62,6 +62,22 @@ export class NodeView {
         return this._nodeUid;
     }
 
+    isParamNode() {
+        return this.ref === '@system/Param';
+    }
+
+    isOutputNode() {
+        return this.ref === '@system/Output';
+    }
+
+    isFrameNode() {
+        return this.ref === '@system/Frame';
+    }
+
+    isCommentNode() {
+        return this.ref === '@system/Comment';
+    }
+
     async reloadModuleSpec() {
         this._moduleSpec = await this.loader.loadModule(this.ref);
     }
@@ -279,6 +295,13 @@ export class NodeView {
         return false;
     }
 
+    canDock() {
+        return this.isParamNode() && this.getOutboundLinks().size === 1;
+    }
+
+    isDocked() {
+        return this.canDock() && !!this.metadata.docked;
+    }
 }
 
 export interface NodeLink {
