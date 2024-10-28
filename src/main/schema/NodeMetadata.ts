@@ -12,6 +12,7 @@ export const NodeMetadataSchema = new Schema<NodeMetadata>({
         h: { type: 'number', default: 5 },
         label: { type: 'string', default: '' },
         collapsed: { type: 'boolean', default: false },
+        docked: { type: 'boolean', default: false },
         listedProps: {
             type: 'object',
             properties: {},
