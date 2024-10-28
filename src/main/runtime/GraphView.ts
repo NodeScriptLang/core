@@ -18,7 +18,8 @@ export class GraphView {
     }
 
     get scopeId(): string {
-        return this.parentNode == null ? 'root' :
+        return this.parentNode == null ?
+            'root' :
             this.parentNode.graph.scopeId + ':' + this.parentNode.localId;
     }
 

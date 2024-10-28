@@ -302,6 +302,7 @@ export class NodeView {
     isDocked() {
         return this.canDock() && !!this.metadata.docked;
     }
+
 }
 
 export interface NodeLink {

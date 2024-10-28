@@ -8,9 +8,7 @@ export enum FetchMethod {
     DELETE = 'DELETE',
 }
 
-export interface FetchHeaders {
-    [key: string]: string | string[];
-}
+export type FetchHeaders = Record<string, string | string[]>;
 
 export interface FetchRequestSpec {
     url: string;

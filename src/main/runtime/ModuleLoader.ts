@@ -10,6 +10,7 @@ export interface ModuleLoader {
 }
 
 export abstract class GenericModuleLoader implements ModuleLoader {
+
     modules = new Map<string, ModuleSpec>();
 
     constructor() {
@@ -105,14 +106,18 @@ export class StandardModuleLoader extends GenericModuleLoader {
 }
 
 export class UnresolvedNodeError extends Error {
+
     override name = this.constructor.name;
     status = 500;
+
 }
 
 export class ModuleLoadFailedError extends Error {
+
     override name = this.constructor.name;
 
     constructor(override readonly message: string, readonly status = 500) {
         super(message);
     }
+
 }

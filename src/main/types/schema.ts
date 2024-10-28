@@ -9,9 +9,7 @@ export type SchemaSpec = {
     description?: string;
     default?: string;
     metadata?: any;
-    properties?: {
-        [key: string]: SchemaSpec;
-    };
+    properties?: Record<string, SchemaSpec>;
     additionalProperties?: SchemaSpec;
     items?: SchemaSpec;
     refs?: SchemaSpec[];

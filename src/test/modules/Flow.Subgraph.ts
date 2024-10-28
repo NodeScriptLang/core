@@ -6,9 +6,7 @@ type P = {
 
 type R = Promise<unknown>;
 
-type SI = {
-    [key: string]: unknown;
-};
+type SI = Record<string, unknown>;
 
 type SO = {
     result: unknown;

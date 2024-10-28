@@ -22,7 +22,7 @@
         "dev:ts": "tsc -b -w",
         "compile": "run-s compile:*",
         "compile:ts": "tsc -b",
-        "lint": "eslint --ext=.js,.ts --cache .",
+        "lint": "eslint --cache .",
         "test": "NODE_ENV=test mocha",
         "test:dev": "nodemon --config nodemon.test.json",
         "preversion": "npm run lint",
@@ -43,11 +43,11 @@
         "nanoid": "^3.3.4"
     },
     "devDependencies": {
-        "@nodescript/eslint-config": "^1.0.3",
+        "@nodescript/eslint-config": "^2.0.1",
         "@types/glob": "^7.2.0",
         "@types/mocha": "^9.1.1",
         "@types/node": "^18.7.23",
-        "eslint": "^8.24.0",
+        "eslint": "^9.13.0",
         "glob": "^8.0.3",
         "mocha": "^10.0.0",
         "nodemon": "^3.0.2",

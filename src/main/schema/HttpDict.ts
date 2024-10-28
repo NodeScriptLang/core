@@ -1,8 +1,6 @@
 import { Schema } from 'airtight';
 
-export interface HttpDict {
-    [key: string]: string[];
-}
+export type HttpDict = Record<string, string[]>;
 
 export const HttpDictSchema = new Schema<HttpDict>({
     id: 'HttpDict',

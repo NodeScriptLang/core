@@ -12,6 +12,7 @@ export const SYM_DEFERRED = Symbol.for('NodeScript:Deferred');
  * node caching, introspection, etc.
  */
 export class GraphEvalContext implements t.GraphEvalContext {
+
     readonly lib = runtimeLib;
 
     nodeUid = '';
@@ -117,8 +118,10 @@ export class GraphEvalContext implements t.GraphEvalContext {
 }
 
 export class NodePendingError extends Error {
+
     override name = this.constructor.name;
     code = 'EPENDING';
+
 }
 
 export class Deferred implements t.Deferred {

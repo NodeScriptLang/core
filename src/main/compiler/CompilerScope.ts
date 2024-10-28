@@ -135,7 +135,7 @@ export class CompilerScope {
                 this.code.line(`ctx.nodeEvaluated.emit({` +
                     `nodeUid: ${JSON.stringify(node.nodeUid)},` +
                     `progress: $i / $l,` +
-                `});`);
+                    `});`);
             }
             const tempSym = `$t`;
             this.code.line(`let ${tempSym};`);
@@ -435,7 +435,8 @@ export class CompilerScope {
 
     private convertTypeExpr(async = false, expr: string, sourceSchema: SchemaSpec, targetSchema: SchemaSpec) {
         const schemaCompatible = isSchemaCompatible(targetSchema, sourceSchema);
-        return schemaCompatible ? expr :
+        return schemaCompatible ?
+            expr :
             this.code.compose(async, expr, _ => `ctx.convertType(${_}, ${JSON.stringify(targetSchema)})`);
     }
 

@@ -1,4 +1,5 @@
 export class MultiMap<K, V> {
+
     map = new Map<K, Set<V>>();
 
     add(key: K, value: V) {
@@ -37,4 +38,5 @@ export class MultiMap<K, V> {
     groups(): IterableIterator<Set<V>> {
         return this.map.values();
     }
+
 }

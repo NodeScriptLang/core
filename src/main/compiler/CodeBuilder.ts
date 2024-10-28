@@ -1,4 +1,5 @@
 export class CodeBuilder {
+
     buffer: string[] = [];
 
     constructor(

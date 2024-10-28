@@ -32,7 +32,7 @@ export const compute: ModuleCompute<P, R> = async (params, ctx) => {
             if (value != null) {
                 return value;
             }
-        } catch (error) {}
+        } catch (_err) {}
     }
     return null;
 };

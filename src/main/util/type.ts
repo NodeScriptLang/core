@@ -97,6 +97,8 @@ export function isSchemaCompatible(desiredSchema: SchemaSpec, actualSchema: Sche
 }
 
 export class InvalidTypeError extends Error {
+
     override name = this.constructor.name;
     status = 400;
+
 }

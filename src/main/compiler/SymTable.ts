@@ -1,6 +1,7 @@
 import { CompilerError } from './CompilerError.js';
 
 export class SymTable {
+
     symCounters = new Map<string, number>();
     symtable = new Map<string, string>();
 

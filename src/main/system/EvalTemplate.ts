@@ -4,7 +4,7 @@ export const EvalTemplate = ModuleSpecSchema.create({
     moduleName: 'Eval / Template',
     version: '1.0.0',
     description: 'Evaluates a JavaScript template string. ' +
-    'Use ${expression} syntax to insert argument values or arbitrary expressions.',
+        'Use ${expression} syntax to insert argument values or arbitrary expressions.',
     keywords: ['string', 'expression'],
     params: {
         args: {

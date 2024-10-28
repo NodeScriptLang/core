@@ -10,6 +10,7 @@ import { CompilerOptions } from './GraphCompiler.js';
  * Compiler's unit of work.
  */
 export class CompilerJob {
+
     done = false;
     symbols = new CompilerSymbols();
     code = new CodeBuilder();

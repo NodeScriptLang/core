@@ -36,6 +36,7 @@ function makeControlHeaders(req: FetchRequestSpec): Record<string, string> {
 }
 
 export class FetchError extends Error {
+
     override name = this.constructor.name;
     status = 500;
     details = {};
@@ -47,4 +48,5 @@ export class FetchError extends Error {
         };
         this.stack = '';
     }
+
 }

@@ -13,6 +13,7 @@ import { GraphSpec } from '../main/types/index.js';
  * Warning: if runtime is modified, make sure it is fully restored.
  */
 export class TestRuntime {
+
     httpPort = Number(process.env.PORT) || 8085;
 
     makeUrl(path: string) {
@@ -35,6 +36,7 @@ export class TestRuntime {
         await graph.loadRefs();
         return graph;
     }
+
 }
 
 export const runtime = new TestRuntime();
