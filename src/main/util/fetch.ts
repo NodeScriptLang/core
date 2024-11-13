@@ -32,6 +32,9 @@ function makeControlHeaders(req: FetchRequestSpec): Record<string, string> {
     if (req.proxy) {
         headers['x-fetch-proxy'] = req.proxy.trim();
     }
+    if (req.timeout != null) {
+        headers['x-fetch-timeout'] = String(req.timeout);
+    }
     return headers;
 }
 

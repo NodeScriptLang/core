@@ -16,6 +16,7 @@ export interface FetchRequestSpec {
     headers: FetchHeaders;
     proxy?: string;
     followRedirects?: boolean;
+    timeout?: number;
     connectOptions?: Record<string, any>;
 }
 
