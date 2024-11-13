@@ -12,6 +12,7 @@ export const FetchRequestSpecSchema = new Schema<FetchRequestSpec>({
         headers: FetchHeadersSchema.schema,
         proxy: { type: 'string', optional: true },
         followRedirects: { type: 'boolean', optional: true },
+        timeout: { type: 'number', optional: true },
         connectOptions: {
             type: 'object',
             properties: {},
