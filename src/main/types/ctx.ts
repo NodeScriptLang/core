@@ -15,6 +15,7 @@ export interface GraphEvalContext {
     locals: Map<string, any>;
     nodeEvaluated: Event<NodeResult>;
     scopeCaptured: Event<ScopeData>;
+    _currentScope: any;
 
     clear(): void;
     finalize(): Promise<void>;

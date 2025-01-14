@@ -24,6 +24,7 @@ export class GraphEvalContext implements t.GraphEvalContext {
     cache = new Map<string, any>();
     // Locals are stored per-context. Lookups delegate up the hierarchy.
     locals = new Map<string, any>();
+    _currentScope: any = null;
 
     constructor(
         readonly parent: GraphEvalContext | null = null,
@@ -114,6 +115,16 @@ export class GraphEvalContext implements t.GraphEvalContext {
      * @deprecated kept for backwards compatibility
      */
     span() {}
+
+    get currentScope(): any {
+        return this._currentScope ?? this.parent?.currentScope;
+    }
+
+    withScope(scope: any): t.GraphEvalContext {
+        const ctx = new GraphEvalContext(this);
+        ctx._currentScope = scope;
+        return ctx;
+    }
 
 }
 
