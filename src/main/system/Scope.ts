@@ -13,12 +13,5 @@ export const Scope = ModuleSpecSchema.create({
     },
     newScope: false,
     cacheMode: 'auto',
-    evalMode: 'auto',
-    attributes: {
-        customImportUrl: 'data:text/javascript;base64,' + (`
-            export function compute(params, ctx) {
-                return ctx.currentScope ?? {};
-            }
-        `)
-    },
+    evalMode: 'auto'
 }); 
