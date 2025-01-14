@@ -233,6 +233,8 @@ export class CompilerScope {
                 return this.emitParamNode(node, resSym);
             case '@system/Input':
                 return this.emitInputNode(node, resSym);
+            case '@system/Scope':
+                return this.emitScopeNode(node, resSym);
             case '@system/Result':
             case '@system/Output':
                 return this.emitOutputNode(node, resSym);
@@ -265,7 +267,13 @@ export class CompilerScope {
     }
 
     private emitInputNode(node: NodeView, resSym: string) {
-        this.code.line(`${resSym} = params;`);
+        this.code.line(`${resSym} = { ...params, ...ctx.getScopeData() };`);
+        // TODO phase out the workaround after subgraphs are migrated to Scope + Param nodes
+        // this.code.line(`${resSym} = params;`);
+    }
+
+    private emitScopeNode(node: NodeView, resSym: string) {
+        this.code.line(`${resSym} = ctx.getScopeData();`);
     }
 
     private emitOutputNode(node: NodeView, resSym: string) {
@@ -367,14 +375,14 @@ export class CompilerScope {
         const sym = this.symbols.getNodeSym(rootNode.nodeUid);
         if (this.options.introspect) {
             return [
-                `(params, ctx) => {`,
-                `ctx.scopeCaptured.emit({ nodeUid: ${JSON.stringify(node.nodeUid)}, params });`,
+                `(scopeData, ctx) => {`,
+                `ctx.scopeCaptured.emit({ nodeUid: ${JSON.stringify(node.nodeUid)}, params: scopeData });`,
                 `ctx.checkPendingNode(${JSON.stringify(node.nodeUid)});`,
-                `return ${sym}(params, ctx);`,
+                `return ${sym}(params, ctx.setScopeData(scopeData));`,
                 `}`,
             ].join('');
         }
-        return sym;
+        return `(scopeData, ctx) => ${sym}(params, ctx.setScopeData(scopeData))`;
     }
 
     private emitNodeProps(node: NodeView) {
