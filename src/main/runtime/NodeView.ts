@@ -95,12 +95,15 @@ export class NodeView {
 
     supportsSubgraph() {
         const { subgraph } = this.getModuleSpec();
+        if (this.isScopeNode() && this.graph.isSubgraph()) {
+            return false;
+        }
         return !!subgraph;
     }
 
     getSubgraph(): GraphView | null {
         const { subgraph } = this.getModuleSpec();
-        if (!subgraph) {
+        if (!subgraph || (this.isScopeNode() && this.graph.isSubgraph())) {
             return null;
         }
         const { nodes = {}, rootNodeId = '', metadata = {} } = this.nodeSpec.subgraph ?? {};
@@ -301,6 +304,10 @@ export class NodeView {
 
     isDocked() {
         return this.canDock() && !!this.metadata.docked;
+    }
+
+    isScopeNode() {
+        return this.ref === '@system/Scope';
     }
 
 }
