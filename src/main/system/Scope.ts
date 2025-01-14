@@ -14,4 +14,4 @@ export const Scope = ModuleSpecSchema.create({
     newScope: false,
     cacheMode: 'auto',
     evalMode: 'auto'
-}); 
+});
