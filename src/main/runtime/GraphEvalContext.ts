@@ -25,6 +25,8 @@ export class GraphEvalContext implements t.GraphEvalContext {
     // Locals are stored per-context. Lookups delegate up the hierarchy.
     locals = new Map<string, any>();
 
+    scopeData: any = undefined;
+
     constructor(
         readonly parent: GraphEvalContext | null = null,
     ) {
@@ -66,6 +68,15 @@ export class GraphEvalContext implements t.GraphEvalContext {
 
     newScope(): t.GraphEvalContext {
         return new GraphEvalContext(this);
+    }
+
+    getScopeData() {
+        return this.scopeData;
+    }
+
+    setScopeData(data: any) {
+        this.scopeData = data;
+        return this;
     }
 
     convertType(value: unknown, schema: SchemaSpec) {

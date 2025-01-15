@@ -25,6 +25,7 @@ export abstract class GenericModuleLoader implements ModuleLoader {
         this.addModule('@system/Output', systemModules.Output);
         this.addModule('@system/Param', systemModules.Param);
         this.addModule('@system/Result', systemModules.Output);
+        this.addModule('@system/Scope', systemModules.Scope);
     }
 
     abstract resolveComputeUrl(ref: string): string;

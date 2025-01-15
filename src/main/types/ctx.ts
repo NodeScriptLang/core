@@ -19,6 +19,8 @@ export interface GraphEvalContext {
     clear(): void;
     finalize(): Promise<void>;
     newScope(): GraphEvalContext;
+    getScopeData(): any;
+    setScopeData(data: any): this;
     checkPendingNode(nodeUid: string): void;
 
     getLocal<T>(key: string, defaultValue?: T): T | undefined;
