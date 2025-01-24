@@ -455,9 +455,6 @@ export class CompilerScope {
     }
 
     private isNodeCached(node: NodeView) {
-        if (this.options.forceCache) {
-            return true;
-        }
         const cache = node.getModuleSpec().cacheMode ?? 'auto';
         switch (cache) {
             case 'auto': {
