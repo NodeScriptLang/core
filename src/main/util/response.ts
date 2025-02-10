@@ -1,16 +1,15 @@
 import { ResponseSpec, ResponseSpecSchema } from '../schema/ResponseSpec.js';
 
 export function errorToResponse(error: any): ResponseSpec {
+    const isFetchFailed = error.name === 'TypeError' && error.message === 'fetch failed';
+    const body = isFetchFailed ? createWrappedErrorBody(error) : createErrorBody(error);
+
     return {
         status: Number(error?.status) || 500,
         headers: {
             'content-type': ['application/json'],
         },
-        body: {
-            name: error?.name ?? 'Error',
-            message: error?.message ?? 'Unknown error',
-            details: error?.details ?? undefined,
-        },
+        body,
     };
 }
 
@@ -32,5 +31,23 @@ export function resultToResponse(value: any): ResponseSpec {
         status: 200,
         headers: {},
         body: value,
+    };
+}
+
+function createErrorBody(error: any) {
+    return {
+        name: error?.name ?? 'Error',
+        message: error?.message ?? 'Unknown error',
+        details: error?.details ?? undefined,
+    };
+}
+
+function createWrappedErrorBody(error: any) {
+    return {
+        name: 'ServerError',
+        message: 'The target server failed to complete the request.',
+        details: {
+            ...createErrorBody(error)
+        }
     };
 }
