@@ -46,8 +46,6 @@ function createWrappedErrorBody(error: any) {
     return {
         name: 'ServerError',
         message: 'The target server failed to complete the request.',
-        details: {
-            ...createErrorBody(error)
-        }
+        details: createErrorBody(error)
     };
 }
