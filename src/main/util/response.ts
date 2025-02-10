@@ -2,7 +2,8 @@ import { ResponseSpec, ResponseSpecSchema } from '../schema/ResponseSpec.js';
 
 export function errorToResponse(error: any): ResponseSpec {
     const isFetchFailed = error.name === 'TypeError' && error.message === 'fetch failed';
-    const body = isFetchFailed ? createWrappedErrorBody(error) : createErrorBody(error);
+    const isUnknown = !error?.name && !error?.message;
+    const body = isFetchFailed || isUnknown ? createWrappedErrorBody(error) : createErrorBody(error);
 
     return {
         status: Number(error?.status) || 500,
