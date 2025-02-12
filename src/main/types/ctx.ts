@@ -21,7 +21,10 @@ export interface GraphEvalContext {
     newScope(): GraphEvalContext;
     getScopeData(): any;
     setScopeData(data: any): this;
+
     checkPendingNode(nodeUid: string): void;
+    skipEvaluation(message?: string, token?: string, status?: number): void;
+    isControlException(error: any): boolean;
 
     getLocal<T>(key: string, defaultValue?: T): T | undefined;
     setLocal(key: string, value: unknown): void;

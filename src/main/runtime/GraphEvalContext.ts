@@ -6,6 +6,8 @@ import { SchemaSpec } from '../types/index.js';
 import { convertAuto, runtimeLib } from '../util/index.js';
 
 export const SYM_DEFERRED = Symbol.for('NodeScript:Deferred');
+export const SYM_PENDING = Symbol.for('NodeScript:Pending');
+export const SYM_SKIPPED = Symbol.for('NodeScript:Skipped');
 
 /**
  * GraphEvalContext provides runtime tools for graph computation,
@@ -105,6 +107,21 @@ export class GraphEvalContext implements t.GraphEvalContext {
         }
     }
 
+    skipEvaluation(
+        message?: string,
+        token?: string,
+        status?: number,
+    ) {
+        throw new EvaluationSkippedError(message ?? 'Evaluation skipped', token, status);
+    }
+
+    isControlException(error: any): boolean {
+        if (!error) {
+            return false;
+        }
+        return error[SYM_PENDING] || error[SYM_SKIPPED];
+    }
+
     deferred(fn: () => unknown): Deferred {
         return new Deferred(fn);
     }
@@ -132,6 +149,32 @@ export class NodePendingError extends Error {
 
     override name = this.constructor.name;
     code = 'EPENDING';
+
+    get [SYM_PENDING]() {
+        return true;
+    }
+
+}
+
+export class EvaluationSkippedError extends Error {
+
+    code = 'ESKIPPED';
+    status = 204;
+    token = '';
+
+    constructor(
+        message: string,
+        token?: string,
+        status?: number,
+    ) {
+        super(message);
+        this.token = token ?? '';
+        this.status = status ?? 204;
+    }
+
+    get [SYM_SKIPPED]() {
+        return true;
+    }
 
 }
 
