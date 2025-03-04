@@ -17,17 +17,20 @@ export class GraphEvalContext implements t.GraphEvalContext {
 
     readonly lib = runtimeLib;
 
-    nodeUid = '';
-    pendingNodeUids: Set<string>;
+    // Introspection events delegate to root context.
     nodeEvaluated: Event<t.NodeResult>;
     scopeCaptured: Event<t.ScopeData>;
+    // Pending nodes are stored on root context and inherited by child contexts.
+    pendingNodeUids: Set<string>;
     // Each context maintains its own cache. Subscopes have separate caches
     // and do not delegate to parent contexts.
     cache = new Map<string, any>();
     // Locals are stored per-context. Lookups delegate up the hierarchy.
     locals = new Map<string, any>();
 
-    scopeData: any = undefined;
+    // Scope data is maintained by each context separately.
+    // Compiler populates it via setScopeData when emitting nodes with subgraphs.
+    private scopeData: any = undefined;
 
     constructor(
         readonly parent: GraphEvalContext | null = null,

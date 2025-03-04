@@ -58,8 +58,9 @@ export class CompilerScope {
     }
 
     private emitNode(node: NodeView) {
-        this.emitComment(`${node.ref} ${node.nodeUid}`);
-        const sym = this.symbols.getNodeSym(node.nodeUid);
+        const nodeUid = node.nodeUid;
+        this.emitComment(`${node.ref} ${nodeUid}`);
+        const sym = this.symbols.getNodeSym(nodeUid);
         this.code.block(`${this.asyncSym(node)}function ${sym}(params, ctx) {`, `}`, () => {
             if (this.isNodeCached(node)) {
                 this.code.line(`let $c = ctx.cache.get("${node.nodeUid}");`);
@@ -73,17 +74,19 @@ export class CompilerScope {
                 this.emitNodeBodyIntrospect(node);
             }
         });
+        // Emit friendlier function names for stack trace introspection
+        this.code.line(`Object.defineProperty(${sym}, 'name', { value: ${JSON.stringify(nodeUid)} });`);
     }
 
     private emitNodeBodyIntrospect(node: NodeView) {
         const resSym = '$r';
+        const nodeUid = node.nodeUid;
         this.code.line(`let ${resSym};`);
-        this.code.line(`ctx.nodeUid = ${JSON.stringify(node.nodeUid)}`);
         if (this.options.introspect) {
-            const nodeUid = node.nodeUid;
             this.code.block('try {', '}', () => {
                 if (!node.supportsSubgraph()) {
-                    // For subgraphs, pending check is done prior to calling the subgraph the first time.
+                    // For subgraphs, pending check is done prior to calling the subgraph the first time
+                    // (see getSubgraphExpr which calls checkPendingNode instead of doing it here)
                     this.code.line(`ctx.checkPendingNode(${JSON.stringify(nodeUid)});`);
                 }
                 this.code.line(`ctx.nodeEvaluated.emit({` +
