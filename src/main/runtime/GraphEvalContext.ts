@@ -2,7 +2,7 @@ import { Schema } from 'airtight';
 import { Event } from 'nanoevent';
 
 import * as t from '../types/index.js';
-import { SchemaSpec } from '../types/index.js';
+import { SchemaSpec, TraceData } from '../types/index.js';
 import { convertAuto, runtimeLib } from '../util/index.js';
 
 export const SYM_DEFERRED = Symbol.for('NodeScript:Deferred');
@@ -26,8 +26,12 @@ export class GraphEvalContext implements t.GraphEvalContext {
     cache = new Map<string, any>();
     // Locals are stored per-context. Lookups delegate up the hierarchy.
     locals = new Map<string, any>();
+    // Error traces are stored on main context and inherited by child contexts.
+    errorTrace: TraceData[] = [];
 
-    scopeData: any = undefined;
+    // Scope data is maintained by each context separately.
+    // Compiler populates it via setScopeData when emitting nodes with subgraphs.
+    private scopeData: any = undefined;
 
     constructor(
         readonly parent: GraphEvalContext | null = null,
@@ -35,6 +39,7 @@ export class GraphEvalContext implements t.GraphEvalContext {
         this.nodeEvaluated = parent ? parent.nodeEvaluated : new Event();
         this.scopeCaptured = parent ? parent.scopeCaptured : new Event();
         this.pendingNodeUids = parent ? parent.pendingNodeUids : new Set();
+        this.errorTrace = parent ? parent.errorTrace : [];
     }
 
     clear() {

@@ -77,11 +77,11 @@ export class CompilerScope {
 
     private emitNodeBodyIntrospect(node: NodeView) {
         const resSym = '$r';
+        const nodeUid = node.nodeUid;
         this.code.line(`let ${resSym};`);
-        this.code.line(`ctx.nodeUid = ${JSON.stringify(node.nodeUid)}`);
-        if (this.options.introspect) {
-            const nodeUid = node.nodeUid;
-            this.code.block('try {', '}', () => {
+        this.code.line(`ctx.nodeUid = ${JSON.stringify(nodeUid)}`);
+        this.code.block('try {', '}', () => {
+            if (this.options.introspect) {
                 if (!node.supportsSubgraph()) {
                     // For subgraphs, pending check is done prior to calling the subgraph the first time.
                     this.code.line(`ctx.checkPendingNode(${JSON.stringify(nodeUid)});`);
@@ -90,26 +90,30 @@ export class CompilerScope {
                     `nodeUid: ${JSON.stringify(nodeUid)},` +
                     `progress: 0` +
                     `});`);
-                this.emitNodeBodyRaw(node, resSym);
-                if (this.options.introspect) {
-                    this.code.line(`ctx.nodeEvaluated.emit({` +
-                        `nodeUid: ${JSON.stringify(nodeUid)},` +
-                        `result: ${resSym},` +
-                        `});`);
-                }
-                this.code.line(`return ${resSym};`);
-            });
-            this.code.block('catch (error) {', '}', () => {
+            }
+            this.emitNodeBodyRaw(node, resSym);
+            if (this.options.introspect) {
+                this.code.line(`ctx.nodeEvaluated.emit({` +
+                    `nodeUid: ${JSON.stringify(nodeUid)},` +
+                    `result: ${resSym},` +
+                    `});`);
+            }
+            this.code.line(`return ${resSym};`);
+        });
+        this.code.block('catch (error) {', '}', () => {
+            if (this.options.introspect) {
                 this.code.line(`ctx.nodeEvaluated.emit({` +
                     `nodeUid: ${JSON.stringify(nodeUid)},` +
                     `error,` +
                     `});`);
-                this.code.line('throw error;');
+            }
+            this.code.block(`ctx.errorTrace.push({`, `});`, () => {
+                this.code.line(`scopeId: ${JSON.stringify(this.scopeId)},`);
+                this.code.line(`nodeUid: ${JSON.stringify(nodeUid)},`);
+                this.code.line(`error,`);
             });
-        } else {
-            this.emitNodeBodyRaw(node, resSym);
-            this.code.line(`return ${resSym};`);
-        }
+            this.code.line('throw error;');
+        });
     }
 
     private emitNodeBodyRaw(node: NodeView, resSym: string) {

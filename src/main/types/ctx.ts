@@ -7,12 +7,19 @@ export interface Deferred {
     resolve: () => unknown;
 }
 
+export interface TraceData {
+    scopeId: string;
+    nodeUid: string;
+    error?: any;
+}
+
 export interface GraphEvalContext {
     readonly lib: RuntimeLib;
 
     nodeUid: string;
     cache: Map<string, any>;
     locals: Map<string, any>;
+    errorTrace: TraceData[];
     nodeEvaluated: Event<NodeResult>;
     scopeCaptured: Event<ScopeData>;
 
