@@ -2,7 +2,7 @@ import { Schema } from 'airtight';
 import { Event } from 'nanoevent';
 
 import * as t from '../types/index.js';
-import { SchemaSpec, TraceData } from '../types/index.js';
+import { SchemaSpec } from '../types/index.js';
 import { convertAuto, runtimeLib } from '../util/index.js';
 
 export const SYM_DEFERRED = Symbol.for('NodeScript:Deferred');
@@ -17,17 +17,16 @@ export class GraphEvalContext implements t.GraphEvalContext {
 
     readonly lib = runtimeLib;
 
-    nodeUid = '';
-    pendingNodeUids: Set<string>;
+    // Introspection events delegate to root context.
     nodeEvaluated: Event<t.NodeResult>;
     scopeCaptured: Event<t.ScopeData>;
+    // Pending nodes are stored on root context and inherited by child contexts.
+    pendingNodeUids: Set<string>;
     // Each context maintains its own cache. Subscopes have separate caches
     // and do not delegate to parent contexts.
     cache = new Map<string, any>();
     // Locals are stored per-context. Lookups delegate up the hierarchy.
     locals = new Map<string, any>();
-    // Error traces are stored on main context and inherited by child contexts.
-    errorTrace: TraceData[] = [];
 
     // Scope data is maintained by each context separately.
     // Compiler populates it via setScopeData when emitting nodes with subgraphs.
@@ -39,7 +38,6 @@ export class GraphEvalContext implements t.GraphEvalContext {
         this.nodeEvaluated = parent ? parent.nodeEvaluated : new Event();
         this.scopeCaptured = parent ? parent.scopeCaptured : new Event();
         this.pendingNodeUids = parent ? parent.pendingNodeUids : new Set();
-        this.errorTrace = parent ? parent.errorTrace : [];
     }
 
     clear() {

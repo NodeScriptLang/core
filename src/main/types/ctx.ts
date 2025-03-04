@@ -3,23 +3,11 @@ import { Event } from 'nanoevent';
 import { RuntimeLib } from './runtime-lib.js';
 import { SchemaSpec } from './schema.js';
 
-export interface Deferred {
-    resolve: () => unknown;
-}
-
-export interface TraceData {
-    scopeId: string;
-    nodeUid: string;
-    error?: any;
-}
-
 export interface GraphEvalContext {
     readonly lib: RuntimeLib;
 
-    nodeUid: string;
     cache: Map<string, any>;
     locals: Map<string, any>;
-    errorTrace: TraceData[];
     nodeEvaluated: Event<NodeResult>;
     scopeCaptured: Event<ScopeData>;
 
@@ -45,6 +33,10 @@ export interface GraphEvalContext {
     deferred(fn: () => unknown): unknown;
     isDeferred(value: unknown): value is Deferred;
     resolveDeferred(value: unknown): unknown;
+}
+
+export interface Deferred {
+    resolve: () => unknown;
 }
 
 export interface NodeResult {
