@@ -74,9 +74,11 @@ export class CompilerScope {
                 this.emitNodeBodyIntrospect(node);
             }
         });
-        // Emit friendlier function names for stack trace introspection
-        const fnName = ['ns', node.ref, nodeUid].join(':');
-        this.code.line(`Object.defineProperty(${sym}, 'name', { value: ${JSON.stringify(fnName)} });`);
+        if (this.options.graphId) {
+            // Emit friendlier function names for stack trace introspection
+            const fnName = ['ns', this.options.graphId, nodeUid].join(':');
+            this.code.line(`Object.defineProperty(${sym}, 'name', { value: ${JSON.stringify(fnName)} });`);
+        }
     }
 
     private emitNodeBodyIntrospect(node: NodeView) {

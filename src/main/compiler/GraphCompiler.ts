@@ -3,6 +3,7 @@ import { ModuleSpec } from '../types/index.js';
 import { CompilerJob } from './CompilerJob.js';
 
 export interface CompilerOptions {
+    graphId?: string;
     comments: boolean;
     introspect: boolean;
     emitNodeMap: boolean;

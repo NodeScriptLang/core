@@ -8,78 +8,78 @@ describe('parseStack', () => {
         const stack = `
           error: Error [BoomError]: Something happened, but we don't know what
         at compute (ns:endpoint:eXphQV7F0W7bq6YL:latest:3:340)
-        at ns:vmHr1btnGlbifW6E:root:9uJNBoCS (ns:endpoint:eXphQV7F0W7bq6YL:latest:3:609)
-        at ns:@system/Output:root:result (ns:endpoint:eXphQV7F0W7bq6YL:latest:3:480)
-        at ns:SSi8wguqb64m76RE:root:Hvok7Y1K:Q8niRNV4 (ns:endpoint:eXphQV7F0W7bq6YL:latest:3:1358)
-        at ns:@system/Output:root:Hvok7Y1K:result (ns:endpoint:eXphQV7F0W7bq6YL:latest:3:1220)
+        at ns:SSi8wguqb64m76RE:root:9uJNBoCS (ns:endpoint:eXphQV7F0W7bq6YL:latest:3:609)
+        at ns:SSi8wguqb64m76RE:root:result (ns:endpoint:eXphQV7F0W7bq6YL:latest:3:480)
+        at ns:eXphQV7F0W7bq6YL:root:Hvok7Y1K:Q8niRNV4 (ns:endpoint:eXphQV7F0W7bq6YL:latest:3:1358)
+        at ns:eXphQV7F0W7bq6YL:root:Hvok7Y1K:result (ns:endpoint:eXphQV7F0W7bq6YL:latest:3:1220)
         at ns:endpoint:eXphQV7F0W7bq6YL:latest:3:1070
         at compute (ns:endpoint:eXphQV7F0W7bq6YL:latest:3:209)
-        at ns:2nqFDfVgDo7aAM0r:root:Hvok7Y1K (ns:endpoint:eXphQV7F0W7bq6YL:latest:3:1048)
+        at ns:eXphQV7F0W7bq6YL:root:Hvok7Y1K (ns:endpoint:eXphQV7F0W7bq6YL:latest:3:1048)
         at async Promise.all (index 0)
-        at async ns:@system/Output:root:result (ns:endpoint:eXphQV7F0W7bq6YL:latest:3:852)
+        at async ns:eXphQV7F0W7bq6YL:root:result (ns:endpoint:eXphQV7F0W7bq6YL:latest:3:852)
         `;
         const parsed = parseStack(stack);
         assert.deepStrictEqual(parsed, [
             {
                 symbol: 'compute',
                 source: 'ns:endpoint:eXphQV7F0W7bq6YL:latest:3:340',
-                nodeRef: undefined,
+                graphId: undefined,
                 nodeUid: undefined,
                 scopeId: undefined,
             },
             {
-                symbol: 'ns:vmHr1btnGlbifW6E:root:9uJNBoCS',
+                symbol: 'ns:SSi8wguqb64m76RE:root:9uJNBoCS',
                 source: 'ns:endpoint:eXphQV7F0W7bq6YL:latest:3:609',
-                nodeRef: 'vmHr1btnGlbifW6E',
+                graphId: 'SSi8wguqb64m76RE',
                 nodeUid: 'root:9uJNBoCS',
                 scopeId: 'root',
             },
             {
-                symbol: 'ns:@system/Output:root:result',
+                symbol: 'ns:SSi8wguqb64m76RE:root:result',
                 source: 'ns:endpoint:eXphQV7F0W7bq6YL:latest:3:480',
-                nodeRef: '@system/Output',
+                graphId: 'SSi8wguqb64m76RE',
                 nodeUid: 'root:result',
                 scopeId: 'root',
             },
             {
-                symbol: 'ns:SSi8wguqb64m76RE:root:Hvok7Y1K:Q8niRNV4',
+                symbol: 'ns:eXphQV7F0W7bq6YL:root:Hvok7Y1K:Q8niRNV4',
                 source: 'ns:endpoint:eXphQV7F0W7bq6YL:latest:3:1358',
-                nodeRef: 'SSi8wguqb64m76RE',
+                graphId: 'eXphQV7F0W7bq6YL',
                 nodeUid: 'root:Hvok7Y1K:Q8niRNV4',
                 scopeId: 'root:Hvok7Y1K',
             },
             {
-                symbol: 'ns:@system/Output:root:Hvok7Y1K:result',
+                symbol: 'ns:eXphQV7F0W7bq6YL:root:Hvok7Y1K:result',
                 source: 'ns:endpoint:eXphQV7F0W7bq6YL:latest:3:1220',
-                nodeRef: '@system/Output',
+                graphId: 'eXphQV7F0W7bq6YL',
                 nodeUid: 'root:Hvok7Y1K:result',
                 scopeId: 'root:Hvok7Y1K',
             },
             {
                 symbol: 'compute',
                 source: 'ns:endpoint:eXphQV7F0W7bq6YL:latest:3:209',
-                nodeRef: undefined,
+                graphId: undefined,
                 nodeUid: undefined,
                 scopeId: undefined,
             },
             {
-                symbol: 'ns:2nqFDfVgDo7aAM0r:root:Hvok7Y1K',
+                symbol: 'ns:eXphQV7F0W7bq6YL:root:Hvok7Y1K',
                 source: 'ns:endpoint:eXphQV7F0W7bq6YL:latest:3:1048',
-                nodeRef: '2nqFDfVgDo7aAM0r',
+                graphId: 'eXphQV7F0W7bq6YL',
                 nodeUid: 'root:Hvok7Y1K',
                 scopeId: 'root',
             },
             {
                 symbol: 'Promise.all',
                 source: 'index 0',
-                nodeRef: undefined,
+                graphId: undefined,
                 nodeUid: undefined,
                 scopeId: undefined,
             },
             {
-                symbol: 'ns:@system/Output:root:result',
+                symbol: 'ns:eXphQV7F0W7bq6YL:root:result',
                 source: 'ns:endpoint:eXphQV7F0W7bq6YL:latest:3:852',
-                nodeRef: '@system/Output',
+                graphId: 'eXphQV7F0W7bq6YL',
                 nodeUid: 'root:result',
                 scopeId: 'root',
             },
