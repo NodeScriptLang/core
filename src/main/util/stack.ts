@@ -3,7 +3,6 @@ export interface StackItem {
     source: string;
     graphId?: string;
     nodeUid?: string;
-    scopeId?: string;
 }
 
 export function parseStack(stack: string): StackItem[] {
@@ -18,13 +17,11 @@ export function parseStack(stack: string): StackItem[] {
         const source = match[2] ?? '';
         const graphId = symbol.startsWith('ns:') ? symbol.split(':')[1] : undefined;
         const nodeUid = symbol.startsWith('ns:') ? symbol.split(':').slice(2).join(':') : undefined;
-        const scopeId = nodeUid ? nodeUid.substring(0, nodeUid.lastIndexOf(':')) : undefined;
         result.push({
             symbol,
             source,
             graphId,
             nodeUid,
-            scopeId,
         });
     }
     return result;
