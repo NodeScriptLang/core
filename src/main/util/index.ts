@@ -14,5 +14,6 @@ export * from './response.js';
 export * from './runtime-lib.js';
 export * from './seq.js';
 export * from './serialize.js';
+export * from './stack.js';
 export * from './string.js';
 export * from './type.js';

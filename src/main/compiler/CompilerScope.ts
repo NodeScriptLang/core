@@ -75,7 +75,8 @@ export class CompilerScope {
             }
         });
         // Emit friendlier function names for stack trace introspection
-        this.code.line(`Object.defineProperty(${sym}, 'name', { value: ${JSON.stringify(nodeUid)} });`);
+        const fnName = ['ns', node.ref, nodeUid].join(':');
+        this.code.line(`Object.defineProperty(${sym}, 'name', { value: ${JSON.stringify(fnName)} });`);
     }
 
     private emitNodeBodyIntrospect(node: NodeView) {
